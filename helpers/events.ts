@@ -17,20 +17,17 @@ export const getMyTrainingEvents = async (userId: string) => {
   return data ?? [];
 };
 
-export const getAllTrainingEvents = cache(
-  async () => {
-    const data = await db.query.trainingEvents.findMany({
-      columns: {
-        id: true,
-        name: true,
-        description: true,
-      },
-      orderBy: [desc(trainingEvents.createdAt)],
-    });
-    return data ?? [];
-  },
-  { tags: ['trainings'] }
-);
+export const getAllTrainingEvents = cache(async () => {
+  const data = await db.query.trainingEvents.findMany({
+    columns: {
+      id: true,
+      name: true,
+      description: true,
+    },
+    orderBy: [desc(trainingEvents.createdAt)],
+  });
+  return data ?? [];
+});
 
 export const getOneEvent = async (userId: string, eventId: string) => {
   return db.query.events.findFirst({

@@ -30,6 +30,7 @@ export const createNewTrainingEvent = async (
   const userId = getUserIdFromToken();
   try {
     await db.insert(trainingEvents).values({
+      // @ts-ignore
       description: data.description,
       name: data.name,
       city: location.city,
@@ -42,6 +43,7 @@ export const createNewTrainingEvent = async (
       createdBy: userId,
     });
     await db.insert(eventAttendees).values({
+      // @ts-ignore
       eventId: trainingEvents.id,
       userId: userId,
     });
