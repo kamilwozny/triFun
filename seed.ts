@@ -114,31 +114,31 @@ async function seedDatabase() {
     ])
     .returning();
 
-  const newTrainingEvents = await db
-    .insert(trainingEvents)
-    .values([
-      {
-        description: 'Training for marathon',
-        name: 'Marathon Training',
-        location: 'Central Park',
-        goalType: 'Distance',
-        goalValue: 10000,
-        date: '2023-10-01',
-        createdBy: newUsers[0].id,
-        createdAt: '2023-09-01T10:00:00Z',
-      },
-      {
-        description: 'Training for triathlon',
-        name: 'Triathlon Training',
-        location: 'Santa Monica',
-        goalType: 'Time',
-        goalValue: 7200,
-        date: '2023-10-02',
-        createdBy: newUsers[1].id,
-        createdAt: '2023-09-02T10:00:00Z',
-      },
-    ])
-    .returning();
+  // const newTrainingEvents = await db
+  //   .insert(trainingEvents)
+  //   .values([
+  //     {
+  //       description: 'Training for marathon',
+  //       name: 'Marathon Training',
+  //       location: 'Central Park',
+  //       goalType: 'Distance',
+  //       goalValue: 10000,
+  //       date: '2023-10-01',
+  //       createdBy: newUsers[0].id,
+  //       createdAt: '2023-09-01T10:00:00Z',
+  //     },
+  //     {
+  //       description: 'Training for triathlon',
+  //       name: 'Triathlon Training',
+  //       location: 'Santa Monica',
+  //       goalType: 'Time',
+  //       goalValue: 7200,
+  //       date: '2023-10-02',
+  //       createdBy: newUsers[1].id,
+  //       createdAt: '2023-09-02T10:00:00Z',
+  //     },
+  //   ])
+  //   .returning();
 
   const newPosts = await db
     .insert(posts)
