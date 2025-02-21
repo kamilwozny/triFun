@@ -1,5 +1,4 @@
 import { getTrainingEvent } from '@/actions/getTrainingEvent';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { FaRunning, FaBicycle, FaSwimmer } from 'react-icons/fa';
 

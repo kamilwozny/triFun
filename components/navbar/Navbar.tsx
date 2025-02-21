@@ -10,7 +10,7 @@ export const Navbar = () => {
   return (
     <div className="navbar bg-neutral mb-16 shadow-xl text-base-100 px-24">
       <div className="navbar-start">
-        <div>
+        <div className="lg:hidden">
           <div className="drawer">
             <input
               id="my-drawer"
@@ -39,36 +39,50 @@ export const Navbar = () => {
                 </svg>
               </label>
             </div>
-            <div className="drawer-side">
+            <div className="drawer-side z-20">
               <label
                 htmlFor="my-drawer"
                 aria-label="close sidebar"
                 className="drawer-overlay"
               ></label>
-              <ul className="menu bg-neutral text-white min-h-full w-60 p-4 font-semibold text-base">
-                <li>
+              <ul className="menu bg-neutral text-white min-h-full w-60 font-semibold text-xl items-center p-0">
+                <li className="w-full hover:bg-netural-80 p-2 text-center">
                   <Link href="/events" onClick={closeDrawer}>
                     Events
                   </Link>
                 </li>
-                <li>
+                <li className="w-full hover:bg-gray-700 p-2 text-center">
                   <Link href="/trainings" onClick={closeDrawer}>
                     Trainings
                   </Link>
                 </li>
-                <li>
-                  <Link href="/events" onClick={closeDrawer}>
+                <li className="w-full hover:bg-gray-700 p-2 text-center">
+                  <Link href="/stats" onClick={closeDrawer}>
                     Stats
                   </Link>
                 </li>
-                <li>
-                  <Link href="/events" onClick={closeDrawer}>
+                <li className="w-full hover:bg-gray-700 p-2 text-center">
+                  <Link href="/about" onClick={closeDrawer}>
                     About
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
+        </div>
+        <div className="hidden lg:flex space-x-4">
+          <Link href="/events" className="hover:bg-netural-80 p-2 rounded">
+            Events
+          </Link>
+          <Link href="/trainings" className="hover:bg-gray-700 p-2 rounded">
+            Trainings
+          </Link>
+          <Link href="/stats" className="hover:bg-gray-700 p-2 rounded">
+            Stats
+          </Link>
+          <Link href="/about" className="hover:bg-gray-700 p-2 rounded">
+            About
+          </Link>
         </div>
       </div>
       <div className="navbar-center">

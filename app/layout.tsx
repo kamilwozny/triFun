@@ -19,7 +19,7 @@ export default function RootLayout({
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         />
       </Head>
-      <body className={`${inter.className} bg-primary w-full h-[100vh] pb-20`}>
+      <body className={`${inter.className} bg-primary w-full h-full pb-20`}>
         <Navbar />
         {children}
       </body>
