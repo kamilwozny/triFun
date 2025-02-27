@@ -1,1 +1,1 @@
-import './Trainings.tsx';
+import './NewTrainings.tsx';

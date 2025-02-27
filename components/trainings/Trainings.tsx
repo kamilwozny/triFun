@@ -48,7 +48,7 @@ export const Trainings: React.FC<TrainingsPageClientProps> = ({
 
   const filters = ['Swim', 'Bike', 'Run'];
   return (
-    <>
+    <div>
       <div className="card card-side flex flex-col md:flex-row items-center justify-between bg-neutral p-6 rounded-xl shadow-lg mx-40">
         <Image
           src="/images/swim4.jpg"
@@ -141,6 +141,6 @@ export const Trainings: React.FC<TrainingsPageClientProps> = ({
           </table>
         </div> */}
       </div>
-    </>
+    </div>
   );
 };

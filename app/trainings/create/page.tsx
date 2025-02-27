@@ -6,7 +6,7 @@ import '@/components/trainings/Trainings.css';
 import { PrimaryButton } from '@/components/primaryButton/PrimaryButton';
 import type { LatLng } from 'leaflet';
 import type { Location } from '@/components/map/types';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { createNewTrainingEvent } from '@/actions/trainingEvents';
 import { useRouter } from 'next/navigation';
 

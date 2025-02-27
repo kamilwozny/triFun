@@ -8,7 +8,7 @@ export const Navbar = () => {
   const closeDrawer = () => setDrawerOpen(false);
 
   return (
-    <div className="navbar bg-neutral mb-16 shadow-xl text-base-100 px-24">
+    <div className="navbar bg-neutral shadow-xl text-base-100 px-24 mb-20">
       <div className="navbar-start">
         <div className="lg:hidden">
           <div className="drawer">
