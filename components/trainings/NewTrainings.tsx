@@ -56,12 +56,15 @@ export const NewTrainings: React.FC<TrainingsPageClientProps> = ({
   const Map = useMemo(
     () =>
       dynamic(() => import('@/components/map/Map'), {
-        loading: () => <p>A map is loading</p>,
+        loading: () => (
+          <div className="min-w-[40vw] h-[700px] mr-10 text-center">
+            <p className="text-white text-lg font-bold">Loading map...</p>
+          </div>
+        ),
         ssr: false,
       }),
     []
   );
-  console.log(filteredTrainings);
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       setUserPosition({
@@ -124,7 +127,7 @@ export const NewTrainings: React.FC<TrainingsPageClientProps> = ({
                         ))}
                     </div>
                     <button className="mt-4 bg-red-500 text-white py-2 px-4 rounded text-sm font-bold self-end hover:bg-red-600">
-                      See Details
+                      <Link href={`trainings/${event.id}`}>See Details</Link>
                     </button>
                   </div>
                 </div>
@@ -141,9 +144,11 @@ export const NewTrainings: React.FC<TrainingsPageClientProps> = ({
               handleLocation={setLocation}
             />
           ) : (
-            <p className="text-white text-sm">Loading map...</p>
+            <div className="min-w-[40vw] h-[700px] mr-10 text-center">
+              <p className="text-white text-lg font-bold">Loading map...</p>
+            </div>
           )}
-          <div className="mt-10 p-6 bg-neutral text-center rounded-lg shadow-md w-full max-w-4xl mx-auto">
+          <div className="mt-10 p-6 bg-neutral text-center rounded-lg shadow-md w-full">
             <h2 className="text-2xl font-bold text-white">
               Create Your Own Event
             </h2>

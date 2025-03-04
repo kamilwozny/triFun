@@ -79,12 +79,8 @@ export const eventsRelations = relations(events, ({ many, one }) => ({
 export const eventAttendees = sqliteTable(
   'event_attendees',
   {
-    eventId: text('event_id')
-      .notNull()
-      .references(() => trainingEvents.id, { onDelete: 'cascade' }),
-    attendeeId: text('attendee_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+    eventId: text('event_id').notNull(),
+    attendeeId: text('attendee_id').notNull(),
   },
   (table) => ({
     pk: unique().on(table.eventId, table.attendeeId),

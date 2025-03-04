@@ -29,23 +29,27 @@ export const createNewTrainingEvent = async (
 ) => {
   const userId = getUserIdFromToken();
   try {
-    await db.insert(trainingEvents).values({
-      // @ts-ignore
-      description: data.description,
-      name: data.name,
-      city: location.city,
-      country: location.country,
-      userPosition: JSON.stringify(userPosition),
-      distances: JSON.stringify(data.distances),
-      date: data.date,
-      level: data.level,
-      isPublic: true,
-      createdBy: userId,
-    });
+    const [event] = await db
+      .insert(trainingEvents)
+      .values({
+        // @ts-ignore
+        description: data.description,
+        name: data.name,
+        city: location.city,
+        country: location.country,
+        userPosition: JSON.stringify(userPosition),
+        distances: JSON.stringify(data.distances),
+        date: data.date,
+        level: data.level,
+        isPublic: true,
+        createdBy: userId,
+      })
+      .returning({ id: trainingEvents.id });
+    console.log(event);
+    // @ts-ignore
     await db.insert(eventAttendees).values({
-      // @ts-ignore
-      eventId: trainingEvents.id,
-      userId: userId,
+      eventId: event.id,
+      attendeeId: userId,
     });
     revalidateTag('trainings');
   } catch (error) {

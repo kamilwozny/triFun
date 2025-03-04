@@ -231,7 +231,7 @@ export default function CreateTrainingEvent() {
             {...register('date', { required: true })}
           />
         </div>
-        <PrimaryButton text="Pick a starting point" handleClick={() => {}} />
+        {/* <PrimaryButton text="Pick a starting point" handleClick={() => {}} /> */}
         {userPosition ? (
           <Map
             position={userPosition}
