@@ -2,7 +2,17 @@
 
 import type { LatLng } from 'leaflet';
 import dynamic from 'next/dynamic';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  AwaitedReactNode,
+  JSXElementConstructor,
+  Key,
+  ReactElement,
+  ReactNode,
+  ReactPortal,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import type { Location } from '@/components/map/types';
 import '@/components/trainings/Trainings.css';
 import Link from 'next/link';
@@ -36,7 +46,8 @@ export const NewTrainings: React.FC<TrainingsPageClientProps> = ({
       return trainings;
     }
     return JSON.parse(training.distances).some(
-      (item) => 'activity' in item && item.activity === filter
+      (item: { activity: string }) =>
+        'activity' in item && item.activity === filter
     );
   });
 
@@ -115,16 +126,25 @@ export const NewTrainings: React.FC<TrainingsPageClientProps> = ({
                     </div>
                     <div className="flex justify-around mt-4 text-sm">
                       {event.distances &&
-                        JSON.parse(event.distances).map((dist, index) => (
-                          <div key={index} className="text-center">
-                            <span className="block text-gray-800 font-semibold">
-                              {dist.activity}
-                            </span>
-                            <span className="text-gray-600">
-                              {dist.distance} {dist.unit}
-                            </span>
-                          </div>
-                        ))}
+                        JSON.parse(event.distances).map(
+                          (
+                            dist: {
+                              activity: string;
+                              distance: number;
+                              unit: string;
+                            },
+                            index: Key
+                          ) => (
+                            <div key={index} className="text-center">
+                              <span className="block text-gray-800 font-semibold">
+                                {dist.activity}
+                              </span>
+                              <span className="text-gray-600">
+                                {dist.distance} {dist.unit}
+                              </span>
+                            </div>
+                          )
+                        )}
                     </div>
                     <button className="mt-4 bg-red-500 text-white py-2 px-4 rounded text-sm font-bold self-end hover:bg-red-600">
                       <Link href={`trainings/${event.id}`}>See Details</Link>

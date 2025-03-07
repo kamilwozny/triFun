@@ -1,6 +1,13 @@
 import { randomUUID } from 'crypto';
 import { relations, sql } from 'drizzle-orm';
-import { integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import {
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+  unique,
+} from 'drizzle-orm/sqlite-core';
+import type { AdapterAccountType } from 'next-auth/adapters';
 
 type Level = 'Beginner' | 'Intermediate' | 'Expert';
 
@@ -18,27 +25,90 @@ const date = (name: string) => text(name);
 
 const boolean = (field: string) => integer(field, { mode: 'boolean' });
 
-export const users = sqliteTable('users', {
-  id: id(),
-  createdAt: createdAt(),
-  lastLogin: text('lastLogin'),
-  email: text('email').unique().notNull(),
-  password: text('password').notNull(),
-  username: text('username').notNull(),
+export const users = sqliteTable('user', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text('name'),
-  surname: text('surname'),
-  country: text('country'),
-  city: text('city'),
-  bio: text('username'),
-  age: integer('age'),
-  expierenceLevel: text('experienceLevel').$type<Level>(),
+  email: text('email').unique(),
+  emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
+  image: text('image'),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  events: many(events),
+  events: many(trainingEvents),
   posts: many(posts),
   trainingData: many(trainingData),
 }));
+
+export const accounts = sqliteTable(
+  'account',
+  {
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: text('type').$type<AdapterAccountType>().notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('providerAccountId').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  },
+  (account) => ({
+    compoundKey: primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+  })
+);
+
+export const sessions = sqliteTable('session', {
+  sessionToken: text('sessionToken').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+});
+
+export const verificationTokens = sqliteTable(
+  'verificationToken',
+  {
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (verificationToken) => ({
+    compositePk: primaryKey({
+      columns: [verificationToken.identifier, verificationToken.token],
+    }),
+  })
+);
+
+export const authenticators = sqliteTable(
+  'authenticator',
+  {
+    credentialID: text('credentialID').notNull().unique(),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    providerAccountId: text('providerAccountId').notNull(),
+    credentialPublicKey: text('credentialPublicKey').notNull(),
+    counter: integer('counter').notNull(),
+    credentialDeviceType: text('credentialDeviceType').notNull(),
+    credentialBackedUp: integer('credentialBackedUp', {
+      mode: 'boolean',
+    }).notNull(),
+    transports: text('transports'),
+  },
+  (authenticator) => ({
+    compositePK: primaryKey({
+      columns: [authenticator.userId, authenticator.credentialID],
+    }),
+  })
+);
 
 export const events = sqliteTable(
   'events',
@@ -69,7 +139,7 @@ export const events = sqliteTable(
   })
 );
 
-export const eventsRelations = relations(events, ({ many, one }) => ({
+export const eventsRelations = relations(events, ({ one }) => ({
   createdBy: one(users, {
     references: [users.id],
     fields: [events.createdById],
@@ -84,6 +154,20 @@ export const eventAttendees = sqliteTable(
   },
   (table) => ({
     pk: unique().on(table.eventId, table.attendeeId),
+  })
+);
+
+export const eventeAttendeesRelations = relations(
+  eventAttendees,
+  ({ one }) => ({
+    event: one(trainingEvents, {
+      references: [trainingEvents.id],
+      fields: [eventAttendees.eventId],
+    }),
+    attendee: one(users, {
+      references: [users.id],
+      fields: [eventAttendees.attendeeId],
+    }),
   })
 );
 
@@ -178,12 +262,16 @@ export const trainingEvents = sqliteTable('training_events', {
   createdAt: createdAt(),
 });
 
-export const trainingEventsRelations = relations(trainingEvents, ({ one }) => ({
-  createdByUser: one(users, {
-    references: [users.id],
-    fields: [trainingEvents.createdBy],
-  }),
-}));
+export const trainingEventsRelations = relations(
+  trainingEvents,
+  ({ one, many }) => ({
+    createdByUser: one(users, {
+      references: [users.id],
+      fields: [trainingEvents.createdBy],
+    }),
+    attendees: many(eventAttendees),
+  })
+);
 
 export const trainingData = sqliteTable('training_data', {
   id: id(),

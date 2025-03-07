@@ -1,7 +1,5 @@
-import { SignInForm } from '../../../components/signInForm';
+import { SignInForm } from '@/components/signInForm/SignInForm';
 
-const SigninPage = () => {
+export default async function SignInPage() {
   return <SignInForm />;
-};
-
-export default SigninPage;
+}

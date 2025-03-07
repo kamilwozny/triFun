@@ -1,6 +1,8 @@
 import { getTrainingEvent } from '@/actions/getTrainingEvent';
+import { getTrainingList } from '@/actions/trainingList';
 import { PrimaryButton } from '@/components/primaryButton/PrimaryButton';
 import 'leaflet/dist/leaflet.css';
+import { Key } from 'react';
 import { FaRunning, FaBicycle, FaSwimmer } from 'react-icons/fa';
 
 const activityIcons = {
@@ -15,8 +17,9 @@ export default async function TrainingPage({
   params: { id: string };
 }) {
   const training = await getTrainingEvent(params.id);
-  // const atendees = await getTrainingAtendees(params.id);
-
+  const atendees = await getTrainingList(params.id);
+  console.log(atendees);
+  console.log(123);
   if (!training) return <p>Training not found</p>;
 
   return (
@@ -32,15 +35,21 @@ export default async function TrainingPage({
 
       <h3 className="text-lg font-semibold mt-6">Activities</h3>
       <div className="space-y-2 mt-2">
-        {JSON.parse(training.distances).map((dist, index) => (
-          <div key={index}>
-            <span className=" text-gray-800 font-semibold">
-              {`${dist.activity}: ${dist.distance} ${dist.unit}`}
-            </span>
-          </div>
-        ))}
+        {JSON.parse(training.distances).map(
+          (
+            dist: { activity: string; distance: number; unit: string },
+            index: Key
+          ) => (
+            <div key={index}>
+              <span className=" text-gray-800 font-semibold">
+                {`${dist.activity}: ${dist.distance} ${dist.unit}`}
+              </span>
+            </div>
+          )
+        )}
       </div>
-      {/* <PrimaryButton text="Invite" handleClick={() => {}} /> */}
+      <PrimaryButton text="Invite" handleClick={() => {}} />
+      <h3 className="text-lg font-semibold mt-6">Attendees</h3>
     </div>
   );
 }

@@ -3,9 +3,8 @@
 import { db } from '@/db/db';
 import { eventAttendees, trainingEvents } from '@/db/schema';
 import type { Location } from '../components/map/types';
-import { revalidatePath, revalidateTag } from 'next/cache';
-import { getUserIdFromToken } from '@/helpers/auth';
 import { LatLng } from 'leaflet';
+import { auth } from '@/app/auth';
 
 interface DistanceData {
   activity: string;
@@ -27,7 +26,8 @@ export const createNewTrainingEvent = async (
   location: Location,
   userPosition: LatLng | null
 ) => {
-  const userId = getUserIdFromToken();
+  const session = await auth();
+
   try {
     const [event] = await db
       .insert(trainingEvents)
@@ -42,16 +42,15 @@ export const createNewTrainingEvent = async (
         date: data.date,
         level: data.level,
         isPublic: true,
-        createdBy: userId,
+        createdBy: session?.user?.id,
       })
       .returning({ id: trainingEvents.id });
     console.log(event);
     // @ts-ignore
     await db.insert(eventAttendees).values({
       eventId: event.id,
-      attendeeId: userId,
+      attendeeId: session?.user?.id,
     });
-    revalidateTag('trainings');
   } catch (error) {
     console.error('Error creating event:', error);
   }

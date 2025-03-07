@@ -1,12 +1,16 @@
 'use client';
-
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IFormLoginInput, signInUser } from '@/actions/auth';
+import { IFormLoginInput } from '@/actions/auth';
 import Link from 'next/link';
 import { loginAuthSchema } from '@/actions/schemas';
+import { signIn } from 'next-auth/react';
 
-export const SignInForm = () => {
+interface SignInFormProps {
+  csrfToken: string;
+}
+
+export const SignInForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -14,14 +18,29 @@ export const SignInForm = () => {
   } = useForm<IFormLoginInput>({
     resolver: zodResolver(loginAuthSchema),
   });
+
   const onSubmit: SubmitHandler<IFormLoginInput> = async (data) => {
-    console.log(data);
-    await signInUser(data);
+    const result = await signIn('credentials', {
+      redirect: false,
+      emailOrLogin: data.emailOrLogin,
+      password: data.password,
+      callbackUrl: '/',
+    });
+
+    if (result?.error) {
+      console.error(result.error);
+    } else {
+      window.location.href = result?.url || '/';
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    await signIn('google', { callbackUrl: '/' });
   };
 
   return (
     <form
-      className=" mx-auto flex flex-col justify-center items-center w-[400px] border-[3px] bg-neutral border-secondary p-4 rounded-md"
+      className="mx-auto flex flex-col justify-center items-center w-[400px] border-[3px] bg-neutral border-secondary p-4 rounded-md"
       onSubmit={handleSubmit(onSubmit)}
     >
       <h1 className="text-primary font-bold text-xl">Sign In</h1>
@@ -52,6 +71,13 @@ export const SignInForm = () => {
       </label>
       <button type="submit" className="btn btn-outline btn-primary mt-8 m-4">
         Login
+      </button>
+      <button
+        type="button"
+        className="btn btn-outline btn-primary mt-2 m-4"
+        onClick={handleGoogleSignIn}
+      >
+        Sign in with Google
       </button>
       <Link className="text-secondary" href={'/signup'}>
         Don&apos;t have an account?

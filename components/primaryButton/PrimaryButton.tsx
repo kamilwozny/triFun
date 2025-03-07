@@ -1,6 +1,6 @@
 interface PrimaryButtonProps {
   text: string;
-  handleClick: () => void;
+  handleClick: () => void | Promise<void>;
 }
 
 export const PrimaryButton = ({ text, handleClick }: PrimaryButtonProps) => {
