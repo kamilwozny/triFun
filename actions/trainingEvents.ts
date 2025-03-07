@@ -45,7 +45,6 @@ export const createNewTrainingEvent = async (
         createdBy: session?.user?.id,
       })
       .returning({ id: trainingEvents.id });
-    console.log(event);
     // @ts-ignore
     await db.insert(eventAttendees).values({
       eventId: event.id,

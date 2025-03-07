@@ -18,8 +18,6 @@ export default async function TrainingPage({
 }) {
   const training = await getTrainingEvent(params.id);
   const atendees = await getTrainingList(params.id);
-  console.log(atendees);
-  console.log(123);
   if (!training) return <p>Training not found</p>;
 
   return (

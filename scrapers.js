@@ -70,7 +70,7 @@ const scrapeData = async (url) => {
   }
 
   // Output all scraped data
-  console.log(allData);
+  // console.log(allData);
 
   // Close the browser
   await browser.close();

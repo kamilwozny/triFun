@@ -12,10 +12,8 @@ export const LocationMarker = ({
 }: LocationMarkerProps) => {
   useMapEvents({
     click(e) {
-      console.log(e);
       if (pickPointMode) {
         const newPosition = e.latlng;
-        console.log(newPosition);
         setPosition(e.latlng);
       }
     },
