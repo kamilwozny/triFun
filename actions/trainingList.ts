@@ -1,12 +1,17 @@
 import { db } from '@/db/db';
-import { eventAttendees } from '@/db/schema';
+import { eventAttendees, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const getTrainingList = async (eventId: string) => {
-  const trainingList = await db
-    .select()
+  const attendeesList = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+    })
     .from(eventAttendees)
-    .where(eq(eventAttendees.eventId, eventId));
+    .where(eq(eventAttendees.eventId, eventId))
+    .leftJoin(users, eq(users.id, eventAttendees.attendeeId));
 
-  return trainingList[0] || null;
+  return attendeesList;
 };

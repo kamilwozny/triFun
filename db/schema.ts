@@ -151,6 +151,10 @@ export const eventAttendees = sqliteTable(
   {
     eventId: text('event_id').notNull(),
     attendeeId: text('attendee_id').notNull(),
+    status: text('status', { enum: ['pending', 'confirmed', 'declined'] })
+      .default('confirmed')
+      .notNull(),
+    createdAt: createdAt(),
   },
   (table) => ({
     pk: unique().on(table.eventId, table.attendeeId),

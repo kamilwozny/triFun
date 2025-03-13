@@ -1,11 +1,20 @@
 import { LatLng } from 'leaflet';
 import { Dispatch, SetStateAction } from 'react';
 
+export interface MapMarker {
+  position: LatLng;
+  popup: string;
+  selected?: boolean;
+  details?: string;
+  type?: 'run' | 'bike' | 'swim';
+}
+
 export interface MapProps {
   position: LatLng;
   zoom: number;
   pickPoint: boolean;
   handleLocation: Dispatch<SetStateAction<Location>>;
+  markers?: MapMarker[];
 }
 
 export interface LocationMarkerProps {
