@@ -132,7 +132,7 @@ export default async function TrainingPage({
               Attendees ({attendees?.length || 0})
             </h2>
           </div>
-          <PrimaryButton text="Invite Friends" />
+          <button>Invite friends</button>
         </div>
 
         <div className="overflow-x-auto">

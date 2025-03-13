@@ -1,14 +1,14 @@
 'use client';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IFormLoginInput } from '@/actions/auth';
 import Link from 'next/link';
 import { loginAuthSchema } from '@/actions/schemas';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 
-interface SignInFormProps {
-  csrfToken: string;
+export interface IFormLoginInput {
+  emailOrLogin: string;
+  password: string;
 }
 
 export const SignInForm: React.FC = () => {
