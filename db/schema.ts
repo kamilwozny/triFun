@@ -151,10 +151,10 @@ export const eventAttendees = sqliteTable(
   {
     eventId: text('event_id').notNull(),
     attendeeId: text('attendee_id').notNull(),
-    status: text('status', { enum: ['pending', 'confirmed', 'declined'] })
-      .default('confirmed')
-      .notNull(),
-    createdAt: createdAt(),
+    status: text('status', {
+      enum: ['pending', 'confirmed', 'declined'],
+    }).notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   },
   (table) => ({
     pk: unique().on(table.eventId, table.attendeeId),
@@ -264,6 +264,7 @@ export const trainingEvents = sqliteTable('training_events', {
   level: text('level').notNull().$type<Level>(),
   createdBy: text('created_by').notNull(),
   createdAt: createdAt(),
+  isPrivate: boolean('is_private').default(false).notNull(),
 });
 
 export const trainingEventsRelations = relations(

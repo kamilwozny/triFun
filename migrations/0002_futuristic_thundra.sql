@@ -1,0 +1,1 @@
+ALTER TABLE `training_events` ADD `is_public` integer DEFAULT false NOT NULL;

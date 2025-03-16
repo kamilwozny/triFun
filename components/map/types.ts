@@ -1,5 +1,6 @@
 import { LatLng } from 'leaflet';
 import { Dispatch, SetStateAction } from 'react';
+import { TrainingEvent } from '@/types/training';
 
 export interface MapMarker {
   position: LatLng;
@@ -9,11 +10,19 @@ export interface MapMarker {
   type?: 'run' | 'bike' | 'swim';
 }
 
+export interface MapBounds {
+  northEast: LatLng;
+  southWest: LatLng;
+}
+
 export interface MapProps {
-  position: LatLng;
-  zoom: number;
-  pickPoint: boolean;
-  handleLocation: Dispatch<SetStateAction<Location>>;
+  position?: { lat: number; lng: number };
+  zoom?: number;
+  events?: TrainingEvent[];
+  userPosition?: { lat: number; lng: number } | null;
+  onBoundsChange?: (bounds: MapBounds) => void;
+  pickPoint?: boolean;
+  handleLocation?: (location: Location) => void;
   markers?: MapMarker[];
 }
 
@@ -27,11 +36,15 @@ export interface MapCursorControllerProps {
 }
 
 export interface ReverseGeocodeProps {
-  latlng: LatLng | null;
-  setLocation: (location: { city: string; country: string }) => void;
+  latlng: LatLng | null | undefined;
+  setLocation: (location: Location) => void;
 }
 
 export interface Location {
   city?: string;
   country?: string;
+  position?: {
+    lat: number;
+    lng: number;
+  } | null;
 }

@@ -1,6 +1,7 @@
 import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
-import { PrimaryButton } from '@/components/primaryButton/PrimaryButton';
+import { auth } from '@/app/auth';
+import { SignupButton } from '@/components/signupButton/SignupButton';
 import 'leaflet/dist/leaflet.css';
 import {
   FaRunning,
@@ -34,6 +35,8 @@ interface Attendee {
   id: string | null;
   name: string | null;
   email: string | null;
+  status: 'pending' | 'confirmed' | 'declined';
+  joinedDate: Date;
 }
 
 export default async function TrainingPage({
@@ -43,6 +46,8 @@ export default async function TrainingPage({
 }) {
   const training = await getTrainingEvent(params.id);
   const attendees = await getTrainingList(params.id);
+  const session = await auth();
+  const user = session?.user;
 
   if (!training) return <p>Training not found</p>;
 
@@ -132,7 +137,11 @@ export default async function TrainingPage({
               Attendees ({attendees?.length || 0})
             </h2>
           </div>
-          <button>Invite friends</button>
+          {attendees?.find((attendee) => attendee.id === user?.id) ? (
+            <button>Invite friends</button>
+          ) : (
+            <SignupButton eventId={params.id} />
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -160,8 +169,23 @@ export default async function TrainingPage({
                         <div className="font-semibold text-neutral-800">
                           {attendee.name || 'Anonymous'}
                         </div>
-                        <div className="text-sm text-neutral-500">
-                          {attendee.email}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-semibold text-neutral-800">
+                          {attendee.status}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-semibold text-neutral-800">
+                          {attendee.joinedDate.toLocaleDateString()}
                         </div>
                       </div>
                     </div>

@@ -7,3 +7,7 @@ export const revalidateTrainings = async () => {
   revalidatePath('/trainings');
   redirect('/trainings');
 };
+
+export const revalidateTraining = async (id: string) => {
+  revalidatePath(`/trainings/${id}`);
+};

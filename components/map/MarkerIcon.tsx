@@ -34,4 +34,4 @@ export const icons = {
   bikeSelected: createSvgIcon(colors.bike, true),
   swim: createSvgIcon(colors.swim),
   swimSelected: createSvgIcon(colors.swim, true),
-};
+} as const;

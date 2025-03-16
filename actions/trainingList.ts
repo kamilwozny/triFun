@@ -8,6 +8,8 @@ export const getTrainingList = async (eventId: string) => {
       id: users.id,
       name: users.name,
       email: users.email,
+      status: eventAttendees.status,
+      joinedDate: eventAttendees.createdAt,
     })
     .from(eventAttendees)
     .where(eq(eventAttendees.eventId, eventId))

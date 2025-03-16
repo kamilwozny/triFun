@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { signOut, useSession } from 'next-auth/react';
 
 export const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { data: session } = useSession();
   const closeDrawer = () => setDrawerOpen(false);
 
   return (
@@ -134,47 +137,74 @@ export const Navbar = () => {
         </Link>
       </div>
       <div className="navbar-end">
-        <Link
-          href="/profile"
-          className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
-          aria-label="Go to profile"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            className="h-5 w-5 md:h-6 md:w-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-            />
-          </svg>
-        </Link>
-        <button
-          className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
-          aria-label="Notifications"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 md:h-6 md:w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-            />
-          </svg>
-        </button>
+        {session ? (
+          <>
+            <button
+              className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Notifications"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 md:h-6 md:w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+            </button>
+            <div className="dropdown dropdown-end">
+              <button
+                className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
+              >
+                <div className="avatar placeholder">
+                  <div className="bg-primary text-white rounded-full w-8">
+                    <span>{session.user?.name?.charAt(0) || 'U'}</span>
+                  </div>
+                </div>
+              </button>
+              <ul
+                className={`dropdown-content menu p-2 shadow bg-neutral rounded-box w-52 ${
+                  dropdownOpen ? 'block' : 'hidden'
+                }`}
+              >
+                <li>
+                  <Link
+                    href="/profile"
+                    className="hover:bg-neutral-focus"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      signOut({ callbackUrl: '/signin' });
+                      setDropdownOpen(false);
+                    }}
+                    className="hover:bg-neutral-focus text-error"
+                  >
+                    Sign out
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </>
+        ) : (
+          <Link href="/signin" className="btn btn-primary">
+            Sign in
+          </Link>
+        )}
       </div>
     </div>
   );

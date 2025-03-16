@@ -10,6 +10,7 @@ import { createNewTrainingEvent } from '@/actions/trainingEvents';
 import { useRouter } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { revalidateTrainings } from '@/actions/revalidations';
+import { Level } from '@/types/training';
 
 interface DistanceData {
   activity: string;
@@ -24,19 +25,23 @@ interface FormData {
   distances: DistanceData[];
   level: string;
   date: string;
+  isPrivate: boolean;
 }
 
 export default function CreateTrainingEvent() {
   const router = useRouter();
   const { register, handleSubmit, control } = useForm<FormData>();
-  const [userPosition, setUserPosition] = useState<LatLng | null>(null);
+  const [userPosition, setUserPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [location, setLocation] = useState<Location>({});
   const [selectedActivities, setSelectedActivities] = useState<Array<string>>(
     []
   );
-
   const [distances, setDistances] = useState<DistanceData[]>([]);
-  const activitiesList = ['Swim', 'Bike', 'Run'];
+  const [activitiesList] = useState<Array<string>>(['Swim', 'Bike', 'Run']);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleActivity = (activity: string) => {
     setSelectedActivities((prev: string[]) => {
@@ -92,7 +97,7 @@ export default function CreateTrainingEvent() {
           setUserPosition({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          } as LatLng);
+          });
         },
         (error) => {
           console.error('Error getting geolocation:', error);
@@ -103,6 +108,12 @@ export default function CreateTrainingEvent() {
 
   const onSubmit = async (data: FormData) => {
     try {
+      setError(null);
+      if (!location.city || !location.country || !location.position) {
+        setError('Please select a location on the map');
+        return;
+      }
+
       const distancesWithUnits: DistanceData[] = distances.map(
         ({ activity, distance, unit }) => ({
           activity,
@@ -110,21 +121,28 @@ export default function CreateTrainingEvent() {
           unit,
         })
       );
-      await createNewTrainingEvent(
+
+      const result = await createNewTrainingEvent(
         {
           name: data.name,
           description: data.description,
           activities: selectedActivities,
-          level: data.level,
+          level: data.level as Level,
           date: data.date,
           distances: distancesWithUnits,
+          isPrivate: data.isPrivate,
         },
-        location,
-        userPosition
+        location
       );
-      revalidateTrainings();
+
+      if (result?.success) {
+        router.push('/trainings');
+      }
     } catch (error) {
       console.error('Error creating event:', error);
+      setError(
+        error instanceof Error ? error.message : 'Failed to create event'
+      );
     }
   };
 
@@ -133,6 +151,24 @@ export default function CreateTrainingEvent() {
       <h2 className="text-lg font-bold text-gray-800 mb-4">
         Create a New Event
       </h2>
+      {error && (
+        <div className="alert alert-error mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col lg:flex-row gap-6"
@@ -233,7 +269,7 @@ export default function CreateTrainingEvent() {
             >
               <option value="Beginner">Beginner</option>
               <option value="Intermediate">Intermediate</option>
-              <option value="Pro">Pro</option>
+              <option value="Expert">Expert</option>
             </select>
           </div>
           <div className="mb-2">
