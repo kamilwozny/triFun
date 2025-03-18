@@ -4,6 +4,7 @@ import '../styles/globals.css';
 import Head from 'next/head';
 import { Inter } from 'next/font/google';
 import Providers from './providers';
+import { Footer } from '@/components/footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           {children}
+          <Footer />
         </Providers>
         <Toaster position="bottom-right" />
       </body>

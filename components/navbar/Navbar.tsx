@@ -7,7 +7,7 @@ import { signOut, useSession } from 'next-auth/react';
 export const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const closeDrawer = () => setDrawerOpen(false);
 
   return (
@@ -137,7 +137,11 @@ export const Navbar = () => {
         </Link>
       </div>
       <div className="navbar-end">
-        {session ? (
+        {status === 'loading' ? (
+          <div className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary">
+            <span className="loading loading-spinner loading-sm"></span>
+          </div>
+        ) : status === 'authenticated' ? (
           <>
             <button
               className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"

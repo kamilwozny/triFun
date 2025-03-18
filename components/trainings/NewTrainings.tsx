@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import type { LatLng } from 'leaflet';
 import { getTrainingEvents } from '@/actions/trainingEvents';
@@ -12,10 +12,9 @@ import toast from 'react-hot-toast';
 import '@/components/trainings/Trainings.css';
 import Link from 'next/link';
 
-interface Distance {
-  activity: string;
-  distance: number;
-  unit: string;
+interface LocationSuggestion {
+  text: string;
+  type: 'city' | 'country';
 }
 
 const activityIcons = {
@@ -30,12 +29,101 @@ const difficultyColors = {
   Expert: 'bg-red-100 text-red-800',
 };
 
+// Add useDebounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Add useClickOutside hook
+function useClickOutside(callback: () => void) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        callback();
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [callback]);
+
+  return ref;
+}
+
 export default function NewTrainings() {
   const router = useRouter();
   const [userPosition, setUserPosition] = useState<LatLng | null>(null);
   const [events, setEvents] = useState<TrainingEvent[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState<string>('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  
+  // Debounce the search input
+  const searchQuery = useDebounce(searchInput, 300);
+
+  const searchRef = useClickOutside(() => setShowSuggestions(false));
+
+  const locationSuggestions = useMemo(() => {
+    const suggestions: LocationSuggestion[] = [];
+    const uniqueCities = new Set<string>();
+    const uniqueCountries = new Set<string>();
+
+    events.forEach((event) => {
+      if (!uniqueCities.has(event.city.toLowerCase())) {
+        uniqueCities.add(event.city.toLowerCase());
+        suggestions.push({ text: event.city, type: 'city' });
+      }
+      if (!uniqueCountries.has(event.country.toLowerCase())) {
+        uniqueCountries.add(event.country.toLowerCase());
+        suggestions.push({ text: event.country, type: 'country' });
+      }
+    });
+
+    return suggestions;
+  }, [events]);
+
+  // Update filteredSuggestions to use searchInput instead of searchQuery for immediate feedback
+  const filteredSuggestions = useMemo(() => {
+    if (!searchInput) return [];
+    return locationSuggestions.filter((suggestion) =>
+      suggestion.text.toLowerCase().includes(searchInput.toLowerCase())
+    );
+  }, [locationSuggestions, searchInput]);
+
+  // Keep filteredEvents using the debounced searchQuery
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => {
+      const matchesSearch = searchQuery
+        ? event.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          event.country.toLowerCase().includes(searchQuery.toLowerCase())
+        : true;
+
+      const matchesActivity =
+        !selectedActivity || selectedActivity === 'All'
+          ? true
+          : event.activities.includes(selectedActivity);
+
+      return matchesSearch && matchesActivity;
+    });
+  }, [events, selectedActivity, searchQuery]);
 
   const Map = useMemo(
     () =>
@@ -80,16 +168,119 @@ export default function NewTrainings() {
     fetchEvents();
   }, []);
 
-  const filteredEvents = useMemo(() => {
-    if (!selectedActivity || selectedActivity === 'All') return events;
-    return events.filter((event) =>
-      event.activities.some((activity) => activity === selectedActivity)
-    );
-  }, [events, selectedActivity]);
+  // Update the handleKeyDown function to use setSearchInput
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || filteredSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
+        );
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          setSearchInput(filteredSuggestions[selectedIndex].text);
+          setShowSuggestions(false);
+          setSelectedIndex(-1);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+        break;
+    }
+  };
+
+  // Reset selected index when suggestions change
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [filteredSuggestions]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 lg:p-8">
       <div className="flex flex-wrap gap-4 justify-center w-full mb-6">
+        <div className="relative" ref={searchRef}>
+          <label className="input flex items-center gap-2">
+            <svg
+              className="h-[1em] opacity-50"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <g
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="2.5"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </g>
+            </svg>
+            <input
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onKeyDown={handleKeyDown}
+              type="search"
+              placeholder="Search by location"
+              className="w-full"
+              aria-label="Search locations"
+              aria-expanded={showSuggestions}
+              aria-controls="location-suggestions"
+              aria-activedescendant={
+                selectedIndex >= 0
+                  ? `suggestion-${filteredSuggestions[selectedIndex].text}`
+                  : undefined
+              }
+            />
+          </label>
+          {showSuggestions && filteredSuggestions.length > 0 && (
+            <div
+              id="location-suggestions"
+              role="listbox"
+              className="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto"
+            >
+              {filteredSuggestions.map((suggestion, index) => (
+                <button
+                  key={`${suggestion.type}-${suggestion.text}-${index}`}
+                  id={`suggestion-${suggestion.text}`}
+                  role="option"
+                  aria-selected={index === selectedIndex}
+                  className={`w-full px-4 py-2 text-left hover:bg-neutral/5 flex items-center gap-2 ${
+                    index === selectedIndex ? 'bg-neutral/10' : ''
+                  }`}
+                  onClick={() => {
+                    setSearchInput(suggestion.text);
+                    setShowSuggestions(false);
+                    setSelectedIndex(-1);
+                  }}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                >
+                  <span className="text-neutral-500 text-sm">
+                    {suggestion.type === 'city' ? '🏙️' : '🌍'}
+                  </span>
+                  <span className="font-medium">{suggestion.text}</span>
+                  <span className="text-xs text-neutral-400 ml-auto">
+                    {suggestion.type}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         {['All', 'Run', 'Bike', 'Swim'].map((activity) => (
           <button
             key={activity}
@@ -193,6 +384,34 @@ export default function NewTrainings() {
                 pickPoint={false}
                 handleLocation={() => {}}
                 events={filteredEvents}
+                markers={filteredEvents.map((event) => {
+                  // Use the event.location if available, otherwise fallback to parsing userPosition
+                  const position = event.location
+                    ? ({
+                        lat: event.location.lat,
+                        lng: event.location.lng,
+                      } as LatLng)
+                    : (() => {
+                        const [lat, lng] = event.userPosition
+                          .split(',')
+                          .map(Number);
+                        return { lat, lng } as LatLng;
+                      })();
+
+                  // Get the primary activity type for the marker
+                  const primaryActivity = event.activities[0]?.toLowerCase() as
+                    | 'run'
+                    | 'bike'
+                    | 'swim';
+
+                  return {
+                    position,
+                    popup: event.name,
+                    details: `${event.city}, ${event.country}`,
+                    type: primaryActivity,
+                    selected: selectedTraining === event.id,
+                  };
+                })}
               />
             ) : (
               <div className="min-w-[40vw] h-[700px] flex items-center justify-center">

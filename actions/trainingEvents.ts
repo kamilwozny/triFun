@@ -6,6 +6,7 @@ import type { Location } from '../components/map/types';
 import { LatLng } from 'leaflet';
 import { auth } from '@/app/auth';
 import { TrainingEvent, Level } from '@/types/training';
+import { revalidateTrainings } from './revalidations';
 
 interface DistanceData {
   activity: string;
@@ -13,62 +14,57 @@ interface DistanceData {
   unit: 'meters' | 'kilometers';
 }
 
-interface FormData {
+interface CreateTrainingEventData {
   name: string;
   description: string;
   activities: string[];
-  distances: DistanceData[];
   level: Level;
   date: string;
+  startTime: string;
+  distances: Array<{
+    activity: string;
+    distance: number;
+    unit: string;
+  }>;
   isPrivate: boolean;
 }
 
-export const createNewTrainingEvent = async (
-  data: FormData,
+export async function createNewTrainingEvent(
+  data: CreateTrainingEventData,
   location: Location
-) => {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    throw new Error('User not authenticated');
-  }
-
-  if (!location.city || !location.country || !location.position) {
-    throw new Error(
-      'Location information is incomplete. Please select a location on the map.'
-    );
-  }
-
+) {
   try {
-    const [event] = await db
-      .insert(trainingEvents)
-      .values({
-        description: data.description,
-        name: data.name,
-        city: location.city,
-        country: location.country,
-        userPosition: JSON.stringify(location.position),
-        distances: JSON.stringify(data.distances),
-        date: data.date,
-        level: data.level,
-        isPrivate: data.isPrivate,
-        createdBy: session.user.id,
-      })
-      .returning({ id: trainingEvents.id });
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('Unauthorized');
+    }
 
-    await db.insert(eventAttendees).values({
-      eventId: event.id,
-      attendeeId: session.user.id,
-      status: 'confirmed' as const,
-      createdAt: new Date(),
+    const result = await db.insert(trainingEvents).values({
+      id: crypto.randomUUID(),
+      name: data.name,
+      description: data.description,
+      city: location.city || '',
+      country: location.country || '',
+      userPosition: `${location.position?.lat},${location.position?.lng}`,
+      distances: JSON.stringify(data.distances),
+      date: data.date,
+      startTime: data.startTime,
+      level: data.level,
+      createdBy: session.user.id,
+      isPrivate: data.isPrivate,
     });
 
-    return { success: true, eventId: event.id };
+    if (result) {
+      revalidateTrainings();
+      return { success: true };
+    }
+
+    return { success: false };
   } catch (error) {
-    console.error('Error creating event:', error);
+    console.error('Error creating training event:', error);
     throw error;
   }
-};
+}
 
 export async function getTrainingEvents(): Promise<TrainingEvent[]> {
   try {

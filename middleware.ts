@@ -11,9 +11,9 @@ export function middleware(request: NextRequest) {
   }
 
   // Protect the main profile page
-  if (request.nextUrl.pathname === '/profile' && !authCookie) {
-    return NextResponse.redirect(new URL('/signin', request.url));
-  }
+  // if (request.nextUrl.pathname === '/profile' && !authCookie) {
+  //   return NextResponse.redirect(new URL('/signin', request.url));
+  // }
 
   return NextResponse.next();
 }

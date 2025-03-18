@@ -33,12 +33,17 @@ export const users = sqliteTable('user', {
   email: text('email').unique(),
   emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
   image: text('image'),
+  bio: text('bio'),
+  location: text('location'),
+  customAvatar: text('customAvatar'),
+  updatedAt: text('updatedAt').default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
   events: many(trainingEvents),
   posts: many(posts),
   trainingData: many(trainingData),
+  attendedEvents: many(eventAttendees),
 }));
 
 export const accounts = sqliteTable(
@@ -261,6 +266,7 @@ export const trainingEvents = sqliteTable('training_events', {
   userPosition: text('user_position').notNull(),
   distances: text('distances').notNull(),
   date: text('date').notNull(),
+  startTime: text('start_time').notNull(),
   level: text('level').notNull().$type<Level>(),
   createdBy: text('created_by').notNull(),
   createdAt: createdAt(),

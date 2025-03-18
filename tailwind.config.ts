@@ -25,7 +25,7 @@ const config: Config = {
           accent: '#5d0e41',
           'secondary-light': '#ff4d6d',
            neutral: '#00224d',
-          'neutral-80': 'rgba(0, 34, 77, 0.8)',
+          'neutral-light': 'rgba(0, 34, 77, 0.8)',
           'base-100': '#ffffff',
           info: '#0ea5e9',
           success: '#22c55e',
