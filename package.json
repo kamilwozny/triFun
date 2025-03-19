@@ -56,5 +56,11 @@
     "eslint-config-next": "14.2.3",
     "tsx": "^4.9.3",
     "typescript": "^5"
+  },
+  "browser": {
+    "crypto": false,
+    "fs": false,
+    "path": false,
+    "os": false
   }
 }
