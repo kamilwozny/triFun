@@ -1,12 +1,16 @@
 'use client';
+import { useRef } from 'react';
 import { FaBug } from 'react-icons/fa';
 export const Footer = () => {
+  const modalReportRef = useRef<HTMLDialogElement>(null);
+  const modalContactRef = useRef<HTMLDialogElement>(null);
+
   const handleOpenContactModal = () => {
-    document.getElementById('contact_modal')?.showModal();
+    modalContactRef.current?.showModal();
   };
 
   const handleOpenReportModal = () => {
-    document.getElementById('report_modal')?.showModal();
+    modalReportRef.current?.showModal();
   };
 
   return (
@@ -20,7 +24,7 @@ export const Footer = () => {
       <div className="text-error hover:cursor-pointer hover:bg-neutral-light">
         <span onClick={handleOpenContactModal}>Contact us</span>
       </div>
-      <dialog id="contact_modal" className="modal">
+      <dialog ref={modalContactRef} className="modal">
         <div className="modal-box flex flex-col gap-4">
           <h3 className="font-bold text-lg">Enter your email</h3>
           <input type="email" placeholder="Email" />
@@ -34,7 +38,7 @@ export const Footer = () => {
           <button>close</button>
         </form>
       </dialog>
-      <dialog id="report_modal" className="modal">
+      <dialog ref={modalReportRef} className="modal">
         <div className="modal-box flex flex-col gap-4">
           <h3 className="font-bold text-lg">Report a bug</h3>
           <textarea

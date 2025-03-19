@@ -45,7 +45,6 @@ export default function CreateTrainingEvent() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const datePickerRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDialogElement>(null);
 
   const [distances, setDistances] = useState<DistanceData[]>([]);
@@ -137,7 +136,6 @@ export default function CreateTrainingEvent() {
     }
   }, []);
 
-  // Close modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -157,7 +155,6 @@ export default function CreateTrainingEvent() {
     };
   }, [isDatePickerOpen]);
 
-  // Handle modal open/close
   useEffect(() => {
     if (isDatePickerOpen) {
       modalRef.current?.showModal();

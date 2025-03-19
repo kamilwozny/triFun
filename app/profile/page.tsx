@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { auth } from '@/app/auth';
 import { db } from '@/db/db';
 import { users, trainingEvents, eventAttendees } from '@/db/schema';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import toast from 'react-hot-toast';
 import { FaUser, FaMapMarkerAlt, FaPen } from 'react-icons/fa';
 import Image from 'next/image';

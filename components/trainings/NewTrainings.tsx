@@ -29,7 +29,6 @@ const difficultyColors = {
   Expert: 'bg-red-100 text-red-800',
 };
 
-// Add useDebounce hook
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
@@ -75,8 +74,7 @@ export default function NewTrainings() {
   const [searchInput, setSearchInput] = useState<string>('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  
-  // Debounce the search input
+
   const searchQuery = useDebounce(searchInput, 300);
 
   const searchRef = useClickOutside(() => setShowSuggestions(false));
