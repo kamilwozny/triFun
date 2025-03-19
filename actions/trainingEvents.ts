@@ -33,7 +33,6 @@ export async function createNewTrainingEvent(
     }
 
     const result = await db.insert(trainingEvents).values({
-      id: crypto.randomUUID(),
       name: data.name,
       description: data.description,
       city: location.city || '',
