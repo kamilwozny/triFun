@@ -77,3 +77,4 @@ history of your trainings (hosted and participated)
 Add translation for polish and handle language button
 Add connection to strava to see if it is possible to show training data
 End to end testing and some unit tests
+Prepare mobile views and include capacitor to test it on mobiles

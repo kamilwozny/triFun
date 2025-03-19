@@ -1,18 +1,11 @@
 'use server';
 
 import { db } from '@/db/db';
-import { eventAttendees, trainingEvents } from '@/db/schema';
+import { trainingEvents } from '@/db/schema';
 import type { Location } from '../components/map/types';
-import { LatLng } from 'leaflet';
 import { auth } from '@/app/auth';
 import { TrainingEvent, Level } from '@/types/training';
 import { revalidateTrainings } from './revalidations';
-
-interface DistanceData {
-  activity: string;
-  distance: number;
-  unit: 'meters' | 'kilometers';
-}
 
 interface CreateTrainingEventData {
   name: string;
