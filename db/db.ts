@@ -1,5 +1,4 @@
 import * as schema from './schema';
-import 'dotenv/config';
 import { type LibSQLDatabase, drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client/http';
 
