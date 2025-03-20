@@ -198,7 +198,6 @@ export default function NewTrainings() {
     }
   };
 
-  // Reset selected index when suggestions change
   useEffect(() => {
     setSelectedIndex(-1);
   }, [filteredSuggestions]);
@@ -236,7 +235,6 @@ export default function NewTrainings() {
               placeholder="Search by location"
               className="w-full"
               aria-label="Search locations"
-              aria-expanded={showSuggestions}
               aria-controls="location-suggestions"
               aria-activedescendant={
                 selectedIndex >= 0
@@ -285,11 +283,11 @@ export default function NewTrainings() {
             onClick={() =>
               setSelectedActivity(activity === 'All' ? null : activity)
             }
-            className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 ${
+            className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 hover:bg-neutral hover:text-white ${
               (activity === 'All' && !selectedActivity) ||
               selectedActivity === activity
                 ? 'bg-neutral text-white shadow-lg scale-105'
-                : 'bg-white text-neutral hover:bg-primary/10'
+                : 'bg-white text-neutral'
             }`}
           >
             {activity !== 'All' &&
@@ -309,7 +307,7 @@ export default function NewTrainings() {
                   setSelectedTraining(event.id);
                   router.push(`/trainings/${event.id}`);
                 }}
-                className={`card bg-white shadow-xl rounded-xl transition-all hover:shadow-2xl ${
+                className={`card bg-white shadow-xl rounded-xl transition-all hover:shadow-2xl hover:cursor-pointer ${
                   selectedTraining === event.id ? 'ring-2 ring-primary' : ''
                 }`}
               >
@@ -370,6 +368,11 @@ export default function NewTrainings() {
                 </div>
               </div>
             ))}
+            {filteredSuggestions.length === 0 && searchInput && (
+              <div className="text-center text-neutral text-xl font-extrabold mt-4">
+                No location suggestions found.
+              </div>
+            )}
           </div>
         </div>
 
@@ -383,7 +386,6 @@ export default function NewTrainings() {
                 handleLocation={() => {}}
                 events={filteredEvents}
                 markers={filteredEvents.map((event) => {
-                  // Use the event.location if available, otherwise fallback to parsing userPosition
                   const position = event.location
                     ? ({
                         lat: event.location.lat,
@@ -396,7 +398,6 @@ export default function NewTrainings() {
                         return { lat, lng } as LatLng;
                       })();
 
-                  // Get the primary activity type for the marker
                   const primaryActivity = event.activities[0]?.toLowerCase() as
                     | 'run'
                     | 'bike'

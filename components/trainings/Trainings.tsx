@@ -116,30 +116,6 @@ export const Trainings: React.FC<TrainingsPageClientProps> = ({
             </tbody>
           </table>
         </div>
-        {/* <div className="overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {trainings.map((training, index) => (
-                <tr key={training.id}>
-                  <th>{index + 1}</th>
-                  <td>
-                    <Link href={`/trainings/${training.id}`}>
-                      {training.name}
-                    </Link>
-                  </td>
-                  <td>{training.description}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div> */}
       </div>
     </div>
   );

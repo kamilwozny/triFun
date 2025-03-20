@@ -14,7 +14,7 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="footer footer-center p-4 bg-neutral text-base-content flex gap-4 justify-end absolute bottom-0 left-0 w-full">
+    <footer className="footer footer-center p-4 bg-neutral text-base-content flex gap-4 justify-end w-full">
       <div className="flex items-center gap-2 hover:bg-neutral-light hover:cursor-pointer">
         <FaBug className="text-error" />
         <span className="text-error" onClick={handleOpenReportModal}>

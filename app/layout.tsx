@@ -22,10 +22,10 @@ export default function RootLayout({
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         />
       </Head>
-      <body className={`${inter.className} bg-primary min-h-[100dvh]`}>
+      <body className={`${inter.className} bg-primary min-h-[100dvh] h-full flex flex-col`}>
         <Providers>
           <Navbar />
-          {children}
+          <div className="flex-grow">{children}</div>
           <Footer />
         </Providers>
         <Toaster position="bottom-right" />

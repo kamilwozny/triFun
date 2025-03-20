@@ -69,10 +69,6 @@ export default function CreateTrainingEvent() {
     };
   }, [isDatePickerOpen]);
 
-  const toggleDateDialog = () => {
-    setIsDatePickerOpen((prev) => prev);
-  };
-
   const toggleActivity = (activity: string) => {
     setSelectedActivities((prev: string[]) => {
       const newSelection = prev.includes(activity)
@@ -419,12 +415,12 @@ export default function CreateTrainingEvent() {
                 </button>
               </div>
               <div className="relative flex-1">
-                <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" />
+                <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-0" />
                 <input
                   type="time"
                   value={selectedTime}
                   onChange={(e) => setSelectedTime(e.target.value)}
-                  className="input input-bordered w-full pl-10 h-10"
+                  className="input input-bordered w-full pl-10 h-10 z-1"
                   required
                 />
               </div>
@@ -463,13 +459,13 @@ export default function CreateTrainingEvent() {
           <div className="p-4 border-b">
             <h3 className="font-bold text-lg">Select Event Date</h3>
           </div>
-          <div className="p-4">
+          <div className="pt-4">
             <DayPicker
               mode="single"
               selected={selectedDate}
               onSelect={handleDateSelect}
               disabled={(date) => date < new Date()}
-              className="mx-auto"
+              className="flex justify-center min-h-[380px]"
               classNames={{
                 day_selected: 'bg-primary text-primary-content',
                 day_today: 'bg-neutral text-neutral-content',
