@@ -2,22 +2,31 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Get auth cookie
   const authCookie = request.cookies.get('next-auth.session-token')?.value;
+  const secureCookie = request.cookies.get(
+    '__Secure-next-auth.session-token'
+  )?.value;
+  const isAuthenticated = !!(authCookie || secureCookie);
 
-  // Allow access to other users' profiles via /profile/[id]
-  if (request.nextUrl.pathname.startsWith('/profile/')) {
-    return NextResponse.next();
+  if (request.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/trainings', request.url));
   }
 
-  // Protect the main profile page
-  // if (request.nextUrl.pathname === '/profile' && !authCookie) {
-  //   return NextResponse.redirect(new URL('/signin', request.url));
-  // }
+  if (request.nextUrl.pathname.startsWith('/profile')) {
+    isAuthenticated
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL('/signin', request.url));
+  }
+
+  if (request.nextUrl.pathname.startsWith('/trainings/create')) {
+    isAuthenticated
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL('/signin', request.url));
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/profile', '/profile/:path*'],
+  matcher: ['/', '/profile', '/profile/:path*'],
 };
