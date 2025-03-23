@@ -1,25 +1,21 @@
 'use client';
 
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { LatLng } from 'leaflet';
 import { useRouter } from 'next/navigation';
-import { FaSwimmer, FaBiking, FaRunning } from 'react-icons/fa';
 import { formatDate } from '@/lib/utils';
 import '@/components/trainings/Trainings.css';
 import Link from 'next/link';
 import { useTrainingEvents } from '@/providers/TrainingEventsProvider';
+import { useSession } from 'next-auth/react';
+import { EventFilters } from './EventFilters';
+import { LocationSearch } from './LocationSearch';
 
 interface LocationSuggestion {
   text: string;
   type: 'city' | 'country';
 }
-
-const activityIcons = {
-  Swim: <FaSwimmer className="h-5 w-5" />,
-  Bike: <FaBiking className="h-5 w-5" />,
-  Run: <FaRunning className="h-5 w-5" />,
-};
 
 const difficultyColors = {
   Beginner: 'bg-green-100 text-green-800',
@@ -43,46 +39,62 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-// Add useClickOutside hook
-function useClickOutside(callback: () => void) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        callback();
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [callback]);
-
-  return ref;
-}
+type TabType = 'upcoming' | 'myEvents';
 
 export default function NewTrainings() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [userPosition, setUserPosition] = useState<LatLng | null>(null);
   const { events } = useTrainingEvents();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState<string>('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [activeTab, setActiveTab] = useState<TabType>('upcoming');
 
   const searchQuery = useDebounce(searchInput, 300);
 
-  const searchRef = useClickOutside(() => setShowSuggestions(false));
+  // Get only future events (today's date or later)
+  const upcomingEvents = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day
+
+    return events.filter((event) => {
+      const eventDate = new Date(event.date);
+      return eventDate >= today;
+    });
+  }, [events]);
+
+  // Filter events the user is participating in or created
+  const userEvents = useMemo(() => {
+    if (!session?.user?.id) return [];
+
+    return upcomingEvents.filter((event) => {
+      // Check if user created the event
+      return event.createdBy === session?.user?.id;
+
+      // Note: In a real implementation, you would also add a check for
+      // events the user is participating in, using an API call or a list of participants
+      // For example: || event.participants?.includes(session.user.id)
+    });
+  }, [upcomingEvents, session?.user?.id]);
+
+  // Select which events to display based on active tab
+  const displayEvents = useMemo(() => {
+    switch (activeTab) {
+      case 'myEvents':
+        return userEvents;
+      case 'upcoming':
+      default:
+        return upcomingEvents;
+    }
+  }, [activeTab, upcomingEvents, userEvents]);
 
   const locationSuggestions = useMemo(() => {
     const suggestions: LocationSuggestion[] = [];
     const uniqueCities = new Set<string>();
     const uniqueCountries = new Set<string>();
 
-    events.forEach((event) => {
+    displayEvents.forEach((event) => {
       if (!uniqueCities.has(event.city.toLowerCase())) {
         uniqueCities.add(event.city.toLowerCase());
         suggestions.push({ text: event.city, type: 'city' });
@@ -94,19 +106,11 @@ export default function NewTrainings() {
     });
 
     return suggestions;
-  }, [events]);
-
-  // Update filteredSuggestions to use searchInput instead of searchQuery for immediate feedback
-  const filteredSuggestions = useMemo(() => {
-    if (!searchInput) return [];
-    return locationSuggestions.filter((suggestion) =>
-      suggestion.text.toLowerCase().includes(searchInput.toLowerCase())
-    );
-  }, [locationSuggestions, searchInput]);
+  }, [displayEvents]);
 
   // Keep filteredEvents using the debounced searchQuery
   const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
+    return displayEvents.filter((event) => {
       const matchesSearch = searchQuery
         ? event.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
           event.country.toLowerCase().includes(searchQuery.toLowerCase())
@@ -119,7 +123,7 @@ export default function NewTrainings() {
 
       return matchesSearch && matchesActivity;
     });
-  }, [events, selectedActivity, searchQuery]);
+  }, [displayEvents, selectedActivity, searchQuery]);
 
   const Map = useMemo(
     () =>
@@ -150,140 +154,48 @@ export default function NewTrainings() {
     }
   }, []);
 
-  // Update the handleKeyDown function to use setSearchInput
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showSuggestions || filteredSuggestions.length === 0) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
-        );
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (selectedIndex >= 0) {
-          setSearchInput(filteredSuggestions[selectedIndex].text);
-          setShowSuggestions(false);
-          setSelectedIndex(-1);
-        }
-        break;
-      case 'Escape':
-        setShowSuggestions(false);
-        setSelectedIndex(-1);
-        break;
-    }
-  };
-
-  useEffect(() => {
-    setSelectedIndex(-1);
-  }, [filteredSuggestions]);
-
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 lg:p-8">
-      <div className="flex flex-wrap gap-4 justify-center w-full mb-6">
-        <div className="relative" ref={searchRef}>
-          <label className="input flex items-center gap-2">
-            <svg
-              className="h-[1em] opacity-50"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <g
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                strokeWidth="2.5"
-                fill="none"
-                stroke="currentColor"
-              >
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.3-4.3"></path>
-              </g>
-            </svg>
-            <input
-              value={searchInput}
-              onChange={(e) => {
-                setSearchInput(e.target.value);
-                setShowSuggestions(true);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-              onKeyDown={handleKeyDown}
-              type="search"
-              placeholder="Search by location"
-              className="w-full"
-              aria-label="Search locations"
-              aria-controls="location-suggestions"
-              aria-activedescendant={
-                selectedIndex >= 0
-                  ? `suggestion-${filteredSuggestions[selectedIndex].text}`
-                  : undefined
-              }
-            />
-          </label>
-          {showSuggestions && filteredSuggestions.length > 0 && (
-            <div
-              id="location-suggestions"
-              role="listbox"
-              className="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto"
-            >
-              {filteredSuggestions.map((suggestion, index) => (
-                <button
-                  key={`${suggestion.type}-${suggestion.text}-${index}`}
-                  id={`suggestion-${suggestion.text}`}
-                  role="option"
-                  aria-selected={index === selectedIndex}
-                  className={`w-full px-4 py-2 text-left hover:bg-neutral/5 flex items-center gap-2 ${
-                    index === selectedIndex ? 'bg-neutral/10' : ''
-                  }`}
-                  onClick={() => {
-                    setSearchInput(suggestion.text);
-                    setShowSuggestions(false);
-                    setSelectedIndex(-1);
-                  }}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                >
-                  <span className="text-neutral-500 text-sm">
-                    {suggestion.type === 'city' ? '🏙️' : '🌍'}
-                  </span>
-                  <span className="font-medium">{suggestion.text}</span>
-                  <span className="text-xs text-neutral-400 ml-auto">
-                    {suggestion.type}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        {['All', 'Run', 'Bike', 'Swim'].map((activity) => (
+      <div className="flex flex-wrap gap-4 justify-center w-full mb-4">
+        <div className="tabs tabs-boxed bg-base-200/50 p-2 rounded-xl mr-auto">
           <button
-            key={activity}
-            onClick={() =>
-              setSelectedActivity(activity === 'All' ? null : activity)
-            }
-            className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 hover:bg-neutral hover:text-white ${
-              (activity === 'All' && !selectedActivity) ||
-              selectedActivity === activity
-                ? 'bg-neutral text-white shadow-lg scale-105'
-                : 'bg-white text-neutral'
+            className={`tab text-xl font-medium transition-all duration-200 hover:bg-neutral hover:text-white ${
+              activeTab === 'upcoming'
+                ? 'bg-neutral text-white'
+                : 'text-neutral'
             }`}
+            onClick={() => setActiveTab('upcoming')}
           >
-            {activity !== 'All' &&
-              activityIcons[activity as keyof typeof activityIcons]}
-            {activity}
+            Upcoming Events
           </button>
-        ))}
+          <button
+            className={`tab text-xl font-medium transition-all duration-200 hover:bg-neutral hover:text-white ${
+              activeTab === 'myEvents'
+                ? 'bg-neutral text-white'
+                : 'text-neutral'
+            }`}
+            onClick={() => setActiveTab('myEvents')}
+          >
+            My Events
+          </button>
+        </div>
+
+        <LocationSearch
+          searchInput={searchInput}
+          setSearchInput={setSearchInput}
+          locationSuggestions={locationSuggestions}
+        />
+        <EventFilters
+          selectedActivity={selectedActivity}
+          setSelectedActivity={setSelectedActivity}
+        />
       </div>
 
       <div className="flex flex-col lg:flex-row items-start justify-center max-w-full gap-8 w-full">
         <div className="w-full lg:w-1/2 xl:w-3/5">
-          <div className="overflow-y-auto max-h-[80vh] pr-4 space-y-6">
+          <div
+            className={`overflow-y-auto max-h-[80vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6`}
+          >
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
@@ -328,7 +240,6 @@ export default function NewTrainings() {
                         key={activity}
                         className="bg-neutral-50 p-4 rounded-lg flex items-center gap-3"
                       >
-                        {activityIcons[activity as keyof typeof activityIcons]}
                         <div>
                           <span className="block text-sm font-semibold text-neutral-800">
                             {activity}
@@ -352,9 +263,11 @@ export default function NewTrainings() {
                 </div>
               </div>
             ))}
-            {filteredSuggestions.length === 0 && searchInput && (
+            {filteredEvents.length === 0 && (
               <div className="text-center text-neutral text-xl font-extrabold mt-4">
-                No location suggestions found.
+                {activeTab === 'myEvents'
+                  ? "You don't have any events yet."
+                  : 'No events found matching your criteria.'}
               </div>
             )}
           </div>

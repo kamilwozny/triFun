@@ -18,7 +18,7 @@ export const Footer = () => {
       <div className="flex items-center gap-2 hover:bg-neutral-light hover:cursor-pointer">
         <FaBug className="text-error" />
         <span className="text-error" onClick={handleOpenReportModal}>
-          Report a bugv
+          Report a bug
         </span>
       </div>
       <div className="text-error hover:cursor-pointer hover:bg-neutral-light">

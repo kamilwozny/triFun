@@ -27,18 +27,16 @@ export function SignupButton({ eventId }: SignupButtonProps) {
         const result = await signUpEventAction(formData);
 
         if (result.success) {
+          // For successful responses, the message property exists
           toast.success(
-            'message' in result && result.message
+            'message' in result
               ? result.message
               : 'Successfully signed up for the event!'
           );
           router.refresh();
         } else {
-          toast.error(
-            'error' in result && result.error
-              ? result.error
-              : 'Failed to sign up'
-          );
+          // For error responses, the error property exists
+          toast.error('error' in result ? result.error : 'Failed to sign up');
         }
 
         setIsLoading(false);
