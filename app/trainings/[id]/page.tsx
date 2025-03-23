@@ -1,7 +1,6 @@
 import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
 import { auth } from '@/app/auth';
-import { SignupButton } from '@/components/signupButton/SignupButton';
 import 'leaflet/dist/leaflet.css';
 import {
   FaRunning,
@@ -12,6 +11,7 @@ import {
   FaUserFriends,
 } from 'react-icons/fa';
 import { MdSportsScore } from 'react-icons/md';
+import { SignupButton } from '@/components/signupButton/SignupButton';
 
 const activityIcons = {
   Run: <FaRunning className="text-red-500 h-6 w-6" />,

@@ -164,7 +164,6 @@ export default function Map({
       `}</style>
       <MapContainer
         center={markerPosition || position}
-        zoom={zoom}
         scrollWheelZoom={false}
         className="h-[700px] w-full"
       >

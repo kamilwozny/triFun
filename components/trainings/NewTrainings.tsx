@@ -3,14 +3,12 @@
 import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import type { LatLng } from 'leaflet';
-import { getTrainingEvents } from '@/actions/trainingEvents';
 import { useRouter } from 'next/navigation';
-import { TrainingEvent } from '@/types/training';
 import { FaSwimmer, FaBiking, FaRunning } from 'react-icons/fa';
 import { formatDate } from '@/lib/utils';
-import toast from 'react-hot-toast';
 import '@/components/trainings/Trainings.css';
 import Link from 'next/link';
+import { useTrainingEvents } from '@/providers/TrainingEventsProvider';
 
 interface LocationSuggestion {
   text: string;
@@ -68,7 +66,7 @@ function useClickOutside(callback: () => void) {
 export default function NewTrainings() {
   const router = useRouter();
   const [userPosition, setUserPosition] = useState<LatLng | null>(null);
-  const [events, setEvents] = useState<TrainingEvent[]>([]);
+  const { events } = useTrainingEvents();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState<string>('');
@@ -150,20 +148,6 @@ export default function NewTrainings() {
         }
       );
     }
-  }, []);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const fetchedEvents = await getTrainingEvents();
-        setEvents(fetchedEvents);
-      } catch (error) {
-        console.error('Error fetching events:', error);
-        toast.error('Failed to load events. Please try again.');
-      }
-    };
-
-    fetchEvents();
   }, []);
 
   // Update the handleKeyDown function to use setSearchInput

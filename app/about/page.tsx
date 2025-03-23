@@ -118,7 +118,7 @@ export default function AboutPage() {
                 Find Training Events
               </Link>
               <Link
-                href="/auth/signin"
+                href="/signin"
                 className="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-primary"
               >
                 Join Now - It&apos;s Free

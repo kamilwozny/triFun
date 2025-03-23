@@ -47,11 +47,21 @@ export async function signUpForEvent(eventId: string) {
     return {
       success: true,
       message: event.isPrivate
-        ? 'Successfully signed up for the event!'
-        : 'Request sent! Waiting for host approval.',
+        ? 'Request sent! Waiting for host approval.'
+        : 'Successfully signed up for the event!',
     };
   } catch (error) {
     console.error('Error signing up for event:', error);
     return { success: false, error: 'Failed to sign up for event' };
   }
+}
+
+export async function signUpEventAction(formData: FormData) {
+  const eventId = formData.get('eventId');
+
+  if (!eventId || typeof eventId !== 'string') {
+    return { success: false, error: 'Invalid event ID' };
+  }
+
+  return signUpForEvent(eventId);
 }
