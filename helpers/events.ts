@@ -40,12 +40,3 @@ export const getAllTrainingEvents = cache(async () => {
   });
   return data ?? [];
 });
-
-export const getOneEvent = async (userId: string, eventId: string) => {
-  return db.query.events.findFirst({
-    where: and(
-      eq(trainingEvents.createdBy, userId),
-      eq(trainingEvents.id, eventId)
-    ),
-  });
-};

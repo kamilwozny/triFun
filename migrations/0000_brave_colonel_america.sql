@@ -54,31 +54,11 @@ CREATE TABLE `comments` (
 CREATE TABLE `event_attendees` (
 	`event_id` text NOT NULL,
 	`attendee_id` text NOT NULL,
-	`status` text DEFAULT 'confirmed' NOT NULL,
-	`created_at` integer DEFAULT CURRENT_TIMESTAMP NOT NULL
+	`status` text NOT NULL,
+	`created_at` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `event_attendees_event_id_attendee_id_unique` ON `event_attendees` (`event_id`,`attendee_id`);--> statement-breakpoint
-CREATE TABLE `events` (
-	`id` text PRIMARY KEY NOT NULL,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`name` text NOT NULL,
-	`startOn` text NOT NULL,
-	`createdById` text NOT NULL,
-	`description` text,
-	`country` text,
-	`city` text,
-	`address` text,
-	`organization` text,
-	`distance_swim` integer,
-	`distance_bike` integer,
-	`distance_run` integer,
-	`isPrivate` integer DEFAULT false NOT NULL,
-	`price` integer,
-	`status` text DEFAULT 'draft' NOT NULL
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX `events_createdById_name_unique` ON `events` (`createdById`,`name`);--> statement-breakpoint
 CREATE TABLE `posts` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
@@ -94,6 +74,21 @@ CREATE TABLE `posts` (
 	`updatedAt` text
 );
 --> statement-breakpoint
+CREATE TABLE `reviews` (
+	`id` text PRIMARY KEY NOT NULL,
+	`event_id` text NOT NULL,
+	`reviewer_id` text NOT NULL,
+	`target_user_id` text NOT NULL,
+	`rating` integer NOT NULL,
+	`comment` text,
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	`updatedAt` text DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (`event_id`) REFERENCES `training_events`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`reviewer_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`target_user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `reviews_event_id_reviewer_id_target_user_id_unique` ON `reviews` (`event_id`,`reviewer_id`,`target_user_id`);--> statement-breakpoint
 CREATE TABLE `session` (
 	`sessionToken` text PRIMARY KEY NOT NULL,
 	`userId` text NOT NULL,
@@ -126,9 +121,11 @@ CREATE TABLE `training_events` (
 	`user_position` text NOT NULL,
 	`distances` text NOT NULL,
 	`date` text NOT NULL,
+	`start_time` text NOT NULL,
 	`level` text NOT NULL,
 	`created_by` text NOT NULL,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	`is_private` integer DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `user` (
@@ -136,7 +133,11 @@ CREATE TABLE `user` (
 	`name` text,
 	`email` text,
 	`emailVerified` integer,
-	`image` text
+	`image` text,
+	`bio` text,
+	`location` text,
+	`customAvatar` text,
+	`updatedAt` text DEFAULT CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);--> statement-breakpoint

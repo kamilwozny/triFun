@@ -1,1 +1,0 @@
-ALTER TABLE `training_events` RENAME COLUMN "is_public" TO "is_private";

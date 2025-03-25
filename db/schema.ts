@@ -44,6 +44,12 @@ export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
   trainingData: many(trainingData),
   attendedEvents: many(eventAttendees),
+  reviewsGiven: many(reviews, {
+    relationName: 'reviewerUser',
+  }),
+  reviewsReceived: many(reviews, {
+    relationName: 'targetUser',
+  }),
 }));
 
 export const accounts = sqliteTable(
@@ -114,42 +120,6 @@ export const authenticators = sqliteTable(
     }),
   })
 );
-
-export const events = sqliteTable(
-  'events',
-  {
-    id: id(),
-    createdAt: createdAt(),
-    name: text('name').notNull(),
-    startOn: date('startOn').notNull(),
-    createdById: text('createdById').notNull(),
-    description: text('description'),
-    country: text('country'),
-    city: text('city'),
-    address: text('address'),
-    organization: text('organization'),
-    distance_swim: integer('distance_swim'),
-    distance_bike: integer('distance_bike'),
-    distance_run: integer('distance_run'),
-    isPrivate: boolean('isPrivate').default(false).notNull(),
-    price: integer('price'),
-    status: text('status', {
-      enum: ['draft', 'live', 'started', 'ended', 'canceled'],
-    })
-      .default('draft')
-      .notNull(),
-  },
-  (table) => ({
-    unq: unique().on(table.createdById, table.name),
-  })
-);
-
-export const eventsRelations = relations(events, ({ one }) => ({
-  createdBy: one(users, {
-    references: [users.id],
-    fields: [events.createdById],
-  }),
-}));
 
 export const eventAttendees = sqliteTable(
   'event_attendees',
@@ -231,10 +201,6 @@ export const checklists = sqliteTable('checklists', {
 });
 
 export const checklistsRelations = relations(checklists, ({ one, many }) => ({
-  event: one(events, {
-    references: [events.id],
-    fields: [checklists.eventId],
-  }),
   user: one(users, {
     references: [users.id],
     fields: [checklists.userId],
@@ -308,5 +274,49 @@ export const trainingDataRelations = relations(trainingData, ({ one }) => ({
   post: one(posts, {
     references: [posts.id],
     fields: [trainingData.postId],
+  }),
+}));
+
+export const reviews = sqliteTable(
+  'reviews',
+  {
+    id: id(),
+    eventId: text('event_id')
+      .notNull()
+      .references(() => trainingEvents.id, { onDelete: 'cascade' }),
+    reviewerId: text('reviewer_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    targetUserId: text('target_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    rating: integer('rating').notNull(),
+    comment: text('comment'),
+    createdAt: createdAt(),
+    updatedAt: text('updatedAt').default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => ({
+    uniqueReview: unique().on(
+      table.eventId,
+      table.reviewerId,
+      table.targetUserId
+    ),
+  })
+);
+
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  event: one(trainingEvents, {
+    fields: [reviews.eventId],
+    references: [trainingEvents.id],
+  }),
+  reviewerUser: one(users, {
+    fields: [reviews.reviewerId],
+    references: [users.id],
+    relationName: 'reviewerUser',
+  }),
+  targetUser: one(users, {
+    fields: [reviews.targetUserId],
+    references: [users.id],
+    relationName: 'targetUser',
   }),
 }));

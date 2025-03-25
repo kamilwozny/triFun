@@ -11,6 +11,9 @@ import { useTrainingEvents } from '@/providers/TrainingEventsProvider';
 import { useSession } from 'next-auth/react';
 import { EventFilters } from './EventFilters';
 import { LocationSearch } from './LocationSearch';
+import { getEventParticipants } from '@/actions/reviews';
+import type { InferSelectModel } from 'drizzle-orm';
+import type { eventAttendees } from '@/db/schema';
 
 interface LocationSuggestion {
   text: string;
@@ -39,7 +42,7 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-type TabType = 'upcoming' | 'myEvents';
+type TabType = 'upcoming' | 'myEvents' | 'past';
 
 export default function NewTrainings() {
   const router = useRouter();
@@ -50,13 +53,23 @@ export default function NewTrainings() {
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState<string>('');
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedEventForReview, setSelectedEventForReview] = useState<
+    (typeof events)[0] | null
+  >(null);
+  const [participants, setParticipants] = useState<
+    Array<{
+      id: string;
+      name: string;
+      image: string;
+    }>
+  >([]);
 
   const searchQuery = useDebounce(searchInput, 300);
 
-  // Get only future events (today's date or later)
   const upcomingEvents = useMemo(() => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of day
+    today.setHours(0, 0, 0, 0);
 
     return events.filter((event) => {
       const eventDate = new Date(event.date);
@@ -64,30 +77,39 @@ export default function NewTrainings() {
     });
   }, [events]);
 
-  // Filter events the user is participating in or created
+  // // Filter events the user is participating in or created
   const userEvents = useMemo(() => {
     if (!session?.user?.id) return [];
 
     return upcomingEvents.filter((event) => {
       // Check if user created the event
       return event.createdBy === session?.user?.id;
-
-      // Note: In a real implementation, you would also add a check for
-      // events the user is participating in, using an API call or a list of participants
-      // For example: || event.participants?.includes(session.user.id)
     });
   }, [upcomingEvents, session?.user?.id]);
+
+  // Get past events
+  const pastEvents = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return events.filter((event) => {
+      const eventDate = new Date(event.date);
+      return eventDate < today;
+    });
+  }, [events]);
 
   // Select which events to display based on active tab
   const displayEvents = useMemo(() => {
     switch (activeTab) {
       case 'myEvents':
         return userEvents;
+      case 'past':
+        return pastEvents;
       case 'upcoming':
       default:
         return upcomingEvents;
     }
-  }, [activeTab, upcomingEvents, userEvents]);
+  }, [activeTab, upcomingEvents, userEvents, pastEvents]);
 
   const locationSuggestions = useMemo(() => {
     const suggestions: LocationSuggestion[] = [];
@@ -154,6 +176,31 @@ export default function NewTrainings() {
     }
   }, []);
 
+  // // Load participants when event is selected for review
+  // useEffect(() => {
+  //   if (selectedEventForReview) {
+  //     getEventParticipants(selectedEventForReview.id).then((result) => {
+  //       setParticipants(
+  //         result.map(
+  //           (
+  //             p: InferSelectModel<typeof eventAttendees> & {
+  //               attendee: {
+  //                 id: string;
+  //                 name: string | null;
+  //                 image: string | null;
+  //               };
+  //             }
+  //           ) => ({
+  //             id: p.attendee.id,
+  //             name: p.attendee.name || '',
+  //             image: p.attendee.image || '',
+  //           })
+  //         )
+  //       );
+  //     });
+  //   }
+  // }, [selectedEventForReview]);
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 lg:p-8">
       <div className="flex flex-wrap gap-4 justify-center w-full mb-4">
@@ -177,6 +224,14 @@ export default function NewTrainings() {
             onClick={() => setActiveTab('myEvents')}
           >
             My Events
+          </button>
+          <button
+            className={`tab text-xl font-medium transition-all duration-200 hover:bg-neutral hover:text-white ${
+              activeTab === 'past' ? 'bg-neutral text-white' : 'text-neutral'
+            }`}
+            onClick={() => setActiveTab('past')}
+          >
+            Past Events
           </button>
         </div>
 
@@ -260,6 +315,21 @@ export default function NewTrainings() {
                       </div>
                     ))}
                   </div>
+
+                  {activeTab === 'past' && (
+                    <div className="mt-6 pt-4 border-t border-base-200">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedEventForReview(event);
+                          setShowReviewModal(true);
+                        }}
+                        className="btn btn-primary btn-sm"
+                      >
+                        Review Participants
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -267,6 +337,8 @@ export default function NewTrainings() {
               <div className="text-center text-neutral text-xl font-extrabold mt-4">
                 {activeTab === 'myEvents'
                   ? "You don't have any events yet."
+                  : activeTab === 'past'
+                  ? 'No past events found.'
                   : 'No events found matching your criteria.'}
               </div>
             )}
@@ -330,6 +402,42 @@ export default function NewTrainings() {
           </div>
         </div>
       </div>
+
+      {/* Review Modal
+      {showReviewModal && selectedEventForReview && (
+        <dialog className="modal modal-open">
+          <div className="modal-box max-w-3xl">
+            <h3 className="font-bold text-lg mb-6">
+              Review Participants - {selectedEventForReview.name}
+            </h3>
+
+            {participants.length > 0 ? (
+              <BulkReviewSection
+                eventId={selectedEventForReview.id}
+                participants={participants}
+                onComplete={() => {
+                  setShowReviewModal(false);
+                  setSelectedEventForReview(null);
+                }}
+              />
+            ) : (
+              <div className="text-center py-8 text-base-content/70">
+                No participants to review.
+              </div>
+            )}
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button
+              onClick={() => {
+                setShowReviewModal(false);
+                setSelectedEventForReview(null);
+              }}
+            >
+              close
+            </button>
+          </form>
+        </dialog>
+      )} */}
     </div>
   );
 }
