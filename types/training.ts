@@ -13,8 +13,14 @@ export interface TrainingEvent {
   createdBy: string;
   createdAt: string;
   isPrivate: boolean;
-  // Computed fields
+  startTime: string;
   activities: string[];
+  attendees?: {
+    eventId: string;
+    attendeeId: string;
+    status: string;
+    createdAt: Date;
+  }[];
   location?: {
     lat: number;
     lng: number;

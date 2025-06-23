@@ -8,39 +8,22 @@ import { formatDate } from '@/lib/utils';
 import '@/components/trainings/Trainings.css';
 import Link from 'next/link';
 import { useTrainingEvents } from '@/providers/TrainingEventsProvider';
+
 import { useSession } from 'next-auth/react';
 import { EventFilters } from './EventFilters';
 import { LocationSearch } from './LocationSearch';
-import { getEventParticipants } from '@/actions/reviews';
-import type { InferSelectModel } from 'drizzle-orm';
-import type { eventAttendees } from '@/db/schema';
-
-interface LocationSuggestion {
-  text: string;
-  type: 'city' | 'country';
-}
+import { BulkReviewForm } from '../reviews/BulkReviewForm';
+import useDebounce from '@/helpers/useDebounce';
+import { LocationSuggestion } from '../map/types';
+import { TrainingTab } from '../trainingTab/TrainingTab';
+import { TrainingEvent } from '@/types/training';
+import MapSkeleton from '../skeletons/MapSkeleton';
 
 const difficultyColors = {
   Beginner: 'bg-green-100 text-green-800',
   Intermediate: 'bg-yellow-100 text-yellow-800',
   Expert: 'bg-red-100 text-red-800',
 };
-
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
 
 type TabType = 'upcoming' | 'myEvents' | 'past';
 
@@ -54,19 +37,12 @@ export default function NewTrainings() {
   const [searchInput, setSearchInput] = useState<string>('');
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [selectedEventForReview, setSelectedEventForReview] = useState<
-    (typeof events)[0] | null
-  >(null);
-  const [participants, setParticipants] = useState<
-    Array<{
-      id: string;
-      name: string;
-      image: string;
-    }>
-  >([]);
+  const [reviewEventId, setReviewEventId] = useState<string>('');
+  const [reviewEvent, setReviewEvent] = useState<TrainingEvent | undefined>();
 
   const searchQuery = useDebounce(searchInput, 300);
 
+  // Get upcoming events
   const upcomingEvents = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -77,13 +53,16 @@ export default function NewTrainings() {
     });
   }, [events]);
 
-  // // Filter events the user is participating in or created
+  // Filter events the user is participating in or created
   const userEvents = useMemo(() => {
     if (!session?.user?.id) return [];
-
     return upcomingEvents.filter((event) => {
-      // Check if user created the event
-      return event.createdBy === session?.user?.id;
+      return (
+        event.createdBy === session?.user?.id ||
+        event.attendees?.find(
+          (attendee) => attendee.attendeeId === session?.user?.id
+        )
+      );
     });
   }, [upcomingEvents, session?.user?.id]);
 
@@ -111,6 +90,7 @@ export default function NewTrainings() {
     }
   }, [activeTab, upcomingEvents, userEvents, pastEvents]);
 
+  // Show suggestions of locations only on already created events
   const locationSuggestions = useMemo(() => {
     const suggestions: LocationSuggestion[] = [];
     const uniqueCities = new Set<string>();
@@ -130,7 +110,7 @@ export default function NewTrainings() {
     return suggestions;
   }, [displayEvents]);
 
-  // Keep filteredEvents using the debounced searchQuery
+  // Filter events based on search and tabs
   const filteredEvents = useMemo(() => {
     return displayEvents.filter((event) => {
       const matchesSearch = searchQuery
@@ -147,19 +127,17 @@ export default function NewTrainings() {
     });
   }, [displayEvents, selectedActivity, searchQuery]);
 
+  // Map component
   const Map = useMemo(
     () =>
       dynamic(() => import('@/components/map/Map'), {
-        loading: () => (
-          <div className="min-w-[40vw] h-[700px] mr-10 text-center">
-            <p className="text-lg font-bold">Loading map...</p>
-          </div>
-        ),
-        ssr: false,
+        loading: () => <MapSkeleton />,
+        ssr: true,
       }),
     []
   );
 
+  // Get user position to show country based map view
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -176,63 +154,34 @@ export default function NewTrainings() {
     }
   }, []);
 
-  // // Load participants when event is selected for review
-  // useEffect(() => {
-  //   if (selectedEventForReview) {
-  //     getEventParticipants(selectedEventForReview.id).then((result) => {
-  //       setParticipants(
-  //         result.map(
-  //           (
-  //             p: InferSelectModel<typeof eventAttendees> & {
-  //               attendee: {
-  //                 id: string;
-  //                 name: string | null;
-  //                 image: string | null;
-  //               };
-  //             }
-  //           ) => ({
-  //             id: p.attendee.id,
-  //             name: p.attendee.name || '',
-  //             image: p.attendee.image || '',
-  //           })
-  //         )
-  //       );
-  //     });
-  //   }
-  // }, [selectedEventForReview]);
+  useEffect(() => {
+    if (reviewEventId) {
+      setReviewEvent(pastEvents.find((event) => event.id === reviewEventId));
+    }
+  }, [reviewEventId, pastEvents]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 lg:p-8">
       <div className="flex flex-wrap gap-4 justify-center w-full mb-4">
         <div className="tabs tabs-boxed bg-base-200/50 p-2 rounded-xl mr-auto">
-          <button
-            className={`tab text-xl font-medium transition-all duration-200 hover:bg-neutral hover:text-white ${
-              activeTab === 'upcoming'
-                ? 'bg-neutral text-white'
-                : 'text-neutral'
-            }`}
+          <TrainingTab
+            label="Upcoming events"
+            activeTab={activeTab}
+            activeLabel="upcoming"
             onClick={() => setActiveTab('upcoming')}
-          >
-            Upcoming Events
-          </button>
-          <button
-            className={`tab text-xl font-medium transition-all duration-200 hover:bg-neutral hover:text-white ${
-              activeTab === 'myEvents'
-                ? 'bg-neutral text-white'
-                : 'text-neutral'
-            }`}
+          />
+          <TrainingTab
+            label="My events"
+            activeTab={activeTab}
+            activeLabel="myEvents"
             onClick={() => setActiveTab('myEvents')}
-          >
-            My Events
-          </button>
-          <button
-            className={`tab text-xl font-medium transition-all duration-200 hover:bg-neutral hover:text-white ${
-              activeTab === 'past' ? 'bg-neutral text-white' : 'text-neutral'
-            }`}
+          />
+          <TrainingTab
+            label="Past events"
+            activeTab={activeTab}
+            activeLabel="past"
             onClick={() => setActiveTab('past')}
-          >
-            Past Events
-          </button>
+          />
         </div>
 
         <LocationSearch
@@ -245,7 +194,6 @@ export default function NewTrainings() {
           setSelectedActivity={setSelectedActivity}
         />
       </div>
-
       <div className="flex flex-col lg:flex-row items-start justify-center max-w-full gap-8 w-full">
         <div className="w-full lg:w-1/2 xl:w-3/5">
           <div
@@ -316,20 +264,21 @@ export default function NewTrainings() {
                     ))}
                   </div>
 
-                  {activeTab === 'past' && (
-                    <div className="mt-6 pt-4 border-t border-base-200">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedEventForReview(event);
-                          setShowReviewModal(true);
-                        }}
-                        className="btn btn-primary btn-sm"
-                      >
-                        Review Participants
-                      </button>
-                    </div>
-                  )}
+                  {activeTab === 'past' &&
+                    session?.user?.id === event.createdBy && (
+                      <div className="mt-6 pt-4 border-t border-base-200">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setReviewEventId(event.id);
+                            setShowReviewModal(true);
+                          }}
+                          className="btn btn-primary btn-sm"
+                        >
+                          Review Participants
+                        </button>
+                      </div>
+                    )}
                 </div>
               </div>
             ))}
@@ -350,7 +299,6 @@ export default function NewTrainings() {
             {userPosition ? (
               <Map
                 position={userPosition}
-                zoom={13}
                 pickPoint={false}
                 handleLocation={() => {}}
                 events={filteredEvents}
@@ -382,9 +330,7 @@ export default function NewTrainings() {
                 })}
               />
             ) : (
-              <div className="min-w-[40vw] h-[700px] flex items-center justify-center">
-                <div className="loading loading-spinner loading-lg"></div>
-              </div>
+              <MapSkeleton />
             )}
           </div>
 
@@ -402,42 +348,29 @@ export default function NewTrainings() {
           </div>
         </div>
       </div>
-
-      {/* Review Modal
-      {showReviewModal && selectedEventForReview && (
+      {showReviewModal && reviewEvent?.attendees && (
         <dialog className="modal modal-open">
           <div className="modal-box max-w-3xl">
             <h3 className="font-bold text-lg mb-6">
-              Review Participants - {selectedEventForReview.name}
+              Review Participants - {reviewEvent.name}
             </h3>
-
-            {participants.length > 0 ? (
-              <BulkReviewSection
-                eventId={selectedEventForReview.id}
-                participants={participants}
-                onComplete={() => {
-                  setShowReviewModal(false);
-                  setSelectedEventForReview(null);
-                }}
-              />
-            ) : (
-              <div className="text-center py-8 text-base-content/70">
-                No participants to review.
-              </div>
-            )}
+            <BulkReviewForm
+              eventId={reviewEventId}
+              participants={reviewEvent.attendees}
+              userId={session?.user?.id}
+            />
           </div>
           <form method="dialog" className="modal-backdrop">
             <button
               onClick={() => {
                 setShowReviewModal(false);
-                setSelectedEventForReview(null);
               }}
             >
               close
             </button>
           </form>
         </dialog>
-      )} */}
+      )}
     </div>
   );
 }

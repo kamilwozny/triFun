@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { v4 as uuid_v4 } from 'uuid';
 import { relations, sql } from 'drizzle-orm';
 import {
   integer,
@@ -14,14 +14,12 @@ type Level = 'Beginner' | 'Intermediate' | 'Expert';
 const id = () =>
   text('id')
     .primaryKey()
-    .$default(() => randomUUID());
+    .$default(() => uuid_v4());
 
 const createdAt = () =>
   text('created_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull();
-
-const date = (name: string) => text(name);
 
 const boolean = (field: string) => integer(field, { mode: 'boolean' });
 
@@ -293,7 +291,9 @@ export const reviews = sqliteTable(
     rating: integer('rating').notNull(),
     comment: text('comment'),
     createdAt: createdAt(),
-    updatedAt: text('updatedAt').default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text('updatedAt')
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
   (table) => ({
     uniqueReview: unique().on(

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface StarRatingProps {
   rating?: number;
@@ -17,6 +17,10 @@ export function StarRating({
 }: StarRatingProps) {
   const [rating, setRating] = useState(initialRating);
   const [hover, setHover] = useState(0);
+
+  useEffect(() => {
+    setRating(initialRating);
+  }, [initialRating]);
 
   const sizeClasses = {
     sm: 'mask-size-8',

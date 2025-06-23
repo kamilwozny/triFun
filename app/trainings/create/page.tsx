@@ -8,11 +8,12 @@ import { useForm } from 'react-hook-form';
 import { createNewTrainingEvent } from '@/actions/trainingEvents';
 import { useRouter } from 'next/navigation';
 import { Level } from '@/types/training';
-import { motion } from 'framer-motion';
-import { FaLock, FaGlobe, FaCalendar, FaClock } from 'react-icons/fa';
-import { DayPicker } from 'react-day-picker';
+import { FaCalendar, FaClock, FaExclamationTriangle } from 'react-icons/fa';
 import { format } from 'date-fns';
 import 'react-day-picker/style.css';
+import { DatePickerModal } from '@/components/datePickerModal/DatePickerModal';
+import { EventTypeSelect } from '@/components/eventTypeSelect/EventTypeSelect';
+import MapSkeleton from '@/components/skeletons/MapSkeleton';
 
 interface DistanceData {
   activity: string;
@@ -108,10 +109,8 @@ export default function CreateTrainingEvent() {
   const Map = useMemo(
     () =>
       dynamic(() => import('@/components/map/Map'), {
-        loading: () => (
-          <div className="skeleton h-full flex items-center justify-center"></div>
-        ),
-        ssr: false,
+        loading: () => <MapSkeleton />,
+        ssr: true,
       }),
     []
   );
@@ -169,6 +168,7 @@ export default function CreateTrainingEvent() {
   };
 
   const onSubmit = async (data: FormData) => {
+    let redirectPath: string | null = null;
     try {
       setError(null);
       if (!location.city || !location.country || !location.position) {
@@ -194,7 +194,7 @@ export default function CreateTrainingEvent() {
         })
       );
 
-      const result = await createNewTrainingEvent(
+      await createNewTrainingEvent(
         {
           name: data.name,
           description: data.description,
@@ -208,14 +208,14 @@ export default function CreateTrainingEvent() {
         location
       );
 
-      if (result?.success) {
-        router.push('/trainings');
-      }
+      redirectPath = '/trainings';
     } catch (error) {
       console.error('Error creating event:', error);
       setError(
         error instanceof Error ? error.message : 'Failed to create event'
       );
+    } finally {
+      redirectPath && router.push(redirectPath);
     }
   };
 
@@ -226,19 +226,7 @@ export default function CreateTrainingEvent() {
       </h2>
       {error && (
         <div className="alert alert-error mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          <FaExclamationTriangle />
           <span>{error}</span>
         </div>
       )}
@@ -337,41 +325,9 @@ export default function CreateTrainingEvent() {
           <div className="form-control">
             <label className="label text-sm font-medium">Event Privacy</label>
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                className="relative w-16 h-8 rounded-full transition-colors duration-300 ease-in-out focus:outline-none"
-                style={{
-                  backgroundColor: isPrivate ? 'rgb(var(--p))' : '#e5e7eb',
-                }}
-                onClick={() => setIsPrivate(!isPrivate)}
-              >
-                <motion.div
-                  className="absolute top-1 left-1 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-md"
-                  animate={{
-                    x: isPrivate ? 32 : 0,
-                  }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 500,
-                    damping: 30,
-                  }}
-                >
-                  <motion.div
-                    animate={{
-                      scale: [1, 0.8, 1],
-                    }}
-                    transition={{
-                      duration: 0.3,
-                    }}
-                  >
-                    {isPrivate ? (
-                      <FaLock className="w-3 h-3 text-secondary" />
-                    ) : (
-                      <FaGlobe className="w-3 h-3 text-neutral" />
-                    )}
-                  </motion.div>
-                </motion.div>
-              </button>
+              <EventTypeSelect
+                onChange={(isPrivate) => setIsPrivate(isPrivate)}
+              />
               <span className="text-md text">
                 {isPrivate ? 'Private Event' : 'Public Event'}
               </span>
@@ -450,42 +406,12 @@ export default function CreateTrainingEvent() {
         </div>
       </form>
 
-      <dialog
-        ref={modalRef}
-        className="modal modal-bottom sm:modal-middle"
-        onClose={() => setIsDatePickerOpen(false)}
-      >
-        <div className="modal-box p-0 relative bg-white rounded-lg shadow-xl">
-          <div className="p-4 border-b">
-            <h3 className="font-bold text-lg">Select Event Date</h3>
-          </div>
-          <div className="pt-4">
-            <DayPicker
-              mode="single"
-              selected={selectedDate}
-              onSelect={handleDateSelect}
-              disabled={(date) => date < new Date()}
-              className="flex justify-center min-h-[380px]"
-              classNames={{
-                day_selected: 'bg-primary text-primary-content',
-                day_today: 'bg-neutral text-neutral-content',
-              }}
-            />
-          </div>
-          <div className="modal-action p-4 border-t">
-            <button
-              type="button"
-              className="btn"
-              onClick={() => setIsDatePickerOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button onClick={() => setIsDatePickerOpen(false)}>close</button>
-        </form>
-      </dialog>
+      <DatePickerModal
+        handleDateSelect={handleDateSelect}
+        selectedDate={selectedDate}
+        modalRef={modalRef}
+        handleVisibilityPicker={() => setIsDatePickerOpen(false)}
+      />
     </div>
   );
 }

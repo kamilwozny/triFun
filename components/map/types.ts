@@ -1,5 +1,4 @@
 import { LatLng } from 'leaflet';
-import { Dispatch, SetStateAction } from 'react';
 import { TrainingEvent } from '@/types/training';
 
 export interface MapMarker {
@@ -47,4 +46,9 @@ export interface Location {
     lat: number;
     lng: number;
   } | null;
+}
+
+export interface LocationSuggestion {
+  text: string;
+  type: 'city' | 'country';
 }

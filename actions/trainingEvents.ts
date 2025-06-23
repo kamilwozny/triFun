@@ -60,9 +60,13 @@ export async function createNewTrainingEvent(
 
 export async function getTrainingEvents(): Promise<TrainingEvent[]> {
   try {
-    const events = await db.select().from(trainingEvents);
+    const events = await db.query.trainingEvents.findMany({
+      with: {
+        attendees: true,
+      },
+    });
     return events.map((event) => {
-      const userPosition = JSON.parse(event.userPosition);
+      const userPosition = event.userPosition.split(',').map(Number);
       const distances = JSON.parse(event.distances);
       const activities = distances.map((d: { activity: string }) => d.activity);
 
@@ -70,7 +74,7 @@ export async function getTrainingEvents(): Promise<TrainingEvent[]> {
         ...event,
         activities,
         location: userPosition
-          ? { lat: userPosition.lat, lng: userPosition.lng }
+          ? { lat: userPosition[0], lng: userPosition[1] }
           : undefined,
         parsedDistances: distances,
       };

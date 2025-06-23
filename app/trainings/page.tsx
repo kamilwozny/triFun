@@ -1,7 +1,5 @@
 import { getTrainingEvents } from '@/actions/trainingEvents';
 import dynamic from 'next/dynamic';
-import { auth } from '@/app/auth';
-import { redirect } from 'next/navigation';
 import { TrainingEventsProvider } from '@/providers/TrainingEventsProvider';
 
 export default async function TrainingsPage() {
@@ -10,7 +8,7 @@ export default async function TrainingsPage() {
   const NewTrainings = dynamic(
     () => import('@/components/trainings/NewTrainings'),
     {
-      ssr: false,
+      ssr: true,
     }
   );
 

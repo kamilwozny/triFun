@@ -2,7 +2,6 @@ import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
 import { auth } from '@/app/auth';
 import { SignupButton } from '@/components/signupButton/SignupButton';
-import { signUpEventAction } from '@/actions/attendeesEvents';
 import 'leaflet/dist/leaflet.css';
 import {
   FaRunning,
@@ -138,14 +137,15 @@ export default async function TrainingPage({
               Attendees ({attendees?.length || 0})
             </h2>
           </div>
-          {attendees?.find((attendee) => attendee.id === user?.id) ? (
-            <button>Invite friends</button>
-          ) : (
-            <SignupButton
-              eventId={params.id}
-              signUpAction={signUpEventAction}
-            />
-          )}
+          {Date.parse(training.date) < Date.now() ? (
+            attendees?.find((attendee) => attendee.id === user?.id) ? (
+              <button>Invite friends</button>
+            ) : (
+              training.createdBy !== user?.id && (
+                <SignupButton eventId={params.id} />
+              )
+            )
+          ) : null}
         </div>
 
         <div className="overflow-x-auto">

@@ -3,25 +3,20 @@
 import { useState } from 'react';
 import { StarRating } from './StarRating';
 import Image from 'next/image';
-
-interface Participant {
-  id: string;
-  name: string;
-  image: string;
-}
+import { createReviews } from '@/actions/reviews';
 
 interface BulkReviewFormProps {
   eventId: string;
-  participants: Participant[];
-  onSubmitReview: (data: {
-    targetUserId: string;
-    rating: number;
-    comment: string;
-  }) => Promise<void>;
-  onComplete: () => void;
+  participants: {
+    eventId: string;
+    attendeeId: string;
+    status: string;
+    createdAt: Date;
+  }[];
+  userId?: string;
 }
 
-interface ReviewData {
+export interface ReviewData {
   rating: number;
   comment: string;
 }
@@ -29,26 +24,23 @@ interface ReviewData {
 export function BulkReviewForm({
   eventId,
   participants,
-  onSubmitReview,
-  onComplete,
+  userId,
 }: BulkReviewFormProps) {
   const [reviews, setReviews] = useState<Record<string, ReviewData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
   const handleSubmit = async () => {
+    if (!userId) return;
     setIsSubmitting(true);
     try {
-      await Promise.all(
-        Object.entries(reviews).map(([userId, review]) =>
-          onSubmitReview({
-            targetUserId: userId,
-            rating: review.rating,
-            comment: review.comment,
-          })
-        )
-      );
-      onComplete();
+      const reviewData = Object.entries(reviews).map(([key, value]) => ({
+        eventId: eventId,
+        targetUserId: key,
+        reviewerId: userId,
+        ...value,
+      }));
+      await createReviews(reviewData);
     } catch (error) {
       console.error('Failed to submit reviews:', error);
     } finally {
@@ -78,7 +70,7 @@ export function BulkReviewForm({
 
   if (!currentParticipant) return null;
 
-  const currentReview = reviews[currentParticipant.id] || {
+  const currentReview = reviews[currentParticipant.attendeeId] || {
     rating: 0,
     comment: '',
   };
@@ -97,7 +89,7 @@ export function BulkReviewForm({
       </div>
 
       <div className="flex items-center gap-4 mb-6">
-        {currentParticipant.image ? (
+        {/* {currentParticipant.image ? (
           <Image
             src={currentParticipant.image}
             alt={currentParticipant.name}
@@ -113,9 +105,11 @@ export function BulkReviewForm({
               </span>
             </div>
           </div>
-        )}
+        )} */}
         <div>
-          <h4 className="text-lg font-medium">{currentParticipant.name}</h4>
+          <h4 className="text-lg font-medium">
+            {currentParticipant.attendeeId}
+          </h4>
         </div>
       </div>
 
@@ -129,7 +123,7 @@ export function BulkReviewForm({
             onChange={(rating) =>
               setReviews({
                 ...reviews,
-                [currentParticipant.id]: {
+                [currentParticipant.attendeeId]: {
                   ...currentReview,
                   rating,
                 },
@@ -155,7 +149,7 @@ export function BulkReviewForm({
             onChange={(e) =>
               setReviews({
                 ...reviews,
-                [currentParticipant.id]: {
+                [currentParticipant.attendeeId]: {
                   ...currentReview,
                   comment: e.target.value,
                 },

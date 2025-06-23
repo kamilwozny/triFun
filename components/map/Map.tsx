@@ -120,7 +120,7 @@ function createClusterCustomIcon(cluster: any) {
 
 export default function Map({
   position,
-  zoom = 13,
+  zoom,
   pickPoint = false,
   handleLocation,
   markers = [],
@@ -164,6 +164,7 @@ export default function Map({
       `}</style>
       <MapContainer
         center={markerPosition || position}
+        zoom={zoom}
         scrollWheelZoom={false}
         className="h-[700px] w-full"
       >
@@ -175,11 +176,32 @@ export default function Map({
         {!pickPoint && position && (
           <CountryBoundsInitializer position={[position.lat, position.lng]} />
         )}
+        {/* Display user's position marker if in pick point mode */}
         {pickPoint && markerPosition && (
           <Marker position={markerPosition} icon={icons.default}>
             <Popup>Your selected location</Popup>
           </Marker>
         )}
+        {/* Display all training markers */}
+        {markers.map((marker: MapMarker, index: number) => {
+          const iconKey = marker.selected
+            ? `${marker.type || 'default'}Selected`
+            : marker.type || 'default';
+          const icon = icons[iconKey as keyof typeof icons] || icons.default;
+
+          return (
+            <Marker key={index} position={marker.position} icon={icon}>
+              <Popup className="custom-popup">
+                <div className="text-center">
+                  <h3 className="font-bold text-lg mb-1">{marker.popup}</h3>
+                  {marker.details && (
+                    <p className="text-sm text-gray-600">{marker.details}</p>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
         {!pickPoint && markers.length > 0 && (
           <MarkerClusterGroup
             chunkedLoading
