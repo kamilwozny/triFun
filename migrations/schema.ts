@@ -63,6 +63,7 @@ export const eventAttendees = sqliteTable(
     eventId: text('event_id').notNull(),
     attendeeId: text('attendee_id').notNull(),
     status: text().notNull(),
+    isHost: integer('is_host').default(0).notNull(),
     createdAt: integer('created_at').notNull(),
   },
   (table) => [

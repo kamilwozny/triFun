@@ -127,6 +127,7 @@ export const eventAttendees = sqliteTable(
     status: text('status', {
       enum: ['pending', 'confirmed', 'declined'],
     }).notNull(),
+    isHost: boolean('is_host').default(false).notNull(),
     createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   },
   (table) => ({

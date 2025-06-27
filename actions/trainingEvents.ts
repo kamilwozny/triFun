@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db/db';
-import { trainingEvents } from '@/db/schema';
+import { eventAttendees, trainingEvents } from '@/db/schema';
 import type { Location } from '../components/map/types';
 import { auth } from '@/app/auth';
 import { TrainingEvent, Level } from '@/types/training';
@@ -32,26 +32,38 @@ export async function createNewTrainingEvent(
       throw new Error('Unauthorized');
     }
 
-    const result = await db.insert(trainingEvents).values({
-      name: data.name,
-      description: data.description,
-      city: location.city || '',
-      country: location.country || '',
-      userPosition: `${location.position?.lat},${location.position?.lng}`,
-      distances: JSON.stringify(data.distances),
-      date: data.date,
-      startTime: data.startTime,
-      level: data.level,
-      createdBy: session.user.id,
-      isPrivate: data.isPrivate,
-    });
+    const resultId = await db
+      .insert(trainingEvents)
+      .values({
+        name: data.name,
+        description: data.description,
+        city: location.city || '',
+        country: location.country || '',
+        userPosition: `${location.position?.lat},${location.position?.lng}`,
+        distances: JSON.stringify(data.distances),
+        date: data.date,
+        startTime: data.startTime,
+        level: data.level,
+        createdBy: session.user.id,
+        isPrivate: data.isPrivate,
+      })
+      .returning({ id: trainingEvents.id });
 
-    if (result) {
-      revalidateTrainings();
-      return { success: true };
+    if (resultId) {
+      const insertHostResult = await db.insert(eventAttendees).values({
+        eventId: resultId[0].id,
+        attendeeId: session.user.id,
+        status: 'confirmed',
+        isHost: true,
+        createdAt: new Date(),
+      });
+      if (resultId && insertHostResult) {
+        revalidateTrainings();
+        return { success: true };
+      }
+
+      return { success: false };
     }
-
-    return { success: false };
   } catch (error) {
     console.error('Error creating training event:', error);
     throw error;
