@@ -137,7 +137,7 @@ export default async function TrainingPage({
               Attendees ({attendees?.length || 0})
             </h2>
           </div>
-          {Date.parse(training.date) < Date.now() ? (
+          {Date.parse(training.date) > Date.now() ? (
             attendees?.find((attendee) => attendee.id === user?.id) ? (
               <button>Invite friends</button>
             ) : (
