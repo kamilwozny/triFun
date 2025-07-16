@@ -14,6 +14,7 @@ import 'react-day-picker/style.css';
 import { DatePickerModal } from '@/components/datePickerModal/DatePickerModal';
 import { EventTypeSelect } from '@/components/eventTypeSelect/EventTypeSelect';
 import MapSkeleton from '@/components/skeletons/MapSkeleton';
+import sendSimpleMessage from '@/helpers/sendMail';
 
 interface DistanceData {
   activity: string;
@@ -207,6 +208,7 @@ export default function CreateTrainingEvent() {
         },
         location
       );
+      sendSimpleMessage();
 
       redirectPath = '/trainings';
     } catch (error) {
