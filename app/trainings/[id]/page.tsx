@@ -35,6 +35,7 @@ interface Attendee {
   id: string | null;
   name: string | null;
   email: string | null;
+  isHost: boolean;
   status: 'pending' | 'confirmed' | 'declined';
   joinedDate: Date;
 }
@@ -170,8 +171,11 @@ export default async function TrainingPage({
                         </div>
                       </div>
                       <div>
-                        <div className="font-semibold text-neutral-800">
-                          {attendee.name || 'Anonymous'}
+                        <div className="font-semibold text-neutral-800 flex gap-1">
+                          {attendee.name || 'Anonymous'}{' '}
+                          <p className="font-bold">
+                            {attendee.isHost && '(Host)'}
+                          </p>
                         </div>
                       </div>
                     </div>

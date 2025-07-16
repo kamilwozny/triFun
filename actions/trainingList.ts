@@ -9,6 +9,7 @@ export const getTrainingList = async (eventId: string) => {
       name: users.name,
       email: users.email,
       status: eventAttendees.status,
+      isHost: eventAttendees.isHost,
       joinedDate: eventAttendees.createdAt,
     })
     .from(eventAttendees)

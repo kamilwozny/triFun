@@ -51,12 +51,13 @@
 - [] Set up CI/CD pipeline
 - [x] Deploy to vercel -->
 
-add host as atendee
+<!-- add host as atendee -->
+<!-- add display of host on training -->
+
 allow users to review host/participiants (report not showing up), show in user profile
 Leaderboards view (created/taken part of)
 Add validation for creating events and taking part in
-Make first / view from trainings page
-Prepare about us(landing page)
+<!-- Prepare about us(landing page) -->
 Add notifications in app and on mail to actions (user can disable mail notification under user profile)
 Add more filters (by date, level and name of event)
 Make invite friends link working
