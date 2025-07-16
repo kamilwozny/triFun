@@ -1,0 +1,1 @@
+ALTER TABLE `training_events` DROP COLUMN `start_time`;
