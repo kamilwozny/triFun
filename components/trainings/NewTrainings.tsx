@@ -18,6 +18,7 @@ import { LocationSuggestion } from '../map/types';
 import { TrainingTab } from '../trainingTab/TrainingTab';
 import { TrainingEvent } from '@/types/training';
 import MapSkeleton from '../skeletons/MapSkeleton';
+import { getReviewsForEvent } from '@/actions/reviews';
 
 const difficultyColors = {
   Beginner: 'bg-green-100 text-green-800',
@@ -34,6 +35,7 @@ export default function NewTrainings() {
   const { events } = useTrainingEvents();
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   const [selectedTraining, setSelectedTraining] = useState<string | null>(null);
+  const [reviewedEventIds, setReviewedEventIds] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState<string>('');
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -76,6 +78,21 @@ export default function NewTrainings() {
       return eventDate < today;
     });
   }, [events]);
+
+  useEffect(() => {
+    if (activeTab === 'past') {
+      Promise.all(
+        pastEvents.map(async (event) => {
+          if (event.attendees && event.attendees.length < 1) return event.id;
+          const reviews = await getReviewsForEvent(event.id);
+          return reviews && reviews.length > 0 ? event.id : null;
+        })
+      ).then((ids) => {
+        console.log(ids);
+        setReviewedEventIds(ids.filter(Boolean) as string[]);
+      });
+    }
+  }, [activeTab, pastEvents]);
 
   // Select which events to display based on active tab
   const displayEvents = useMemo(() => {
@@ -265,7 +282,8 @@ export default function NewTrainings() {
                   </div>
 
                   {activeTab === 'past' &&
-                    session?.user?.id === event.createdBy && (
+                    session?.user?.id === event.createdBy &&
+                    !reviewedEventIds.includes(event.id) && (
                       <div className="mt-6 pt-4 border-t border-base-200">
                         <button
                           onClick={(e) => {
