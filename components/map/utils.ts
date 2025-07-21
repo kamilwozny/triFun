@@ -5,6 +5,7 @@ import {
   ReverseGeocodeProps,
 } from './types';
 import { useEffect } from 'react';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export const LocationMarker = ({
   pickPointMode,

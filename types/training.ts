@@ -20,6 +20,7 @@ export interface TrainingEvent {
     attendeeId: string;
     status: string;
     createdAt: Date;
+    isHost?: boolean;
   }[];
   location?: {
     lat: number;

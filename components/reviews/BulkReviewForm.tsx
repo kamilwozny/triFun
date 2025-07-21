@@ -12,6 +12,7 @@ interface BulkReviewFormProps {
     attendeeId: string;
     status: string;
     createdAt: Date;
+    isHost?: boolean;
   }[];
   userId?: string;
 }
@@ -40,16 +41,26 @@ export function BulkReviewForm({
         reviewerId: userId,
         ...value,
       }));
-      await createReviews(reviewData);
+      const result = await createReviews(reviewData);
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert(
+          ('error' in result && result.error) || 'Failed to submit reviews'
+        );
+      }
     } catch (error) {
       console.error('Failed to submit reviews:', error);
+      alert('Failed to submit reviews. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const currentParticipant = participants[currentStep];
-  const totalSteps = participants.length;
+  const filteredParticipants = participants.filter(
+    (participant) => participant.attendeeId !== userId && !participant.isHost
+  );
+  const currentParticipant = filteredParticipants[currentStep];
+  const totalSteps = filteredParticipants.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleNext = () => {
@@ -92,7 +103,7 @@ export function BulkReviewForm({
         {/* {currentParticipant.image ? (
           <Image
             src={currentParticipant.image}
-            alt={currentParticipant.name}
+            alt={currentParticipant.name || 'User'}
             width={64}
             height={64}
             className="rounded-full"
@@ -101,16 +112,16 @@ export function BulkReviewForm({
           <div className="avatar placeholder">
             <div className="bg-neutral-focus text-neutral-content rounded-full w-16">
               <span className="text-2xl">
-                {currentParticipant.name.charAt(0)}
+                {currentParticipant.name?.charAt(0) || 'U'}
               </span>
             </div>
           </div>
-        )} */}
+        )}
         <div>
           <h4 className="text-lg font-medium">
-            {currentParticipant.attendeeId}
+            {currentParticipant.name || 'Anonymous User'}
           </h4>
-        </div>
+        </div> */}
       </div>
 
       <div className="space-y-4">
@@ -119,16 +130,17 @@ export function BulkReviewForm({
             Rating
           </label>
           <StarRating
-            rating={currentReview.rating}
-            onChange={(rating) =>
-              setReviews({
+            rating={reviews[currentParticipant.attendeeId]?.rating || 0}
+            onChange={(rating) => {
+              console.log(currentParticipant);
+              return setReviews({
                 ...reviews,
                 [currentParticipant.attendeeId]: {
                   ...currentReview,
                   rating,
                 },
-              })
-            }
+              });
+            }}
             size="lg"
           />
         </div>
@@ -145,7 +157,7 @@ export function BulkReviewForm({
             rows={3}
             className="textarea textarea-bordered w-full"
             placeholder="Share your experience..."
-            value={currentReview.comment}
+            value={reviews[currentParticipant.attendeeId]?.comment || ''}
             onChange={(e) =>
               setReviews({
                 ...reviews,
@@ -186,7 +198,7 @@ export function BulkReviewForm({
               disabled={isSubmitting}
               className={`btn btn-primary ${isSubmitting ? 'loading' : ''}`}
             >
-              Submit All Reviews
+              Submit Reviews
             </button>
           ) : (
             <button

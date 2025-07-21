@@ -72,18 +72,9 @@ function CountryBoundsInitializer({
           ? position
           : [position.lat, position.lng];
 
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-        );
-        const data = await response.json();
-        const countryCode = data.address.country_code;
-
-        // Get country bounds
-        const boundsResponse = await fetch(
-          `https://nominatim.openstreetmap.org/search?country=${countryCode}&format=json`
-        );
-        const boundsData = await boundsResponse.json();
-
+        const response = await fetch(`/api/latlng?lat=${lat}&lng=${lng}`);
+        const boundsData = await response.json();
+        console.log(boundsData);
         if (boundsData[0]) {
           const bounds = L.latLngBounds(
             [boundsData[0].boundingbox[0], boundsData[0].boundingbox[2]],
