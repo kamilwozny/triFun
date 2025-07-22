@@ -1,8 +1,10 @@
 'use client';
 
+import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import { TrainingEvent } from '@/types/training';
+import { useTranslation } from 'react-i18next';
 
 const difficultyColors = {
   Beginner: 'bg-green-100 text-green-800',
@@ -12,38 +14,35 @@ const difficultyColors = {
 
 interface TrainingEventCardProps {
   event: TrainingEvent;
-  selectedTraining: string | null;
-  onSelect: (eventId: string) => void;
   showReviewButton?: boolean;
   onReview?: (eventId: string) => void;
 }
 
 export function TrainingEventCard({
   event,
-  selectedTraining,
-  onSelect,
   showReviewButton = false,
   onReview,
 }: TrainingEventCardProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
-  const handleCardClick = () => {
-    onSelect(event.id);
+  const handleCardClick = useCallback(() => {
     router.push(`/trainings/${event.id}`);
-  };
+  }, [event.id, router]);
 
-  const handleReviewClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onReview?.(event.id);
-  };
+  const handleReviewClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onReview?.(event.id);
+    },
+    [onReview, event.id]
+  );
 
   return (
     <div
       key={event.id}
       onClick={handleCardClick}
-      className={`card bg-white shadow-xl rounded-xl transition-all hover:shadow-2xl hover:cursor-pointer ${
-        selectedTraining === event.id ? 'ring-2 ring-primary' : ''
-      }`}
+      className={`card bg-white shadow-xl rounded-xl transition-all hover:shadow-2xl hover:cursor-pointer`}
     >
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
@@ -62,9 +61,7 @@ export function TrainingEventCard({
             </span>
             <span
               className={`mt-2 px-3 py-1 rounded-full text-xs font-medium ${
-                difficultyColors[
-                  event.level as keyof typeof difficultyColors
-                ]
+                difficultyColors[event.level as keyof typeof difficultyColors]
               }`}
             >
               {event.level}
@@ -84,14 +81,12 @@ export function TrainingEventCard({
                 </span>
                 <span className="text-neutral-600">
                   {
-                    event.parsedDistances.find(
-                      (d) => d.activity === activity
-                    )?.distance
+                    event.parsedDistances.find((d) => d.activity === activity)
+                      ?.distance
                   }{' '}
                   {
-                    event.parsedDistances.find(
-                      (d) => d.activity === activity
-                    )?.unit
+                    event.parsedDistances.find((d) => d.activity === activity)
+                      ?.unit
                   }
                 </span>
               </div>

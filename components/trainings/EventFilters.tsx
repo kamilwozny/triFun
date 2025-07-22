@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { FaSwimmer, FaBiking, FaRunning } from 'react-icons/fa';
 
 const activityIcons = {
@@ -15,24 +16,27 @@ export function EventFilters({
   selectedActivity,
   setSelectedActivity,
 }: EventFiltersProps) {
+  const { t } = useTranslation();
+  const activities = [
+    { key: 'All', label: t('All') },
+    { key: 'Run', label: t('Run') },
+    { key: 'Bike', label: t('Bike') },
+    { key: 'Swim', label: t('Swim') },
+  ];
   return (
     <>
-      {['All', 'Run', 'Bike', 'Swim'].map((activity) => (
+      {activities.map(({ key, label }) => (
         <button
-          key={activity}
-          onClick={() =>
-            setSelectedActivity(activity === 'All' ? null : activity)
-          }
+          key={key}
+          onClick={() => setSelectedActivity(key === 'All' ? null : key)}
           className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 hover:bg-neutral hover:text-white ${
-            (activity === 'All' && !selectedActivity) ||
-            selectedActivity === activity
+            (key === 'All' && !selectedActivity) || selectedActivity === key
               ? 'bg-neutral text-white shadow-lg scale-105'
               : 'bg-white text-neutral'
           }`}
         >
-          {activity !== 'All' &&
-            activityIcons[activity as keyof typeof activityIcons]}
-          {activity}
+          {key !== 'All' && activityIcons[key as keyof typeof activityIcons]}
+          {label}
         </button>
       ))}
     </>

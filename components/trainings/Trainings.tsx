@@ -5,6 +5,7 @@ import { FilterButton } from '../filterButton/FilterButton';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaSort } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 interface ITraining {
   id: string;
@@ -19,6 +20,7 @@ interface TrainingsPageClientProps {
 export const Trainings: React.FC<TrainingsPageClientProps> = ({
   trainings,
 }) => {
+  const { t } = useTranslation();
   const [sortConfig, setSortConfig] = useState<{
     key: keyof ITraining;
     direction: string;
@@ -46,7 +48,7 @@ export const Trainings: React.FC<TrainingsPageClientProps> = ({
     router.push('/trainings/create');
   };
 
-  const filters = ['Swim', 'Bike', 'Run'];
+  const filters = [t('Swim'), t('Bike'), t('Run')];
   return (
     <div>
       <div className="card card-side flex flex-col md:flex-row items-center justify-between bg-neutral p-6 rounded-xl shadow-lg mx-40">
@@ -59,16 +61,16 @@ export const Trainings: React.FC<TrainingsPageClientProps> = ({
         />
         <div className="card-body bg-neutral">
           <h2 className="text-2xl font-bold text-white">
-            Organize Your Own Party Training!
+            {t('organizeYourOwnPartyTraining')}
           </h2>
           <p className="text-gray-300 mt-2">
-            Discover and join training events in your area.
+            {t('discoverJoinTrainingEvents')}
           </p>
           <button
             onClick={handleCreateTraining}
             className="btn btn-primary mt-4 bg-light text-white"
           >
-            Create Event
+            {t('btnCreateEvent')}
           </button>
         </div>
       </div>
@@ -87,19 +89,19 @@ export const Trainings: React.FC<TrainingsPageClientProps> = ({
                   onClick={() => requestSort('id')}
                   className={`border border-white text-white p-2 cursor-pointer flex justify-center gap-2 items-center`}
                 >
-                  ID <FaSort />
+                  {t('id')} <FaSort />
                 </td>
                 <td
                   onClick={() => requestSort('name')}
                   className={`border border-white p-2 cursor-pointer`}
                 >
-                  Name <FaSort />
+                  {t('name')} <FaSort />
                 </td>
                 <td
                   onClick={() => requestSort('description')}
                   className={`border border-white p-2 cursor-pointer`}
                 >
-                  Description <FaSort />
+                  {t('description')} <FaSort />
                 </td>
               </tr>
             </thead>

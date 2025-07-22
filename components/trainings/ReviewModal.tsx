@@ -1,29 +1,42 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { TrainingEvent } from '@/types/training';
 import { BulkReviewForm } from '../reviews/BulkReviewForm';
 
 interface ReviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   reviewEvent: TrainingEvent | undefined;
   reviewEventId: string;
   userId?: string;
+  modalTrigger: number;
 }
 
 export function ReviewModal({
-  isOpen,
-  onClose,
   reviewEvent,
   reviewEventId,
   userId,
+  modalTrigger,
 }: ReviewModalProps) {
-  if (!isOpen || !reviewEvent?.attendees) {
+  const modalRef = useRef<HTMLDialogElement>(null);
+  const [lastTrigger, setLastTrigger] = useState<number>(0);
+
+  useEffect(() => {
+    if (reviewEvent?.attendees && reviewEventId && modalTrigger > lastTrigger && modalRef.current) {
+      modalRef.current.showModal();
+      setLastTrigger(modalTrigger);
+    }
+  }, [reviewEvent, reviewEventId, modalTrigger, lastTrigger]);
+
+  const handleClose = () => {
+    modalRef.current?.close();
+  };
+
+  if (!reviewEvent?.attendees || !reviewEventId) {
     return null;
   }
 
   return (
-    <dialog className="modal modal-open">
+    <dialog ref={modalRef} className="modal">
       <div className="modal-box max-w-3xl">
         <h3 className="font-bold text-lg mb-6">
           Review Participants - {reviewEvent.name}
@@ -35,7 +48,7 @@ export function ReviewModal({
         />
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button onClick={onClose}>close</button>
+        <button onClick={handleClose}>close</button>
       </form>
     </dialog>
   );

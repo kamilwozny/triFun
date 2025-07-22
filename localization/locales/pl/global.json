@@ -13,12 +13,14 @@
   "swim": "Pływanie",
   "createEvent": "Utwórz własne wydarzenie",
   "createEventDescription": "Chcesz zorganizować własny trening? Utwórz wydarzenie i zaproś znajomych!",
+  "organizeYourOwnPartyTraining": "Zorganizuj własny trening towarzyski!",
+  "discoverJoinTrainingEvents": "Odkryj i dołącz do wydarzeń treningowych w swojej okolicy.",
   "btnCreateEvent": "Utwórz wydarzenie",
   "events": "Wydarzenia",
   "trainings": "Treningi",
   "about": "O nas",
   "stats": "Statystyki",
-  "reportbug": "Zgłoś błąd",
+  "reportBug": "Zgłoś błąd",
   "contactUs": "Skontaktuj się z nami",
   "createNewEvent": "Utwórz nowe wydarzenie",
   "eventName": "Nazwa wydarzenia",
@@ -49,5 +51,9 @@
   "cancelled": "Anulowany",
   "joinedDateEvent": "Data dołączenia",
   "close": "Zamknij",
-  "signingUp": "Rejestracja..."
+  "signingUp": "Rejestracja...",
+  "id": "ID",
+  "name": "Nazwa",
+  "description": "Opis",
+  "reviewParticipants": "Oceń uczestników"
 }
