@@ -3,12 +3,15 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
+import LanguageSwitcher from '../languageSwitcher/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { data: session, status } = useSession();
   const closeDrawer = () => setDrawerOpen(false);
+  const { t } = useTranslation();
 
   return (
     <div className="navbar bg-neutral shadow-xl text-base-100 px-4 md:px-8 lg:px-24 mb-20">
@@ -198,7 +201,7 @@ export const Navbar = () => {
                     }}
                     className="hover:bg-neutral-focus text-error"
                   >
-                    Sign out
+                    {t('signOut')}
                   </button>
                 </li>
               </ul>
@@ -209,6 +212,7 @@ export const Navbar = () => {
             Sign in
           </Link>
         )}
+        <LanguageSwitcher />
       </div>
     </div>
   );

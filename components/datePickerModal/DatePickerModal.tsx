@@ -1,5 +1,6 @@
 import { RefObject } from 'react';
 import { DayPicker } from 'react-day-picker';
+import { useTranslation } from 'react-i18next';
 
 interface DatePickerModalProps {
   modalRef: RefObject<HTMLDialogElement>;
@@ -14,6 +15,7 @@ export const DatePickerModal = ({
   selectedDate,
   handleDateSelect,
 }: DatePickerModalProps) => {
+  const { t } = useTranslation();
   return (
     <dialog
       ref={modalRef}
@@ -22,7 +24,7 @@ export const DatePickerModal = ({
     >
       <div className="modal-box p-0 relative bg-white rounded-lg shadow-xl">
         <div className="p-4 border-b">
-          <h3 className="font-bold text-lg">Select Event Date</h3>
+          <h3 className="font-bold text-lg">{t('dateTitleModal')}</h3>
         </div>
         <div className="pt-4">
           <DayPicker
@@ -43,12 +45,12 @@ export const DatePickerModal = ({
             className="btn"
             onClick={handleVisibilityPicker}
           >
-            Close
+            {t('close')}
           </button>
         </div>
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button onClick={handleVisibilityPicker}>close</button>
+        <button onClick={handleVisibilityPicker}>{t('close')}</button>
       </form>
     </dialog>
   );

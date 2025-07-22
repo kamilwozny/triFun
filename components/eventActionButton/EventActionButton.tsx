@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'react-hot-toast';
 import { FaUserPlus, FaUserFriends } from 'react-icons/fa';
 import { signUpEventAction } from '@/actions/attendeesEvents';
+import { useTranslation } from 'react-i18next';
 
 interface EventActionButtonProps {
   eventId: string;
@@ -18,6 +19,7 @@ export function EventActionButton({
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleSignUp = async () => {
     try {
@@ -62,7 +64,7 @@ export function EventActionButton({
         onClick={() => toast.success('Invite feature coming soon!')}
       >
         <FaUserFriends className="h-5 w-5" />
-        Invite friends
+        {t('inviteFriends')}
       </button>
     );
   }
@@ -74,7 +76,7 @@ export function EventActionButton({
       disabled={isLoading || isPending}
     >
       <FaUserPlus className="h-5 w-5" />
-      {isLoading || isPending ? 'Signing up...' : 'Sign up'}
+      {isLoading || isPending ? t('signingUp') : t('signUp')}
     </button>
   );
 }

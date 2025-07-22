@@ -1,9 +1,11 @@
 'use client';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaBug } from 'react-icons/fa';
 export const Footer = () => {
   const modalReportRef = useRef<HTMLDialogElement>(null);
   const modalContactRef = useRef<HTMLDialogElement>(null);
+  const { t } = useTranslation();
 
   const handleOpenContactModal = () => {
     modalContactRef.current?.showModal();
@@ -18,11 +20,11 @@ export const Footer = () => {
       <div className="flex items-center gap-2 hover:bg-neutral-light hover:cursor-pointer">
         <FaBug className="text-error" />
         <span className="text-error" onClick={handleOpenReportModal}>
-          Report a bug
+          {t('reportBug')}
         </span>
       </div>
       <div className="text-error hover:cursor-pointer hover:bg-neutral-light">
-        <span onClick={handleOpenContactModal}>Contact us</span>
+        <span onClick={handleOpenContactModal}>{t('contactUs')}</span>
       </div>
       <dialog ref={modalContactRef} className="modal">
         <div className="modal-box flex flex-col gap-4">
@@ -35,12 +37,12 @@ export const Footer = () => {
           <button className="btn btn-primary">Send</button>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button>{t('close')}</button>
         </form>
       </dialog>
       <dialog ref={modalReportRef} className="modal">
         <div className="modal-box flex flex-col gap-4">
-          <h3 className="font-bold text-lg">Report a bug</h3>
+          <h3 className="font-bold text-lg">{t('reportBug')}</h3>
           <textarea
             placeholder="Message"
             className="textarea textarea-bordered"
@@ -48,7 +50,7 @@ export const Footer = () => {
           <button className="btn btn-primary">Send</button>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button>{t('close')}</button>
         </form>
       </dialog>
     </footer>
