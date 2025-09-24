@@ -103,7 +103,7 @@ function createClusterCustomIcon(cluster: any) {
   };
 
   return L.divIcon({
-    html: `<div class="cluster-icon cluster-icon-${size}">${count}</div>`,
+    html: `<div class="cluster-icon bg-foreground cluster-icon-${size}">${count}</div>`,
     className: 'custom-marker-cluster',
     iconSize: L.point(sizeMap[size], sizeMap[size]),
   });
@@ -126,12 +126,13 @@ export default function Map({
         .custom-marker-cluster {
           background: none;
           border: none;
+          z-index: 500 !important;
         }
         .cluster-icon {
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #3498db;
+          background-color: #ff2e63;
           color: white;
           border-radius: 50%;
           font-weight: bold;
@@ -167,18 +168,16 @@ export default function Map({
         {!pickPoint && position && (
           <CountryBoundsInitializer position={[position.lat, position.lng]} />
         )}
-        {/* Display user's position marker if in pick point mode */}
         {pickPoint && markerPosition && (
-          <Marker position={markerPosition} icon={icons.default}>
+          <Marker position={markerPosition} icon={icons.run}>
             <Popup>Your selected location</Popup>
           </Marker>
         )}
-        {/* Display all training markers */}
         {markers.map((marker: MapMarker, index: number) => {
           const iconKey = marker.selected
             ? `${marker.type || 'default'}Selected`
             : marker.type || 'default';
-          const icon = icons[iconKey as keyof typeof icons] || icons.default;
+          const icon = icons[iconKey as keyof typeof icons] || icons.run;
 
           return (
             <Marker key={index} position={marker.position} icon={icon}>
@@ -202,8 +201,7 @@ export default function Map({
               const iconKey = marker.selected
                 ? `${marker.type || 'default'}Selected`
                 : marker.type || 'default';
-              const icon =
-                icons[iconKey as keyof typeof icons] || icons.default;
+              const icon = icons[iconKey as keyof typeof icons] || icons.run;
 
               return (
                 <Marker key={index} position={marker.position} icon={icon}>

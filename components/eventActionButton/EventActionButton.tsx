@@ -60,7 +60,7 @@ export function EventActionButton({
   if (isAttending) {
     return (
       <button
-        className="btn btn-outline gap-2 hover:bg-primary"
+        className="btn btn-outline gap-2"
         onClick={() => toast.success('Invite feature coming soon!')}
       >
         <FaUserFriends className="h-5 w-5" />

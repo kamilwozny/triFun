@@ -24,10 +24,10 @@ export default async function UserProfilePage({
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-xl shadow-lg p-6">
+      <div className="rounded-xl shadow-lg p-6">
         <div className="flex items-center gap-4">
           <div className="avatar placeholder">
-            <div className="bg-primary text-white rounded-full w-16">
+            <div className="text-white rounded-full w-16">
               <span className="text-2xl">{user.name?.charAt(0) || 'U'}</span>
             </div>
           </div>

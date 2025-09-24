@@ -5,149 +5,112 @@ import { useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import LanguageSwitcher from '../languageSwitcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuList,
+} from '@/components/ui/navigation-menu';
+import { Button } from '../ui/button';
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+enum ActivePages {
+  trainings = 'trainings',
+  stats = 'stats',
+  about = 'about',
+  events = 'events',
+}
 
 export const Navbar = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [activePage, setActivePage] = useState(ActivePages.trainings);
   const { data: session, status } = useSession();
-  const closeDrawer = () => setDrawerOpen(false);
   const { t } = useTranslation();
 
   return (
-    <div className="navbar bg-neutral shadow-xl text-base-100 px-4 md:px-8 lg:px-24 mb-20">
+    <div className="navbar shadow-xl px-4 md:px-8 lg:px-24 mb-10">
       <div className="navbar-start">
-        <div className="lg:hidden">
-          <div className="drawer">
-            <input
-              id="my-drawer"
-              type="checkbox"
-              className="drawer-toggle"
-              checked={drawerOpen}
-              onChange={() => setDrawerOpen(!drawerOpen)}
-              aria-label="Toggle navigation menu"
-            />
-            <div className="drawer-content">
-              <button
-                onClick={() => setDrawerOpen(!drawerOpen)}
-                className="drawer-button hover:cursor-pointer p-1"
-                aria-expanded={drawerOpen}
-                aria-controls="mobile-menu"
-              >
-                <svg
-                  className="h-8 w-8"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h7"
-                  />
-                </svg>
-                <span className="sr-only">Open main menu</span>
-              </button>
-            </div>
-            <div
-              className="drawer-side z-20"
-              id="mobile-menu"
-              role="navigation"
+        <NavigationMenu className="text-black">
+          <NavigationMenuList>
+            <NavigationMenuItem
+              className={`${
+                activePage === ActivePages.events && 'text-foreground'
+              } text-lg font-bold hover:text-foreground`}
             >
-              <label
-                htmlFor="my-drawer"
-                aria-label="close sidebar"
-                className="drawer-overlay"
-              ></label>
-              <nav className="menu bg-neutral text-white min-h-full w-60 font-semibold text-xl items-center p-0">
-                <ul>
-                  <li className="w-full hover:bg-neutral-focus focus:bg-neutral-focus p-2 text-center">
-                    <Link
-                      href="/events"
-                      onClick={closeDrawer}
-                      className="focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      Events
-                    </Link>
-                  </li>
-                  <li className="w-full hover:bg-neutral-focus focus:bg-neutral-focus p-2 text-center">
-                    <Link
-                      href="/trainings"
-                      onClick={closeDrawer}
-                      className="focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      Trainings
-                    </Link>
-                  </li>
-                  <li className="w-full hover:bg-neutral-focus focus:bg-neutral-focus p-2 text-center">
-                    <Link
-                      href="/stats"
-                      onClick={closeDrawer}
-                      className="focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      Stats
-                    </Link>
-                  </li>
-                  <li className="w-full hover:bg-neutral-focus focus:bg-neutral-focus p-2 text-center">
-                    <Link
-                      href="/about"
-                      onClick={closeDrawer}
-                      className="focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      About
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div>
-        </div>
-        <nav className="hidden lg:flex space-x-4" role="navigation">
-          <Link
-            href="/events"
-            className="hover:bg-neutral-focus focus:bg-neutral-focus p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-          >
-            Events
-          </Link>
-          <Link
-            href="/trainings"
-            className="hover:bg-neutral-focus focus:bg-neutral-focus p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-          >
-            Trainings
-          </Link>
-          <Link
-            href="/stats"
-            className="hover:bg-neutral-focus focus:bg-neutral-focus p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-          >
-            Stats
-          </Link>
-          <Link
-            href="/about"
-            className="hover:bg-neutral-focus focus:bg-neutral-focus p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-          >
-            About
-          </Link>
-        </nav>
+              <Link
+                href="/events"
+                onClick={() => setActivePage(ActivePages.events)}
+                className="p-2"
+              >
+                Events
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem
+              className={`${
+                activePage === ActivePages.trainings && 'text-foreground'
+              } text-lg font-bold hover:text-foreground`}
+            >
+              <Link
+                href="/trainings"
+                className="p-2"
+                onClick={() => setActivePage(ActivePages.trainings)}
+              >
+                Trainings
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem
+              className={`${
+                activePage === ActivePages.stats && 'text-foreground'
+              } text-lg font-bold hover:text-foreground`}
+            >
+              <Link
+                href="/stats"
+                className="p-2"
+                onClick={() => setActivePage(ActivePages.stats)}
+              >
+                Stats
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem
+              className={`${
+                activePage === ActivePages.about && 'text-foreground'
+              } text-lg font-bold hover:text-foreground`}
+            >
+              <Link
+                href="/about"
+                className="p-2"
+                onClick={() => setActivePage(ActivePages.about)}
+              >
+                About
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
       <div className="navbar-center">
         <Link
           href="/dashboard"
-          className="btn btn-ghost text-2xl md:text-3xl focus:outline-none focus:ring-2 focus:ring-primary"
+          className="text-foreground text-2xl md:text-3xl"
           aria-label="Go to dashboard"
         >
           TriFun
         </Link>
       </div>
       <div className="navbar-end">
+        <LanguageSwitcher />
         {status === 'loading' ? (
-          <div className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary">
+          <div className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary ml-4">
             <span className="loading loading-spinner loading-sm"></span>
           </div>
         ) : status === 'authenticated' ? (
           <>
             <button
-              className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
+              className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary ml-4"
               aria-label="Notifications"
             >
               <svg
@@ -166,53 +129,50 @@ export const Navbar = () => {
                 />
               </svg>
             </button>
-            <div className="dropdown dropdown-end">
-              <button
-                className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                aria-expanded={dropdownOpen}
-                aria-haspopup="true"
-              >
-                <div className="avatar placeholder">
-                  <div className="bg-primary text-white rounded-full w-8">
-                    <span>{session.user?.name?.charAt(0) || 'U'}</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <button
+                  className="btn-circle focus:outline-none focus:ring-2 focus:ring-foreground"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="true"
+                >
+                  <div className="avatar placeholder">
+                    <div className="bg-foreground text-white text-md font-semibold rounded-full w-8">
+                      <span>{session.user?.name?.charAt(0) || 'U'}</span>
+                    </div>
                   </div>
-                </div>
-              </button>
-              <ul
-                className={`dropdown-content menu p-2 shadow bg-neutral rounded-box w-52 ${
-                  dropdownOpen ? 'block' : 'hidden'
-                }`}
-              >
-                <li>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem className="hover:bg-background hover:cursor-pointer">
                   <Link
+                    className="w-full"
                     href="/profile"
-                    className="hover:bg-neutral-focus"
                     onClick={() => setDropdownOpen(false)}
                   >
                     Profile
                   </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={() => {
-                      signOut({ callbackUrl: '/signin' });
-                      setDropdownOpen(false);
-                    }}
-                    className="hover:bg-neutral-focus text-error"
-                  >
-                    {t('signOut')}
-                  </button>
-                </li>
-              </ul>
-            </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    signOut({ callbackUrl: '/signin' });
+                    setDropdownOpen(false);
+                  }}
+                  className="hover:bg-background text-foreground hover:cursor-pointer"
+                >
+                  {t('signOut')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         ) : (
-          <Link href="/signin" className="btn btn-primary">
-            Sign in
-          </Link>
+          <Button className="bg-foreground ml-4 p-4 hover:bg-white hover:text-foreground">
+            <Link href="/signin" className="">
+              Sign in
+            </Link>
+          </Button>
         )}
-        <LanguageSwitcher />
       </div>
     </div>
   );

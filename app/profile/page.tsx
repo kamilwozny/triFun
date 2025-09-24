@@ -194,11 +194,9 @@ export default function ProfilePage() {
 
               {/* Stats Cards */}
               <div className="grid grid-cols-2 gap-4 w-full">
-                <div className="stat bg-primary/10 rounded-box p-4">
+                <div className="stat rounded-box p-4">
                   <div className="stat-title">Hosted Events</div>
-                  <div className="stat-value text-primary">
-                    {stats.hostedEvents}
-                  </div>
+                  <div className="stat-value">{stats.hostedEvents}</div>
                 </div>
                 <div className="stat bg-secondary/10 rounded-box p-4">
                   <div className="stat-title">Attended Events</div>

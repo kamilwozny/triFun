@@ -39,25 +39,25 @@ export default function AboutPage() {
 
   const features = [
     {
-      icon: <FaUsers className="h-6 w-6 text-primary" />,
+      icon: <FaUsers className="h-6 w-6" />,
       title: 'Find Training Partners',
       description:
         'Connect with like-minded athletes in your area who share your passion for training.',
     },
     {
-      icon: <FaMapMarkedAlt className="h-6 w-6 text-primary" />,
+      icon: <FaMapMarkedAlt className="h-6 w-6" />,
       title: 'Discover Local Events',
       description:
         'Browse and join training events happening nearby, filtered by activity and skill level.',
     },
     {
-      icon: <FaCalendarAlt className="h-6 w-6 text-primary" />,
+      icon: <FaCalendarAlt className="h-6 w-6" />,
       title: 'Create Your Own Events',
       description:
         'Organize training sessions and invite others to join you on your fitness journey.',
     },
     {
-      icon: <FaRunning className="h-6 w-6 text-primary" />,
+      icon: <FaRunning className="h-6 w-6" />,
       title: 'Multiple Activities',
       description:
         'Whether you enjoy running, swimming, or cycling, find partners for any activity you love.',
@@ -119,7 +119,7 @@ export default function AboutPage() {
               </Link>
               <Link
                 href="/signin"
-                className="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-primary"
+                className="btn btn-outline btn-lg text-white border-white hover:bg-white"
               >
                 Join Now - It&apos;s Free
               </Link>
@@ -166,7 +166,7 @@ export default function AboutPage() {
                 variants={itemVariants}
                 className="bg-neutral-50 p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-6">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-800 mb-3">
@@ -201,8 +201,8 @@ export default function AboutPage() {
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-1">
-                    <FaSwimmer className="h-6 w-6 text-primary" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-1">
+                    <FaSwimmer className="h-6 w-6" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Swimming</h3>
@@ -214,8 +214,8 @@ export default function AboutPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-1">
-                    <FaBiking className="h-6 w-6 text-primary" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-1">
+                    <FaBiking className="h-6 w-6" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Cycling</h3>
@@ -227,8 +227,8 @@ export default function AboutPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-1">
-                    <FaRunning className="h-6 w-6 text-primary" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-1">
+                    <FaRunning className="h-6 w-6" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Running</h3>
@@ -291,7 +291,7 @@ export default function AboutPage() {
               variants={itemVariants}
               className="bg-neutral-50 p-8 rounded-xl shadow-sm relative"
             >
-              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl">
+              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full text-white flex items-center justify-center font-bold text-xl">
                 1
               </div>
               <h3 className="text-xl font-semibold text-neutral-800 mb-4 pt-2">
@@ -308,7 +308,7 @@ export default function AboutPage() {
               variants={itemVariants}
               className="bg-neutral-50 p-8 rounded-xl shadow-sm relative mt-10 md:mt-0"
             >
-              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl">
+              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full text-white flex items-center justify-center font-bold text-xl">
                 2
               </div>
               <h3 className="text-xl font-semibold text-neutral-800 mb-4 pt-2">
@@ -324,7 +324,7 @@ export default function AboutPage() {
               variants={itemVariants}
               className="bg-neutral-50 p-8 rounded-xl shadow-sm relative mt-10 md:mt-0"
             >
-              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl">
+              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full text-white flex items-center justify-center font-bold text-xl">
                 3
               </div>
               <h3 className="text-xl font-semibold text-neutral-800 mb-4 pt-2">
@@ -341,7 +341,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary/10">
+      <section className="py-20">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

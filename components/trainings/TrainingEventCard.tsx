@@ -42,7 +42,7 @@ export function TrainingEventCard({
     <div
       key={event.id}
       onClick={handleCardClick}
-      className={`card bg-white shadow-xl rounded-xl transition-all hover:shadow-2xl hover:cursor-pointer`}
+      className={`bg-white shadow-xl rounded-xl transition-all hover:shadow-md hover:shadow-foreground hover:cursor-pointer`}
     >
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
@@ -50,13 +50,29 @@ export function TrainingEventCard({
             <h3 className="text-2xl font-bold text-neutral-800 mb-2">
               {event.name}
             </h3>
-            <p className="text-neutral-600 flex items-center gap-2">
-              <span className="inline-block">📍</span>
+            <p className="text-secondary-foreground flex items-center">
+              <span className="inline-block">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="lucide lucide-map-pin-icon lucide-map-pin"
+                >
+                  <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </span>
               {event.city}, {event.country}
             </p>
           </div>
           <div className="flex flex-col items-end">
-            <span className="bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-semibold">
+            <span className="px-4 py-1 rounded-full text-sm font-semibold text-secondary-foreground">
               {formatDate(event.date)}
             </span>
             <span
@@ -69,17 +85,17 @@ export function TrainingEventCard({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-6 h-12">
           {event.activities.map((activity) => (
             <div
               key={activity}
-              className="bg-neutral-50 p-4 rounded-lg flex items-center gap-3"
+              className="bg-background shadow-md p-2 rounded-lg flex items-center gap-3 w-40"
             >
               <div>
-                <span className="block text-sm font-semibold text-neutral-800">
+                <span className="block text-md font-semibold text-foreground">
                   {activity}
                 </span>
-                <span className="text-neutral-600">
+                <span className="text-sm">
                   {
                     event.parsedDistances.find((d) => d.activity === activity)
                       ?.distance

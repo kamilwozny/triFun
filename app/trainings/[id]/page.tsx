@@ -13,22 +13,24 @@ import {
 } from 'react-icons/fa';
 import { MdSportsScore } from 'react-icons/md';
 
+import { Badge } from '@/components/ui/badge';
+
 const activityIcons = {
   Run: <FaRunning className="text-red-500 h-6 w-6" />,
   Bike: <FaBicycle className="text-green-500 h-6 w-6" />,
   Swim: <FaSwimmer className="text-blue-500 h-6 w-6" />,
 };
 
-const difficultyColors = {
-  Beginner: 'bg-green-100 text-green-800',
-  Intermediate: 'bg-yellow-100 text-yellow-800',
-  Advanced: 'bg-red-100 text-red-800',
-};
+enum Difficulties {
+  Beginner = 'beginner',
+  Intermediate = 'intermediate',
+  Expert = 'expert',
+}
 
-const statusColors = {
-  confirmed: 'badge-success',
-  pending: 'badge-warning',
-  declined: 'badge-error',
+const difficultyColors = {
+  Beginner: Difficulties.Beginner,
+  Intermediate: Difficulties.Intermediate,
+  Expert: Difficulties.Expert,
 };
 
 interface Attendee {
@@ -82,13 +84,14 @@ export default async function TrainingPage({
               </span>
             </div>
           </div>
-          <span
-            className={`${
-              difficultyColors[training.level as keyof typeof difficultyColors]
-            } px-4 py-2 rounded-full text-sm font-semibold`}
+          <Badge
+            variant={difficultyColors[training.level] || 'default'}
+            // className={`${
+            //   difficultyColors[training.level as keyof typeof difficultyColors]
+            // } px-4 py-2 rounded-full text-sm font-semibold hover`}
           >
             {training.level}
-          </span>
+          </Badge>
         </div>
 
         <p className="mt-4 text-neutral-700 leading-relaxed">
@@ -99,7 +102,7 @@ export default async function TrainingPage({
       {/* Activities Section */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex items-center gap-2 mb-4">
-          <MdSportsScore className="h-6 w-6 text-primary" />
+          <MdSportsScore className="h-6 w-6" />
           <h2 className="text-2xl font-semibold text-neutral-800">
             Activities
           </h2>
@@ -133,7 +136,7 @@ export default async function TrainingPage({
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
-            <FaUserFriends className="h-6 w-6 text-primary" />
+            <FaUserFriends className="h-6 w-6" />
             <h2 className="text-2xl font-semibold text-neutral-800">
               Attendees ({attendees?.length || 0})
             </h2>
@@ -164,7 +167,7 @@ export default async function TrainingPage({
                   <td className="py-4">
                     <div className="flex items-center gap-3">
                       <div className="avatar placeholder">
-                        <div className="bg-primary text-white rounded-full w-10">
+                        <div className="text-white rounded-full w-10">
                           <span className="text-lg">
                             {attendee.name?.charAt(0).toUpperCase() || 'A'}
                           </span>

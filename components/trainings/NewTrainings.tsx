@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import '@/components/trainings/Trainings.css';
 import { useTrainingEvents } from '@/providers/TrainingEventsProvider';
@@ -21,6 +21,7 @@ import { useLocationSuggestions } from '@/hooks/useLocationSuggestions';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useReviewedEvents } from '@/hooks/useReviewedEvents';
 import useDebounce from '@/helpers/useDebounce';
+import { Separator } from '@/components/ui/separator';
 
 type TabType = 'upcoming' | 'myEvents' | 'past';
 
@@ -28,7 +29,6 @@ export default function NewTrainings() {
   const { data: session } = useSession();
   const { events } = useTrainingEvents();
 
-  // State
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState<string>('');
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
@@ -36,7 +36,6 @@ export default function NewTrainings() {
   const searchQuery = useDebounce(searchInput, 300);
   const { t } = useTranslation();
 
-  // Custom hooks
   const userPosition = useGeolocation();
   const { upcomingEvents, userEvents, pastEvents } = useTrainingEventsFilter(
     events,
@@ -44,7 +43,6 @@ export default function NewTrainings() {
   );
   const reviewedEventIds = useReviewedEvents(pastEvents, activeTab);
 
-  // Select which events to display based on active tab
   const displayEvents = useMemo(() => {
     switch (activeTab) {
       case 'myEvents':
@@ -64,11 +62,10 @@ export default function NewTrainings() {
     selectedActivity
   );
 
-
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 lg:p-8">
       <div className="flex flex-wrap gap-4 justify-center w-full mb-4">
-        <div className="tabs tabs-boxed bg-base-200/50 p-2 rounded-xl mr-auto">
+        <div className="tabs tabs-boxed bg-base-200/50 p-2 rounded-xl mr-auto ml-[21%]">
           <TrainingTab
             label={t('upcomingEvents')}
             activeTab={activeTab}
@@ -101,8 +98,15 @@ export default function NewTrainings() {
       </div>
 
       <div className="flex flex-col lg:flex-row items-start justify-center max-w-full gap-8 w-full">
-        <div className="w-full lg:w-1/2 xl:w-3/5">
-          <div className="overflow-y-auto max-h-[80vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
+        <div className="w-full lg:w-1/6 xl:w-1/5">
+          <div className="overflow-y-auto max-h-[80vh] space-y-6 rounded-xl bg-base-100">
+            <h1 className="text-2xl font-bold pt-6 pl-6">Filters</h1>
+            <Separator />
+            <button>test</button>
+          </div>
+        </div>
+        <div className="w-full lg:w-3/6 xl:w-2/5 bg-background">
+          <div className="no-scrollbar overflow-y-auto max-h-[75vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
             <TrainingEventList
               events={filteredEvents}
               activeTab={activeTab}
@@ -112,7 +116,7 @@ export default function NewTrainings() {
           </div>
         </div>
 
-        <div className="w-full lg:w-1/2 xl:w-2/5 sticky top-0">
+        <div className="w-full lg:w-2/6 xl:w-2/5 sticky top-0">
           <div className="bg-white rounded-xl shadow-xl overflow-hidden">
             <TrainingMapView
               userPosition={userPosition}
@@ -123,7 +127,6 @@ export default function NewTrainings() {
           <CreateEventCTA />
         </div>
       </div>
-
     </div>
   );
 }

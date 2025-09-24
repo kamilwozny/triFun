@@ -34,7 +34,7 @@ export const DatePickerModal = ({
             disabled={(date) => date < new Date()}
             className="flex justify-center min-h-[380px]"
             classNames={{
-              day_selected: 'bg-primary text-primary-content',
+              day_selected: 'text-primary-content',
               day_today: 'bg-neutral text-neutral-content',
             }}
           />

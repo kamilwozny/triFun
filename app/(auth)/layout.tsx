@@ -5,7 +5,7 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout = ({ children }: AuthLayoutProps) => {
-  return <div className="bg-primary auth-layout">{children}</div>;
+  return <div className="auth-layout">{children}</div>;
 };
 
 export default AuthLayout;

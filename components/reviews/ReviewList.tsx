@@ -64,7 +64,7 @@ export function ReviewList({ reviews, className = '' }: ReviewListProps) {
               <div>
                 <Link
                   href={`/profile/${review.reviewer.id}`}
-                  className="font-medium hover:text-primary transition-colors"
+                  className="font-medium transition-colors"
                 >
                   {review.reviewer.name}
                 </Link>
@@ -84,7 +84,7 @@ export function ReviewList({ reviews, className = '' }: ReviewListProps) {
             <span className="text-base-content/60">Review for: </span>
             <Link
               href={`/trainings/${review.event.id}`}
-              className="text-primary hover:underline"
+              className="hover:underline"
             >
               {review.event.name}
             </Link>

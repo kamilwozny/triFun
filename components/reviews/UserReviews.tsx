@@ -64,20 +64,16 @@ export function UserReviewsClient({
       <div className="space-y-4">
         <div className="tabs tabs-boxed bg-base-200/50 p-1 rounded-xl">
           <button
-            className={`tab text-md font-medium transition-all duration-200 hover:bg-base-100 hover:text-primary ${
-              !showGivenReviews
-                ? 'bg-base-100 !text-primary'
-                : 'text-base-content/70'
+            className={`tab text-md font-medium transition-all duration-200 hover:bg-base-100 ${
+              !showGivenReviews ? 'bg-base-100 ' : 'text-base-content/70'
             }`}
             onClick={() => setShowGivenReviews(false)}
           >
             Reviews Received
           </button>
           <button
-            className={`tab text-md font-medium transition-all duration-200 hover:bg-base-100 hover:text-primary ${
-              showGivenReviews
-                ? 'bg-base-100 !text-primary'
-                : 'text-base-content/70'
+            className={`tab text-md font-medium transition-all duration-200 hover:bg-base-100 ${
+              showGivenReviews ? 'bg-base-100' : 'text-base-content/70'
             }`}
             onClick={() => setShowGivenReviews(true)}
           >
