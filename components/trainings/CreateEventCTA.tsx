@@ -9,7 +9,7 @@ export function CreateEventCTA() {
       <p className="text-black/50 mb-8">{t('createEventDescription')}</p>
       <Link
         href="trainings/create"
-        className="bg-foreground text-white text-lg font-bold p-4 px-6 rounded-md btn-lg"
+        className="bg-foreground hover:bg-card-foreground text-white text-lg font-bold p-4 px-6 rounded-md btn-lg"
       >
         {t('btnCreateEvent')}
       </Link>

@@ -4,6 +4,9 @@ import { useCallback, useState } from 'react';
 import { TrainingEvent } from '@/types/training';
 import { TrainingEventCard } from './TrainingEventCard';
 import { ReviewModal } from './ReviewModal';
+import { CreateEventCTA } from './CreateEventCTA';
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 interface TrainingEventListProps {
   events: TrainingEvent[];
@@ -21,18 +24,30 @@ export function TrainingEventList({
   const [reviewEventId, setReviewEventId] = useState<string>('');
   const [modalTrigger, setModalTrigger] = useState<number>(0);
 
+  const { t } = useTranslation();
+
   const handleReview = useCallback((eventId: string) => {
     setReviewEventId(eventId);
     setModalTrigger((prev) => prev + 1);
   }, []);
   if (events.length === 0) {
     return (
-      <div className="text-center text-neutral text-xl font-extrabold mt-4">
-        {activeTab === 'myEvents'
-          ? "You don't have any events yet."
-          : activeTab === 'past'
-          ? 'No past events found.'
-          : 'No events found matching your criteria.'}
+      <div className="text-center text-neutral text-xl font-extrabold mt-4 h-40 gap-8 flex justify-center flex-col items-center">
+        {activeTab === 'myEvents' ? (
+          "You don't have any events yet created."
+        ) : activeTab === 'past' ? (
+          'No past events found.'
+        ) : (
+          <>
+            <p>No events found matching your criteria?</p>
+            <Link
+              href="trainings/create"
+              className="bg-foreground hover:bg-card-foreground text-white text-lg font-bold p-4 px-6 rounded-md btn-lg"
+            >
+              {t('btnCreateEvent')}
+            </Link>
+          </>
+        )}
       </div>
     );
   }

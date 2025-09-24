@@ -21,7 +21,7 @@ export function Switch({ checked, onChange, label }: SwitchProps) {
           relative inline-flex h-8 w-14 items-center rounded-full
           transition-colors duration-300 ease-in-out focus-visible:outline-none 
           focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
-          ${checked ? 'bg-neutral-200' : 'bg-primary'}
+          ${checked ? 'bg-card-foreground' : 'bg-foreground'}
         `}
       >
         <span

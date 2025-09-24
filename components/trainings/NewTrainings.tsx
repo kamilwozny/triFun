@@ -1,115 +1,130 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import '@/components/trainings/Trainings.css';
 import { useTrainingEvents } from '@/providers/TrainingEventsProvider';
 import { useTranslation } from 'react-i18next';
 
-import { EventFilters } from './EventFilters';
-import { LocationSearch } from './LocationSearch';
-import { TrainingTab } from '../trainingTab/TrainingTab';
 import { TrainingEventList } from './TrainingEventList';
 import { TrainingMapView } from './TrainingMapView';
 import { CreateEventCTA } from './CreateEventCTA';
+import { EventTypeCheckboxes, EventTypeFilters } from './EventTypeCheckboxes';
+import { SportTypeFilters, SportType } from './SportTypeFilters';
+import {
+  LocationFilters,
+  LocationFilters as LocationFiltersType,
+} from './LocationFilters';
 
 import {
-  useTrainingEventsFilter,
-  useEventFiltering,
-} from '@/hooks/useTrainingEvents';
-import { useLocationSuggestions } from '@/hooks/useLocationSuggestions';
+  useAdvancedEventFiltering,
+  getDefaultFilters,
+  AllFilters,
+} from '@/hooks/useAdvancedEventFiltering';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useReviewedEvents } from '@/hooks/useReviewedEvents';
 import useDebounce from '@/helpers/useDebounce';
 import { Separator } from '@/components/ui/separator';
 
-type TabType = 'upcoming' | 'myEvents' | 'past';
-
 export default function NewTrainings() {
   const { data: session } = useSession();
   const { events } = useTrainingEvents();
-
-  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
-  const [searchInput, setSearchInput] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<TabType>('upcoming');
-
-  const searchQuery = useDebounce(searchInput, 300);
   const { t } = useTranslation();
 
+  // Initialize filters with defaults
+  const [filters, setFilters] = useState<AllFilters>(getDefaultFilters());
+
+  // Debounce the filters to avoid excessive updates
+  const debouncedFilters = useDebounce(filters, 300);
+
   const userPosition = useGeolocation();
-  const { upcomingEvents, userEvents, pastEvents } = useTrainingEventsFilter(
+
+  // Use the advanced filtering hook
+  const filteredEvents = useAdvancedEventFiltering(
     events,
+    debouncedFilters,
     session?.user?.id
   );
-  const reviewedEventIds = useReviewedEvents(pastEvents, activeTab);
 
-  const displayEvents = useMemo(() => {
-    switch (activeTab) {
-      case 'myEvents':
-        return userEvents;
-      case 'past':
-        return pastEvents;
-      case 'upcoming':
-      default:
-        return upcomingEvents;
-    }
-  }, [activeTab, upcomingEvents, userEvents, pastEvents]);
+  // For past events review functionality, filter only past events
+  const pastEvents = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return events.filter((event) => {
+      const eventDate = new Date(event.date);
+      return eventDate < today;
+    });
+  }, [events]);
 
-  const locationSuggestions = useLocationSuggestions(displayEvents);
-  const filteredEvents = useEventFiltering(
-    displayEvents,
-    searchQuery,
-    selectedActivity
-  );
+  const reviewedEventIds = useReviewedEvents(pastEvents, 'past');
+
+  // Filter update handlers
+  const handleEventTypeFiltersChange = (eventTypeFilters: EventTypeFilters) => {
+    setFilters((prev) => ({
+      ...prev,
+      eventType: eventTypeFilters,
+    }));
+  };
+
+  const handleSportsChange = (sports: SportType[]) => {
+    setFilters((prev) => ({
+      ...prev,
+      sports,
+    }));
+  };
+
+  const handleLocationFiltersChange = (
+    locationFilters: LocationFiltersType
+  ) => {
+    setFilters((prev) => ({
+      ...prev,
+      location: locationFilters,
+    }));
+  };
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 lg:p-8">
-      <div className="flex flex-wrap gap-4 justify-center w-full mb-4">
-        <div className="tabs tabs-boxed bg-base-200/50 p-2 rounded-xl mr-auto ml-[21%]">
-          <TrainingTab
-            label={t('upcomingEvents')}
-            activeTab={activeTab}
-            activeLabel="upcoming"
-            onClick={() => setActiveTab('upcoming')}
-          />
-          <TrainingTab
-            label={t('myEvents')}
-            activeTab={activeTab}
-            activeLabel="myEvents"
-            onClick={() => setActiveTab('myEvents')}
-          />
-          <TrainingTab
-            label={t('pastEvents')}
-            activeTab={activeTab}
-            activeLabel="past"
-            onClick={() => setActiveTab('past')}
-          />
-        </div>
-
-        <LocationSearch
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
-          locationSuggestions={locationSuggestions}
-        />
-        <EventFilters
-          selectedActivity={selectedActivity}
-          setSelectedActivity={setSelectedActivity}
-        />
-      </div>
-
       <div className="flex flex-col lg:flex-row items-start justify-center max-w-full gap-8 w-full">
         <div className="w-full lg:w-1/6 xl:w-1/5">
-          <div className="overflow-y-auto max-h-[80vh] space-y-6 rounded-xl bg-base-100">
-            <h1 className="text-2xl font-bold pt-6 pl-6">Filters</h1>
+          <div className="overflow-y-auto max-h-[80vh] space-y-6 rounded-xl bg-base-100 p-6">
+            <h1 className="text-2xl font-bold text-black">Filters</h1>
             <Separator />
-            <button>test</button>
+
+            <EventTypeCheckboxes
+              filters={filters.eventType}
+              onFiltersChange={handleEventTypeFiltersChange}
+            />
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3 text-black">
+                {t('sportType', 'Sport Type')}
+              </h3>
+              <SportTypeFilters
+                selectedSports={filters.sports}
+                onSportsChange={handleSportsChange}
+              />
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3 text-black">
+                {t('location', 'Location')}
+              </h3>
+              <LocationFilters
+                filters={filters.location}
+                onFiltersChange={handleLocationFiltersChange}
+              />
+            </div>
           </div>
         </div>
-        <div className="w-full lg:w-3/6 xl:w-2/5 bg-background">
+        <div className="w-full lg:w-3/6 xl:w-2/5">
           <div className="no-scrollbar overflow-y-auto max-h-[75vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
             <TrainingEventList
               events={filteredEvents}
-              activeTab={activeTab}
+              activeTab={'upcoming'}
               userId={session?.user?.id}
               reviewedEventIds={reviewedEventIds}
             />

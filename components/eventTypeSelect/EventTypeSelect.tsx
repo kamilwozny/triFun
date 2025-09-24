@@ -43,9 +43,9 @@ export const EventTypeSelect = ({ onChange }: EventTypeSelectProps) => {
           }}
         >
           {isPrivate ? (
-            <FaLock className="w-3 h-3 text-secondary" />
+            <FaLock className="w-3 h-3 text-foreground" />
           ) : (
-            <FaGlobe className="w-3 h-3 text-neutral" />
+            <FaGlobe className="w-3 h-3 text-foreground" />
           )}
         </motion.div>
       </motion.div>
