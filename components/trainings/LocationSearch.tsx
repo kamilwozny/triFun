@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface LocationSuggestion {
   text: string;
@@ -38,6 +39,7 @@ export function LocationSearch({
 }: LocationSearchProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const { t } = useTranslation();
 
   // Close suggestions when clicking outside
   const searchRef = useClickOutside(() => setShowSuggestions(false));
@@ -46,7 +48,7 @@ export function LocationSearch({
   const filteredSuggestions = useMemo(() => {
     if (!searchInput) return [];
     return locationSuggestions.filter((suggestion) =>
-      suggestion.text.toLowerCase().includes(searchInput.toLowerCase())
+      suggestion.text.toLowerCase().includes(searchInput.toLowerCase()),
     );
   }, [locationSuggestions, searchInput]);
 
@@ -58,13 +60,13 @@ export function LocationSearch({
       case 'ArrowDown':
         e.preventDefault();
         setSelectedIndex((prev) =>
-          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
+          prev < filteredSuggestions.length - 1 ? prev + 1 : 0,
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
         setSelectedIndex((prev) =>
-          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
+          prev > 0 ? prev - 1 : filteredSuggestions.length - 1,
         );
         break;
       case 'Enter':
@@ -115,7 +117,7 @@ export function LocationSearch({
           onFocus={() => setShowSuggestions(true)}
           onKeyDown={handleKeyDown}
           type="search"
-          placeholder="Search by location"
+          placeholder={t('searchByLocation')}
           className="w-full"
           aria-label="Search locations"
           aria-controls="location-suggestions"

@@ -43,7 +43,7 @@ export default function NewTrainings() {
   const filteredEvents = useAdvancedEventFiltering(
     events,
     debouncedFilters,
-    session?.user?.id
+    session?.user?.id,
   );
 
   // For past events review functionality, filter only past events
@@ -74,7 +74,7 @@ export default function NewTrainings() {
   };
 
   const handleLocationFiltersChange = (
-    locationFilters: LocationFiltersType
+    locationFilters: LocationFiltersType,
   ) => {
     setFilters((prev) => ({
       ...prev,
@@ -87,7 +87,7 @@ export default function NewTrainings() {
       <div className="flex flex-col lg:flex-row items-start justify-center max-w-full gap-8 w-full">
         <div className="w-full lg:w-1/6 xl:w-1/5">
           <div className="overflow-y-auto max-h-[80vh] space-y-6 rounded-xl bg-base-100 p-6">
-            <h1 className="text-2xl font-bold text-black">Filters</h1>
+            <h1 className="text-2xl font-bold text-black">{t('filters')}</h1>
             <Separator />
 
             <EventTypeCheckboxes
@@ -99,7 +99,7 @@ export default function NewTrainings() {
 
             <div>
               <h3 className="text-lg font-semibold mb-3 text-black">
-                {t('sportType', 'Sport Type')}
+                {t('sportType')}
               </h3>
               <SportTypeFilters
                 selectedSports={filters.sports}
@@ -111,7 +111,7 @@ export default function NewTrainings() {
 
             <div>
               <h3 className="text-lg font-semibold mb-3 text-black">
-                {t('location', 'Location')}
+                {t('location')}
               </h3>
               <LocationFilters
                 filters={filters.location}

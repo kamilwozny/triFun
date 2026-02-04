@@ -37,7 +37,7 @@ export function SportTypeFilters({
           className="w-20 rounded-lg border-none shadow-md text-sm hover:bg-foreground hover:text-white text-center"
           onClick={() => handleSportToggle(sport.value)}
         >
-          {t(sport.labelKey, sport.value)}
+          {t(sport.value.toLowerCase())}
         </Button>
       ))}
     </div>

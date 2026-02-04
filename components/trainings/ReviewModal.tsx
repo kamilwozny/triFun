@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TrainingEvent } from '@/types/training';
 import { BulkReviewForm } from '../reviews/BulkReviewForm';
+import { useTranslation } from 'react-i18next';
 
 interface ReviewModalProps {
   reviewEvent: TrainingEvent | undefined;
@@ -19,9 +20,15 @@ export function ReviewModal({
 }: ReviewModalProps) {
   const modalRef = useRef<HTMLDialogElement>(null);
   const [lastTrigger, setLastTrigger] = useState<number>(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    if (reviewEvent?.attendees && reviewEventId && modalTrigger > lastTrigger && modalRef.current) {
+    if (
+      reviewEvent?.attendees &&
+      reviewEventId &&
+      modalTrigger > lastTrigger &&
+      modalRef.current
+    ) {
       modalRef.current.showModal();
       setLastTrigger(modalTrigger);
     }
@@ -39,7 +46,7 @@ export function ReviewModal({
     <dialog ref={modalRef} className="modal">
       <div className="modal-box max-w-3xl">
         <h3 className="font-bold text-lg mb-6">
-          Review Participants - {reviewEvent.name}
+          {t('reviewParticipants')} - {reviewEvent.name}
         </h3>
         <BulkReviewForm
           eventId={reviewEventId}
@@ -48,7 +55,7 @@ export function ReviewModal({
         />
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button onClick={handleClose}>close</button>
+        <button onClick={handleClose}>{t('close')}</button>
       </form>
     </dialog>
   );

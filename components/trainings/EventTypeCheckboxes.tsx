@@ -21,7 +21,7 @@ export function EventTypeCheckboxes({
 
   const handleCheckboxChange = (
     key: keyof EventTypeFilters,
-    checked: boolean
+    checked: boolean,
   ) => {
     onFiltersChange({
       ...filters,
@@ -46,10 +46,10 @@ export function EventTypeCheckboxes({
         />
         <div className="flex flex-col">
           <span className="text-sm font-medium text-foreground">
-            {t('hostEvents', 'Host Events')}
+            {t('hostEvents')}
           </span>
           <span className="text-xs text-muted-foreground">
-            {t('hostEventsDesc', 'Events you are hosting')}
+            {t('hostEventsDesc')}
           </span>
         </div>
       </label>
@@ -69,10 +69,10 @@ export function EventTypeCheckboxes({
         />
         <div className="flex flex-col">
           <span className="text-sm font-medium text-foreground">
-            {t('plannedEvents', 'Planned Events')}
+            {t('plannedEvents')}
           </span>
           <span className="text-xs text-muted-foreground">
-            {t('plannedEventsDesc', 'Upcoming events you joined')}
+            {t('plannedEventsDesc')}
           </span>
         </div>
       </label>
@@ -92,10 +92,10 @@ export function EventTypeCheckboxes({
         />
         <div className="flex flex-col">
           <span className="text-sm font-medium text-foreground">
-            {t('pastEvents', 'Past Events')}
+            {t('pastEvents')}
           </span>
           <span className="text-xs text-muted-foreground">
-            {t('pastEventsDesc', 'Events that already happened')}
+            {t('pastEventsDesc')}
           </span>
         </div>
       </label>

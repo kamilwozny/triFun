@@ -14,6 +14,10 @@ interface LocationFiltersProps {
   onFiltersChange: (filters: LocationFilters) => void;
 }
 
+const MIN_LENGTH = 0;
+const MAX_LENGTH = 100;
+const SLIDER_STEPS = 5;
+
 export function LocationFilters({
   filters,
   onFiltersChange,
@@ -38,12 +42,12 @@ export function LocationFilters({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="city-filter" className="text-sm font-medium text-black">
-          {t('city', 'City')}
+          {t('city')}
         </Label>
         <Input
           id="city-filter"
           type="text"
-          placeholder={t('searchByCity', 'Search by city...')}
+          placeholder={t('searchByCity')}
           value={filters.city}
           onChange={(e) => handleCityChange(e.target.value)}
           className="w-full text-black focus-visible:ring-foreground"
@@ -52,19 +56,23 @@ export function LocationFilters({
 
       <div className="space-y-3">
         <Label className="text-sm font-medium text-black">
-          {t('distance', 'Distance')}: ±{filters.distanceKm} km
+          {t('distanceRange')}: ±{filters.distanceKm} {t('km')}
         </Label>
         <Slider
           value={[filters.distanceKm]}
           onValueChange={handleDistanceChange}
-          max={100}
-          min={0}
-          step={5}
+          max={MAX_LENGTH}
+          min={MIN_LENGTH}
+          step={SLIDER_STEPS}
           className="w-full"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>0 km</span>
-          <span>100 km</span>
+          <span>
+            {MIN_LENGTH} {t('km')}
+          </span>
+          <span>
+            {MAX_LENGTH} {t('km')}
+          </span>
         </div>
       </div>
     </div>

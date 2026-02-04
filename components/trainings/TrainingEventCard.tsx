@@ -35,7 +35,7 @@ export function TrainingEventCard({
       e.stopPropagation();
       onReview?.(event.id);
     },
-    [onReview, event.id]
+    [onReview, event.id],
   );
 
   return (
@@ -80,7 +80,7 @@ export function TrainingEventCard({
                 difficultyColors[event.level as keyof typeof difficultyColors]
               }`}
             >
-              {event.level}
+              {t(event.level.toLowerCase())}
             </span>
           </div>
         </div>
@@ -99,11 +99,11 @@ export function TrainingEventCard({
                   {
                     event.parsedDistances.find((d) => d.activity === activity)
                       ?.distance
-                  }{' '}
-                  {
-                    event.parsedDistances.find((d) => d.activity === activity)
-                      ?.unit
                   }
+                  {t(
+                    event.parsedDistances.find((d) => d.activity === activity)
+                      ?.unit || '',
+                  )}
                 </span>
               </div>
             </div>
@@ -116,7 +116,7 @@ export function TrainingEventCard({
               onClick={handleReviewClick}
               className="btn btn-primary btn-sm"
             >
-              Review Participants
+              {t('reviewParticipants')}
             </button>
           </div>
         )}
