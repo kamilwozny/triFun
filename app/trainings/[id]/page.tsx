@@ -14,6 +14,8 @@ import {
 import { MdSportsScore } from 'react-icons/md';
 
 import { Badge } from '@/components/ui/badge';
+import { detectLanguage } from '@/helpers/detectLanguage';
+import { getServerTranslation } from '@/localization/server';
 
 const activityIcons = {
   Run: <FaRunning className="text-red-500 h-6 w-6" />,
@@ -51,6 +53,7 @@ export default async function TrainingPage({
   const attendees = await getTrainingList(params.id);
   const session = await auth();
   const user = session?.user;
+  const { t } = await getServerTranslation();
 
   if (!training) return <p>Training not found</p>;
 
@@ -90,7 +93,7 @@ export default async function TrainingPage({
             //   difficultyColors[training.level as keyof typeof difficultyColors]
             // } px-4 py-2 rounded-full text-sm font-semibold hover`}
           >
-            {training.level}
+            {t(training.level.toLowerCase())}
           </Badge>
         </div>
 
@@ -104,14 +107,14 @@ export default async function TrainingPage({
         <div className="flex items-center gap-2 mb-4">
           <MdSportsScore className="h-6 w-6" />
           <h2 className="text-2xl font-semibold text-neutral-800">
-            Activities
+            {t('activities')}
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {JSON.parse(training.distances).map(
             (
               dist: { activity: string; distance: number; unit: string },
-              index: number
+              index: number,
             ) => (
               <div
                 key={index}
@@ -127,7 +130,7 @@ export default async function TrainingPage({
                   </span>
                 </div>
               </div>
-            )
+            ),
           )}
         </div>
       </div>

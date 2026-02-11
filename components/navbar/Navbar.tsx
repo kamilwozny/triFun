@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
-import LanguageSwitcher from '../languageSwitcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import {
   NavigationMenu,
@@ -15,9 +14,10 @@ import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-DropdownMenuItem,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Image from 'next/image';
 
 enum ActivePages {
   trainings = 'trainings',
@@ -47,7 +47,7 @@ export const Navbar = () => {
                 onClick={() => setActivePage(ActivePages.events)}
                 className="p-2"
               >
-                Events
+                {t('events')}
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem
@@ -60,7 +60,7 @@ export const Navbar = () => {
                 className="p-2"
                 onClick={() => setActivePage(ActivePages.trainings)}
               >
-                Trainings
+                {t('trainings')}
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem
@@ -73,7 +73,7 @@ export const Navbar = () => {
                 className="p-2"
                 onClick={() => setActivePage(ActivePages.stats)}
               >
-                Stats
+                {t('stats')}
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem
@@ -86,7 +86,7 @@ export const Navbar = () => {
                 className="p-2"
                 onClick={() => setActivePage(ActivePages.about)}
               >
-                About
+                {t('about')}
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -102,7 +102,7 @@ export const Navbar = () => {
         </Link>
       </div>
       <div className="navbar-end">
-        <LanguageSwitcher />
+        {/* <LanguageSwitcher /> */}
         {status === 'loading' ? (
           <div className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary ml-4">
             <span className="loading loading-spinner loading-sm"></span>
@@ -130,28 +130,45 @@ export const Navbar = () => {
               </svg>
             </button>
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <button
-                  className="btn-circle focus:outline-none focus:ring-2 focus:ring-foreground"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  aria-expanded={dropdownOpen}
-                  aria-haspopup="true"
-                >
-                  <div className="avatar placeholder">
+              <DropdownMenuTrigger
+                className="btn-circle focus:outline-none hover:ring-2 hover:ring-foreground"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
+              >
+                <div className="avatar placeholder rounded-full">
+                  {session?.user?.image ? (
+                    <Image
+                      src={session.user.image}
+                      className="rounded-full"
+                      alt="Avatar"
+                      width={36}
+                      height={36}
+                    />
+                  ) : (
                     <div className="bg-foreground text-white text-md font-semibold rounded-full w-8">
                       <span>{session.user?.name?.charAt(0) || 'U'}</span>
                     </div>
-                  </div>
-                </button>
+                  )}
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem className="hover:bg-background hover:cursor-pointer">
+                <DropdownMenuItem className="hover:bg-background hover:cursor-pointe focus:bg-backgroundr">
                   <Link
                     className="w-full"
-                    href="/profile"
+                    href={`/profile/${session.user?.id}`}
                     onClick={() => setDropdownOpen(false)}
                   >
-                    Profile
+                    {t('profile')}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-background hover:cursor-pointer focus:bg-background">
+                  <Link
+                    className="w-full"
+                    href="/settings"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    {t('settings')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -159,7 +176,7 @@ export const Navbar = () => {
                     signOut({ callbackUrl: '/signin' });
                     setDropdownOpen(false);
                   }}
-                  className="hover:bg-background text-foreground hover:cursor-pointer"
+                  className="hover:bg-background text-foreground hover:cursor-pointer focus:bg-background"
                 >
                   {t('signOut')}
                 </DropdownMenuItem>
@@ -169,7 +186,7 @@ export const Navbar = () => {
         ) : (
           <Button className="bg-foreground ml-4 p-4 hover:bg-white hover:text-foreground">
             <Link href="/signin" className="">
-              Sign in
+              {t('signin')}
             </Link>
           </Button>
         )}

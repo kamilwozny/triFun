@@ -8,6 +8,14 @@ const nextConfig = {
     AUTH_SECRET: process.env.AUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'qn73wmqg6m.ufs.sh',
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

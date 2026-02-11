@@ -2,7 +2,11 @@ import { db } from '@/db/db';
 import NextAuth, { User, NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
+import Strava from 'next-auth/providers/strava';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import { accounts, users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { utapi } from '@/server/uploadthing';
 
 export const BASE_PATH = '/api/auth';
 
@@ -11,6 +15,10 @@ const authOptions: NextAuthConfig = {
     Google({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
+    }),
+    Strava({
+      clientId: process.env.STRAVA_ID,
+      clientSecret: process.env.STRAVA_SECRET,
     }),
     Credentials({
       name: 'Credentials',
@@ -38,7 +46,7 @@ const authOptions: NextAuthConfig = {
         const user = users.find(
           (user) =>
             user.userName === credentials.username &&
-            user.password === credentials.password
+            user.password === credentials.password,
         );
         return user
           ? { id: user.id, name: user.name, email: user.email }
@@ -52,10 +60,23 @@ const authOptions: NextAuthConfig = {
       return session;
     },
   },
+  events: {
+    createUser: async ({ user }) => {
+      if (!user?.id || !user.image) return;
+      const upload = await utapi.uploadFilesFromUrl(user.image);
+      const file = upload.data?.ufsUrl;
+      await db
+        .update(users)
+        .set({
+          customAvatar: file,
+        })
+        .where(eq(users.id, user.id));
+    },
+  },
   session: {
     strategy: 'database',
   },
-  adapter: DrizzleAdapter(db),
+  adapter: DrizzleAdapter(db, { usersTable: users, accountsTable: accounts }),
   pages: {
     signIn: '/signin',
   },
