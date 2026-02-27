@@ -1,3 +1,5 @@
+'use client';
+
 import {
   MapContainer,
   Marker,
@@ -9,15 +11,13 @@ import {
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { SearchField } from '@/helpers/searchControl';
 import { useState, useEffect } from 'react';
 import type { MapProps, MapMarker, Location } from './types';
 import { LocationMarker } from './utils';
 import { icons } from './MarkerIcon';
-import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 
 function MapCursorController({
   pickPoint,
@@ -31,7 +31,7 @@ function MapCursorController({
       if (pickPoint && handleLocation) {
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`,
           );
           const data = await response.json();
 
@@ -66,6 +66,9 @@ function CountryBoundsInitializer({
 
   useEffect(() => {
     async function setCountryBounds() {
+      if (!map) return;
+
+      map.invalidateSize();
       try {
         // Get country from coordinates
         const [lat, lng] = Array.isArray(position)
@@ -74,11 +77,11 @@ function CountryBoundsInitializer({
 
         const response = await fetch(`/api/latlng?lat=${lat}&lng=${lng}`);
         const boundsData = await response.json();
-        console.log(boundsData);
+
         if (boundsData[0]) {
           const bounds = L.latLngBounds(
             [boundsData[0].boundingbox[0], boundsData[0].boundingbox[2]],
-            [boundsData[0].boundingbox[1], boundsData[0].boundingbox[3]]
+            [boundsData[0].boundingbox[1], boundsData[0].boundingbox[3]],
           );
           map.fitBounds(bounds);
         }
@@ -109,7 +112,7 @@ function createClusterCustomIcon(cluster: any) {
   });
 }
 
-export default function Map({
+function Map({
   position,
   zoom,
   pickPoint = false,
@@ -117,7 +120,7 @@ export default function Map({
   markers = [],
 }: MapProps) {
   const [markerPosition, setMarkerPosition] = useState(
-    position ? { lat: position.lat, lng: position.lng } : null
+    position ? { lat: position.lat, lng: position.lng } : null,
   );
 
   return (
@@ -155,6 +158,7 @@ export default function Map({
         }
       `}</style>
       <MapContainer
+        key={`${markerPosition?.lat}-${markerPosition?.lng}`}
         center={markerPosition || position}
         zoom={zoom}
         scrollWheelZoom={false}
@@ -173,7 +177,7 @@ export default function Map({
             <Popup>Your selected location</Popup>
           </Marker>
         )}
-        {markers.map((marker: MapMarker, index: number) => {
+        {/* {markers.map((marker: MapMarker, index: number) => {
           const iconKey = marker.selected
             ? `${marker.type || 'default'}Selected`
             : marker.type || 'default';
@@ -191,7 +195,7 @@ export default function Map({
               </Popup>
             </Marker>
           );
-        })}
+        })} */}
         {!pickPoint && markers.length > 0 && (
           <MarkerClusterGroup
             chunkedLoading
@@ -236,3 +240,5 @@ export default function Map({
     </>
   );
 }
+
+export default Map;

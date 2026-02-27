@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useRef, useState } from 'react';
 import '@/components/trainings/Trainings.css';
 import type { Location } from '@/components/map/types';
 import { useForm } from 'react-hook-form';
@@ -13,8 +12,8 @@ import { format } from 'date-fns';
 import 'react-day-picker/style.css';
 import { DatePickerModal } from '@/components/datePickerModal/DatePickerModal';
 import { EventTypeSelect } from '@/components/eventTypeSelect/EventTypeSelect';
-import MapSkeleton from '@/components/skeletons/MapSkeleton';
 import sendSimpleMessage from '@/helpers/sendMail';
+import Map from '@/components/map/Map';
 
 interface DistanceData {
   activity: string;
@@ -42,7 +41,7 @@ export default function CreateTrainingEvent() {
   } | null>(null);
   const [location, setLocation] = useState<Location>({});
   const [selectedActivities, setSelectedActivities] = useState<Array<string>>(
-    []
+    [],
   );
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
@@ -84,7 +83,7 @@ export default function CreateTrainingEvent() {
   const handleDistanceChange = (
     activity: string,
     value: number | '',
-    unit: 'meters' | 'kilometers'
+    unit: 'meters' | 'kilometers',
   ) => {
     setDistances((prev) => {
       const existingActivity = prev.find((d) => d.activity === activity);
@@ -92,7 +91,7 @@ export default function CreateTrainingEvent() {
         return prev.map((d) =>
           d.activity === activity
             ? { ...d, distance: value === '' ? 0 : Number(value), unit }
-            : d
+            : d,
         );
       } else {
         return [
@@ -107,15 +106,6 @@ export default function CreateTrainingEvent() {
     });
   };
 
-  const Map = useMemo(
-    () =>
-      dynamic(() => import('@/components/map/Map'), {
-        loading: () => <MapSkeleton />,
-        ssr: true,
-      }),
-    []
-  );
-
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -127,7 +117,7 @@ export default function CreateTrainingEvent() {
         },
         (error) => {
           console.error('Error getting geolocation:', error);
-        }
+        },
       );
     }
   }, []);
@@ -192,7 +182,7 @@ export default function CreateTrainingEvent() {
           activity,
           distance,
           unit,
-        })
+        }),
       );
 
       await createNewTrainingEvent(
@@ -206,7 +196,7 @@ export default function CreateTrainingEvent() {
           distances: distancesWithUnits,
           isPrivate: data.isPrivate,
         },
-        location
+        location,
       );
       sendSimpleMessage();
 
@@ -214,7 +204,7 @@ export default function CreateTrainingEvent() {
     } catch (error) {
       console.error('Error creating event:', error);
       setError(
-        error instanceof Error ? error.message : 'Failed to create event'
+        error instanceof Error ? error.message : 'Failed to create event',
       );
     } finally {
       redirectPath && router.push(redirectPath);
@@ -299,7 +289,7 @@ export default function CreateTrainingEvent() {
                         activity,
                         e.target.value ? Number(e.target.value) : 0,
                         distances.find((d) => d.activity === activity)?.unit ||
-                          'meters'
+                          'meters',
                       )
                     }
                   />
@@ -311,7 +301,7 @@ export default function CreateTrainingEvent() {
                         activity,
                         distances.find((d) => d.activity === activity)
                           ?.distance || 0,
-                        e.target.value as 'meters' | 'kilometers'
+                        e.target.value as 'meters' | 'kilometers',
                       )
                     }
                   >

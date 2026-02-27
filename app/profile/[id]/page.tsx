@@ -6,8 +6,9 @@ import { notFound } from 'next/navigation';
 export default async function UserProfilePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id: userId } = await params;
   const [user] = await db
     .select({
       id: users.id,
@@ -16,7 +17,7 @@ export default async function UserProfilePage({
       image: users.image,
     })
     .from(users)
-    .where(eq(users.id, params.id));
+    .where(eq(users.id, userId));
 
   if (!user) {
     notFound();

@@ -3,14 +3,16 @@ import { cookies, headers } from 'next/headers';
 const DEFAULT = 'en';
 const SUPPORTED = ['en', 'pl'];
 
-export function detectLanguage() {
-  const cookieLanguage = cookies().get('NEXT_LOCALE')?.value;
+export async function detectLanguage() {
+  const cookieStore = await cookies();
+  const headersStore = await headers();
+  const cookieLanguage = cookieStore.get('NEXT_LOCALE')?.value;
 
   if (cookieLanguage && SUPPORTED.includes(cookieLanguage)) {
     return cookieLanguage;
   }
 
-  const acceptLanguage = headers().get('accept-language');
+  const acceptLanguage = headersStore.get('accept-language');
   if (acceptLanguage) {
     const lang = acceptLanguage
       .split(',')

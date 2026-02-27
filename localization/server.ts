@@ -12,7 +12,7 @@ const resources = {
 
 export async function getServerTranslation(ns = 'global') {
   const instance: i18n = i18next.createInstance();
-  const lng = detectLanguage();
+  const lng = await detectLanguage();
 
   await instance.init({ ...i18nOptions, lng, ns, resources });
 

@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import dynamic from 'next/dynamic';
 import type { LatLng } from 'leaflet';
 import { TrainingEvent } from '@/types/training';
 import MapSkeleton from '../skeletons/MapSkeleton';
+import Map from '@/components/map/Map';
 
 interface TrainingMapViewProps {
   userPosition: LatLng | null;
@@ -17,15 +17,6 @@ export function TrainingMapView({
   events,
   selectedTraining,
 }: TrainingMapViewProps) {
-  const Map = useMemo(
-    () =>
-      dynamic(() => import('@/components/map/Map'), {
-        loading: () => <MapSkeleton />,
-        ssr: true,
-      }),
-    []
-  );
-
   const mapMarkers = useMemo(() => {
     return events.map((event) => {
       const position = event.location
@@ -34,9 +25,7 @@ export function TrainingMapView({
             lng: event.location.lng,
           } as LatLng)
         : (() => {
-            const [lat, lng] = event.userPosition
-              .split(',')
-              .map(Number);
+            const [lat, lng] = event.userPosition.split(',').map(Number);
             return { lat, lng } as LatLng;
           })();
 
