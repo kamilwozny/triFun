@@ -11,7 +11,6 @@ import {
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import { SearchField } from '@/helpers/searchControl';
 import { useState, useEffect } from 'react';
 import type { MapProps, MapMarker, Location } from './types';
 import { LocationMarker } from './utils';
@@ -161,10 +160,9 @@ function Map({
         key={`${markerPosition?.lat}-${markerPosition?.lng}`}
         center={markerPosition || position}
         zoom={zoom}
-        scrollWheelZoom={false}
+        scrollWheelZoom={true}
         className="h-[700px] w-full"
       >
-        <SearchField />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

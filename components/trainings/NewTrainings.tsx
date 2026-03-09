@@ -11,10 +11,6 @@ import { TrainingMapView } from './TrainingMapView';
 import { CreateEventCTA } from './CreateEventCTA';
 import { EventTypeCheckboxes, EventTypeFilters } from './EventTypeCheckboxes';
 import { SportTypeFilters, SportType } from './SportTypeFilters';
-import {
-  LocationFilters,
-  LocationFilters as LocationFiltersType,
-} from './LocationFilters';
 
 import {
   useAdvancedEventFiltering,
@@ -31,22 +27,18 @@ export default function NewTrainings() {
   const { events } = useTrainingEvents();
   const { t } = useTranslation();
 
-  // Initialize filters with defaults
   const [filters, setFilters] = useState<AllFilters>(getDefaultFilters());
 
-  // Debounce the filters to avoid excessive updates
-  const debouncedFilters = useDebounce(filters, 300);
+  const debouncedFilters = useDebounce(filters, 400);
 
   const userPosition = useGeolocation();
 
-  // Use the advanced filtering hook
   const filteredEvents = useAdvancedEventFiltering(
     events,
     debouncedFilters,
     session?.user?.id,
   );
 
-  // For past events review functionality, filter only past events
   const pastEvents = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -58,7 +50,6 @@ export default function NewTrainings() {
 
   const reviewedEventIds = useReviewedEvents(pastEvents, 'past');
 
-  // Filter update handlers
   const handleEventTypeFiltersChange = (eventTypeFilters: EventTypeFilters) => {
     setFilters((prev) => ({
       ...prev,
@@ -70,15 +61,6 @@ export default function NewTrainings() {
     setFilters((prev) => ({
       ...prev,
       sports,
-    }));
-  };
-
-  const handleLocationFiltersChange = (
-    locationFilters: LocationFiltersType,
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      location: locationFilters,
     }));
   };
 
@@ -106,22 +88,10 @@ export default function NewTrainings() {
                 onSportsChange={handleSportsChange}
               />
             </div>
-
-            <Separator />
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3 text-black">
-                {t('location')}
-              </h3>
-              <LocationFilters
-                filters={filters.location}
-                onFiltersChange={handleLocationFiltersChange}
-              />
-            </div>
           </div>
         </div>
         <div className="w-full lg:w-3/6 xl:w-2/5">
-          <div className="no-scrollbar overflow-y-auto max-h-[75vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
+          <div className="no-scrollbar overflow-y-auto max-h-[80vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
             <TrainingEventList
               events={filteredEvents}
               activeTab={'upcoming'}
