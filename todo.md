@@ -57,7 +57,9 @@
 allow users to review host/participiants (report not showing up), show in user profile
 Leaderboards view (created/taken part of)
 Add validation for creating events and taking part in
+
 <!-- Prepare about us(landing page) -->
+
 Add notifications in app and on mail to actions (user can disable mail notification under user profile)
 Add more filters (by date, level and name of event)
 Make invite friends link working
@@ -74,3 +76,11 @@ add logging in from mail only (with mailing)
 End to end testing and some unit tests
 Restructure views/pages to make components out of views and make them reusable
 Prepare mobile views and include capacitor to test it on mobiles
+
+/////
+
+Search bar with text under to look for specific results
+Add to filters levels handling + clearing all filters
+Responsive design for mobiles/tablets
+Filtry w wyszukiwarce na mobile (pokazanie ilosci znalezionych treningow na bazie filtrow lub szukajki)
+Add info about user who created event in card, also count of athletes joined already with icon

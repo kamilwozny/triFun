@@ -21,6 +21,7 @@ import { useGeolocation } from '@/hooks/useGeolocation';
 import { useReviewedEvents } from '@/hooks/useReviewedEvents';
 import useDebounce from '@/helpers/useDebounce';
 import { Separator } from '@/components/ui/separator';
+import { SearchTrainings } from './SearchTrainings';
 
 export default function NewTrainings() {
   const { data: session } = useSession();
@@ -91,7 +92,8 @@ export default function NewTrainings() {
           </div>
         </div>
         <div className="w-full lg:w-3/6 xl:w-2/5">
-          <div className="no-scrollbar overflow-y-auto max-h-[80vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
+          <SearchTrainings />
+          <div className="no-scrollbar overflow-y-auto max-h-[70vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6 mt-6">
             <TrainingEventList
               events={filteredEvents}
               activeTab={'upcoming'}
@@ -109,7 +111,7 @@ export default function NewTrainings() {
               selectedTraining={null}
             />
           </div>
-          <CreateEventCTA />
+          {/* <CreateEventCTA /> */}
         </div>
       </div>
     </div>

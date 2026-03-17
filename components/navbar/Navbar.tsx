@@ -35,7 +35,14 @@ export const Navbar = () => {
   return (
     <div className="navbar shadow-xl px-4 md:px-8 lg:px-24 mb-10">
       <div className="navbar-start">
-        <NavigationMenu className="text-black">
+        <Link
+          href="/dashboard"
+          className="text-foreground text-2xl md:text-3xl"
+          aria-label="Go to dashboard"
+        >
+          TriFun
+        </Link>
+        {/* <NavigationMenu className="text-black">
           <NavigationMenuList>
             <NavigationMenuItem
               className={`${
@@ -90,17 +97,9 @@ export const Navbar = () => {
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
-        </NavigationMenu>
+        </NavigationMenu> */}
       </div>
-      <div className="navbar-center">
-        <Link
-          href="/dashboard"
-          className="text-foreground text-2xl md:text-3xl"
-          aria-label="Go to dashboard"
-        >
-          TriFun
-        </Link>
-      </div>
+      <div className="navbar-center"></div>
       <div className="navbar-end">
         {/* <LanguageSwitcher /> */}
         {status === 'loading' ? (

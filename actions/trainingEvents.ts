@@ -6,6 +6,7 @@ import type { Location } from '../components/map/types';
 import { auth } from '@/app/auth';
 import { TrainingEvent, Level } from '@/types/training';
 import { revalidateTrainings } from './revalidations';
+import { and, SQL, lte, gte, like, inArray, eq } from 'drizzle-orm';
 
 interface CreateTrainingEventData {
   name: string;
@@ -24,7 +25,7 @@ interface CreateTrainingEventData {
 
 export async function createNewTrainingEvent(
   data: CreateTrainingEventData,
-  location: Location
+  location: Location,
 ) {
   try {
     const session = await auth();
@@ -70,13 +71,55 @@ export async function createNewTrainingEvent(
   }
 }
 
-export async function getTrainingEvents(): Promise<TrainingEvent[]> {
+type SearchParamsProps = {
+  search?: string;
+  userEvents?: boolean;
+  joinedEvents?: boolean;
+  pastEvents?: boolean;
+  levels?: string[];
+  location?: string;
+  radius?: string;
+  categorySport?: string;
+};
+
+export async function getTrainingEvents({
+  search,
+  userEvents,
+  joinedEvents,
+  pastEvents,
+  levels,
+  location,
+  radius,
+  categorySport,
+}: SearchParamsProps): Promise<TrainingEvent[]> {
+  const conditions: SQL[] = [];
   try {
-    const events = await db.query.trainingEvents.findMany({
-      with: {
-        attendees: true,
-      },
-    });
+    if (search) {
+      conditions.push(like(trainingEvents.name, `%${search}%`));
+    }
+
+    if (categorySport) {
+      conditions.push(eq(trainingEvents.distances, categorySport));
+    }
+
+    if (levels?.length) {
+      conditions.push(inArray(trainingEvents.level, levels));
+    }
+
+    if (pastEvents !== undefined) {
+      const now = new Date();
+      if (pastEvents) {
+        conditions.push(lte(trainingEvents.date, now));
+      } else {
+        conditions.push(gte(trainingEvents.date, now));
+      }
+    }
+
+    const events = await db
+      .select()
+      .from(trainingEvents)
+      .where(conditions.length ? and(...conditions) : undefined);
+
     return events.map((event) => {
       const userPosition = event.userPosition.split(',').map(Number);
       const distances = JSON.parse(event.distances);
