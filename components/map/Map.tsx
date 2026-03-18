@@ -17,6 +17,7 @@ import { LocationMarker } from './utils';
 import { icons } from './MarkerIcon';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
+import { useTranslation } from 'react-i18next';
 
 function MapCursorController({
   pickPoint,
@@ -121,6 +122,7 @@ function Map({
   const [markerPosition, setMarkerPosition] = useState(
     position ? { lat: position.lat, lng: position.lng } : null,
   );
+  const { t } = useTranslation();
 
   return (
     <>
@@ -172,28 +174,10 @@ function Map({
         )}
         {pickPoint && markerPosition && (
           <Marker position={markerPosition} icon={icons.run}>
-            <Popup>Your selected location</Popup>
+            <Popup>{t('yourSelectedLocatuion')}</Popup>
           </Marker>
         )}
-        {/* {markers.map((marker: MapMarker, index: number) => {
-          const iconKey = marker.selected
-            ? `${marker.type || 'default'}Selected`
-            : marker.type || 'default';
-          const icon = icons[iconKey as keyof typeof icons] || icons.run;
 
-          return (
-            <Marker key={index} position={marker.position} icon={icon}>
-              <Popup className="custom-popup">
-                <div className="text-center">
-                  <h3 className="font-bold text-lg mb-1">{marker.popup}</h3>
-                  {marker.details && (
-                    <p className="text-sm text-gray-600">{marker.details}</p>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })} */}
         {!pickPoint && markers.length > 0 && (
           <MarkerClusterGroup
             chunkedLoading

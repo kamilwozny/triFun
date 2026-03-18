@@ -14,3 +14,32 @@ export function formatDate(dateString: string): string {
     day: 'numeric',
   });
 }
+
+export function formatDateLong(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+export interface ParsedDistance {
+  activity: string;
+  distance: number;
+  unit: string;
+}
+
+export function parseDistances(distances: string): ParsedDistance[] {
+  try {
+    return JSON.parse(distances) as ParsedDistance[];
+  } catch {
+    return [];
+  }
+}
+
+export function getTodayMidnight(): Date {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}

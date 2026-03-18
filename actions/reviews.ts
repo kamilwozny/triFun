@@ -1,7 +1,7 @@
 import { db } from '@/db/db';
 import { revalidateTrainings } from './revalidations';
 import { reviews } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 export async function createReviews(
   reviewData: {
@@ -40,4 +40,13 @@ export async function getReviewsForEvent(eventId: string) {
     console.error('Error fetching reviews:', error);
     throw error;
   }
+}
+
+export async function getReviewedEventIds(eventIds: string[]): Promise<string[]> {
+  if (eventIds.length === 0) return [];
+  const rows = await db
+    .selectDistinct({ eventId: reviews.eventId })
+    .from(reviews)
+    .where(inArray(reviews.eventId, eventIds));
+  return rows.map((r) => r.eventId);
 }

@@ -87,7 +87,6 @@ export default function AboutPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
       <section className="relative h-[80vh] overflow-hidden">
         <div className="absolute inset-0">
           <Image
@@ -128,7 +127,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <motion.div
@@ -179,7 +177,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Sports Triathlon Section */}
       <section className="py-20 bg-neutral-50">
         <div className="container mx-auto px-6">
           <motion.div
@@ -255,7 +252,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Getting Started Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <motion.div
@@ -340,7 +336,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <motion.div

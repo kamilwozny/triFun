@@ -1,3 +1,6 @@
+'use client';
+
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +17,7 @@ const sportTypes: { value: SportType; labelKey: string }[] = [
   { value: 'Swim', labelKey: 'swimming' },
 ];
 
-export function SportTypeFilters({
+export const SportTypeFilters = React.memo(function SportTypeFilters({
   selectedSports,
   onSportsChange,
 }: SportTypeFiltersProps) {
@@ -42,4 +45,4 @@ export function SportTypeFilters({
       ))}
     </div>
   );
-}
+});

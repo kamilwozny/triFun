@@ -3,11 +3,9 @@ import { Separator } from '@/components/ui/separator';
 export default function TrainingsLoading() {
   return (
     <div className="flex gap-8 px-4 lg:px-8 mt-6">
-      {/* Left filter panel skeleton */}
       <div className="w-[20%] flex-shrink-0 bg-white rounded-xl shadow p-6 animate-pulse">
         <div className="skeleton h-8 w-32 mb-6 bg-neutral-200" />
         <Separator />
-        {/* Filter checkboxes */}
         <div className="mt-8">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-6 mb-4">
@@ -19,7 +17,6 @@ export default function TrainingsLoading() {
         <Separator />
 
         <div className="skeleton h-6 w-28 mt-6 mb-6 bg-neutral-200" />
-        {/* Sport type buttons */}
         <div className="flex flex-col gap-2 mb-6">
           {[1, 2, 3].map((i) => (
             <div
@@ -30,10 +27,8 @@ export default function TrainingsLoading() {
         </div>
         <Separator />
         <div className="skeleton h-6 w-24 mb-2 bg-neutral-200 mt-8" />
-        {/* City search */}
         <div className="skeleton h-4 w-24 mb-2 bg-neutral-200 mt-8" />
         <div className="skeleton h-10 w-full mb-4 bg-neutral-200 mt-6" />
-        {/* Distance slider */}
         <div className="skeleton h-4 w-full mb-2 bg-neutral-200 mt-4" />
         <div className="flex justify-between">
           <div className="skeleton h-4 w-12 bg-neutral-200" />
@@ -41,7 +36,6 @@ export default function TrainingsLoading() {
         </div>
       </div>
 
-      {/* Center event cards skeleton */}
       <div className="flex-1 max-w-[40%] bg-white">
         <div className="flex flex-col gap-6 mt-6">
           {[1, 2, 3, 4].map((i) => (
@@ -78,7 +72,6 @@ export default function TrainingsLoading() {
         </div>
       </div>
 
-      {/* Right map and create event skeleton */}
       <div className="flex flex-col gap-6 w-full max-w-[40%]">
         <div className="skeleton h-[80%] w-full rounded-xl bg-neutral-200" />
         <div className="skeleton h-40 w-full rounded-xl bg-neutral-200" />

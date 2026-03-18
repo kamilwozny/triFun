@@ -2,7 +2,12 @@ import { useMemo } from 'react';
 import { TrainingEvent } from '@/types/training';
 import { EventTypeFilters } from '@/components/trainings/EventTypeCheckboxes';
 import { SportType } from '@/components/trainings/SportTypeFilters';
-import { LocationFilters } from '@/components/trainings/LocationFilters';
+import { getTodayMidnight } from '@/lib/utils';
+
+export interface LocationFilters {
+  city: string;
+  distanceKm: number;
+}
 
 export interface AllFilters {
   eventType: EventTypeFilters;
@@ -10,25 +15,44 @@ export interface AllFilters {
   location: LocationFilters;
 }
 
+interface UserPosition {
+  lat: number;
+  lng: number;
+}
+
+function haversineDistance(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const R = 6371;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 export function useAdvancedEventFiltering(
   events: TrainingEvent[],
   filters: AllFilters,
-  userId?: string
+  userId?: string,
+  userPosition?: UserPosition,
 ) {
   return useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getTodayMidnight();
 
     return events.filter((event) => {
-      // Date-based filtering
       const eventDate = new Date(event.date);
       const isPastEvent = eventDate < today;
       const isUpcomingEvent = eventDate >= today;
 
-      // Check if user is host or attendee
       const isUserHost = event.createdBy === userId;
       const isUserAttendee = event.attendees?.find(
-        (attendee) => attendee.attendeeId === userId
+        (attendee) => attendee.attendeeId === userId,
       );
 
       // Event type filtering
@@ -37,20 +61,13 @@ export function useAdvancedEventFiltering(
       if (filters.eventType.showHostEvents && isUserHost) {
         matchesEventType = true;
       }
-
-      if (
-        filters.eventType.showPlannedEvents &&
-        isUserAttendee &&
-        isUpcomingEvent
-      ) {
+      if (filters.eventType.showPlannedEvents && isUserAttendee && isUpcomingEvent) {
         matchesEventType = true;
       }
-
       if (filters.eventType.showPastEvents && isPastEvent) {
         matchesEventType = true;
       }
 
-      // If no event type filters are selected, show all events
       const hasEventTypeFilters =
         filters.eventType.showHostEvents ||
         filters.eventType.showPlannedEvents ||
@@ -65,23 +82,29 @@ export function useAdvancedEventFiltering(
         filters.sports.length === 0 ||
         filters.sports.some((sport) => event.activities.includes(sport));
 
-      // Location filtering (city search)
+      // Location text filtering (city/country — server already applied this,
+      // but re-apply client-side so sidebar filter stays in sync)
       const matchesCity =
         !filters.location.city ||
-        event.city
-          .toLowerCase()
-          .includes(filters.location.city.toLowerCase()) ||
-        event.country
-          .toLowerCase()
-          .includes(filters.location.city.toLowerCase());
+        event.city.toLowerCase().includes(filters.location.city.toLowerCase()) ||
+        event.country.toLowerCase().includes(filters.location.city.toLowerCase());
 
-      // TODO: Distance filtering would require coordinates and geolocation calculation
-      // For now, we'll implement city search only
-      const matchesDistance = true; // Placeholder for distance filtering
+      // Radius filtering — only active when userPosition is available and radius > 0
+      const matchesDistance =
+        !userPosition ||
+        filters.location.distanceKm === 0 ||
+        !event.location
+          ? true
+          : haversineDistance(
+              userPosition.lat,
+              userPosition.lng,
+              event.location.lat,
+              event.location.lng,
+            ) <= filters.location.distanceKm;
 
       return matchesEventType && matchesSport && matchesCity && matchesDistance;
     });
-  }, [events, filters, userId]);
+  }, [events, filters, userId, userPosition]);
 }
 
 export function getDefaultFilters(): AllFilters {
@@ -94,7 +117,7 @@ export function getDefaultFilters(): AllFilters {
     sports: [],
     location: {
       city: '',
-      distanceKm: 25,
+      distanceKm: 0,
     },
   };
 }

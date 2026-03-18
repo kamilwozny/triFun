@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { TrainingEvent } from '@/types/training';
 import { BulkReviewForm } from '../reviews/BulkReviewForm';
 import { useTranslation } from 'react-i18next';
@@ -9,33 +9,29 @@ interface ReviewModalProps {
   reviewEvent: TrainingEvent | undefined;
   reviewEventId: string;
   userId?: string;
-  modalTrigger: number;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function ReviewModal({
   reviewEvent,
   reviewEventId,
   userId,
-  modalTrigger,
+  isOpen,
+  onClose,
 }: ReviewModalProps) {
   const modalRef = useRef<HTMLDialogElement>(null);
-  const [lastTrigger, setLastTrigger] = useState<number>(0);
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (
-      reviewEvent?.attendees &&
-      reviewEventId &&
-      modalTrigger > lastTrigger &&
-      modalRef.current
-    ) {
+    if (isOpen && reviewEvent?.attendees && modalRef.current) {
       modalRef.current.showModal();
-      setLastTrigger(modalTrigger);
     }
-  }, [reviewEvent, reviewEventId, modalTrigger, lastTrigger]);
+  }, [isOpen, reviewEvent]);
 
   const handleClose = () => {
     modalRef.current?.close();
+    onClose();
   };
 
   if (!reviewEvent?.attendees || !reviewEventId) {

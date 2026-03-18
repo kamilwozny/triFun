@@ -1,7 +1,6 @@
 export default function TrainingDetailsLoading() {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      {/* Header Section Skeleton */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-start">
           <div className="space-y-3">
@@ -14,7 +13,6 @@ export default function TrainingDetailsLoading() {
         <div className="skeleton h-20 w-full mt-4 bg-neutral-200" />
       </div>
 
-      {/* Activities Section Skeleton */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex items-center gap-2 mb-4">
           <div className="skeleton h-6 w-6 bg-neutral-200" />
@@ -36,7 +34,6 @@ export default function TrainingDetailsLoading() {
         </div>
       </div>
 
-      {/* Attendees Section Skeleton */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">

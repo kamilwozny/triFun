@@ -1,16 +1,12 @@
 import { useMemo } from 'react';
 import { TrainingEvent } from '@/types/training';
+import { getTodayMidnight } from '@/lib/utils';
 
 export function useTrainingEventsFilter(events: TrainingEvent[], userId?: string) {
   // Get upcoming events
   const upcomingEvents = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return events.filter((event) => {
-      const eventDate = new Date(event.date);
-      return eventDate >= today;
-    });
+    const today = getTodayMidnight();
+    return events.filter((event) => new Date(event.date) >= today);
   }, [events]);
 
   // Filter events the user is participating in or created
@@ -28,13 +24,8 @@ export function useTrainingEventsFilter(events: TrainingEvent[], userId?: string
 
   // Get past events
   const pastEvents = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return events.filter((event) => {
-      const eventDate = new Date(event.date);
-      return eventDate < today;
-    });
+    const today = getTodayMidnight();
+    return events.filter((event) => new Date(event.date) < today);
   }, [events]);
 
   return {

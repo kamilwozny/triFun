@@ -1,29 +1,12 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface LocationSuggestion {
   text: string;
   type: 'city' | 'country';
-}
-
-// Hook for detecting clicks outside of a component
-function useClickOutside(callback: () => void) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        callback();
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [callback]);
-
-  return ref;
 }
 
 interface LocationSearchProps {
@@ -42,7 +25,7 @@ export function LocationSearch({
   const { t } = useTranslation();
 
   // Close suggestions when clicking outside
-  const searchRef = useClickOutside(() => setShowSuggestions(false));
+  const searchRef = useClickOutside<HTMLDivElement>(() => setShowSuggestions(false));
 
   // Filter suggestions based on input
   const filteredSuggestions = useMemo(() => {

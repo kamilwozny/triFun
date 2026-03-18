@@ -72,6 +72,26 @@ const authOptions: NextAuthConfig = {
         })
         .where(eq(users.id, user.id));
     },
+    signIn: async ({ user, account, profile }) => {
+      if (account?.provider === 'strava' && profile && user.id) {
+        const p = profile as Record<string, unknown>;
+        const location = [p.city, p.country]
+          .filter(Boolean)
+          .join(', ');
+        if (location) {
+          const [existing] = await db
+            .select({ location: users.location })
+            .from(users)
+            .where(eq(users.id, user.id));
+          if (!existing?.location) {
+            await db
+              .update(users)
+              .set({ location })
+              .where(eq(users.id, user.id));
+          }
+        }
+      }
+    },
   },
   session: {
     strategy: 'database',

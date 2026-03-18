@@ -8,10 +8,24 @@ export async function GET(request: NextRequest) {
   const response = await fetch(url, {
     headers: { 'User-Agent': 'TriFun (kamil.wozny@edu.uekat.pl)' },
   });
+  if (!response.ok) {
+    return Response.json(
+      { error: 'Reverse geocoding failed' },
+      { status: 500 },
+    );
+  }
   const data = await response.json();
+  if (!data?.address?.country_code) {
+    return Response.json({ error: 'No country code found' }, { status: 400 });
+  }
   const countryCode = data.address.country_code;
   const boundsResponse = await fetch(
-    `https://nominatim.openstreetmap.org/search?country=${countryCode}&format=json`
+    `https://nominatim.openstreetmap.org/search?country=${countryCode}&format=json`,
+    {
+       headers: {
+      'User-Agent': 'TriFun (kamil.wozny@edu.uekat.pl)',
+    },
+    }
   );
   const boundsData = await boundsResponse.json();
 

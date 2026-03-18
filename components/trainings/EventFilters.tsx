@@ -1,11 +1,7 @@
-import { useTranslation } from 'react-i18next';
-import { FaSwimmer, FaBiking, FaRunning } from 'react-icons/fa';
+'use client';
 
-const activityIcons = {
-  Swim: <FaSwimmer className="h-5 w-5" />,
-  Bike: <FaBiking className="h-5 w-5" />,
-  Run: <FaRunning className="h-5 w-5" />,
-};
+import { useTranslation } from 'react-i18next';
+import { activityIcons } from '@/lib/activityIcons';
 
 interface EventFiltersProps {
   selectedActivity: string | null;

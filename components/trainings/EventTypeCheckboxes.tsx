@@ -1,3 +1,6 @@
+'use client';
+
+import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +16,7 @@ interface EventTypeCheckboxesProps {
   onFiltersChange: (filters: EventTypeFilters) => void;
 }
 
-export function EventTypeCheckboxes({
+export const EventTypeCheckboxes = React.memo(function EventTypeCheckboxes({
   filters,
   onFiltersChange,
 }: EventTypeCheckboxesProps) {
@@ -101,4 +104,4 @@ export function EventTypeCheckboxes({
       </label>
     </div>
   );
-}
+});

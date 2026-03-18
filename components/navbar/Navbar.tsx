@@ -4,11 +4,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import { useTranslation } from 'react-i18next';
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-} from '@/components/ui/navigation-menu';
 import { Button } from '../ui/button';
 
 import {
@@ -19,16 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Image from 'next/image';
 
-enum ActivePages {
-  trainings = 'trainings',
-  stats = 'stats',
-  about = 'about',
-  events = 'events',
-}
-
 export const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [activePage, setActivePage] = useState(ActivePages.trainings);
   const { data: session, status } = useSession();
   const { t } = useTranslation();
 
@@ -42,66 +29,9 @@ export const Navbar = () => {
         >
           TriFun
         </Link>
-        {/* <NavigationMenu className="text-black">
-          <NavigationMenuList>
-            <NavigationMenuItem
-              className={`${
-                activePage === ActivePages.events && 'text-foreground'
-              } text-lg font-bold hover:text-foreground`}
-            >
-              <Link
-                href="/events"
-                onClick={() => setActivePage(ActivePages.events)}
-                className="p-2"
-              >
-                {t('events')}
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem
-              className={`${
-                activePage === ActivePages.trainings && 'text-foreground'
-              } text-lg font-bold hover:text-foreground`}
-            >
-              <Link
-                href="/trainings"
-                className="p-2"
-                onClick={() => setActivePage(ActivePages.trainings)}
-              >
-                {t('trainings')}
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem
-              className={`${
-                activePage === ActivePages.stats && 'text-foreground'
-              } text-lg font-bold hover:text-foreground`}
-            >
-              <Link
-                href="/stats"
-                className="p-2"
-                onClick={() => setActivePage(ActivePages.stats)}
-              >
-                {t('stats')}
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem
-              className={`${
-                activePage === ActivePages.about && 'text-foreground'
-              } text-lg font-bold hover:text-foreground`}
-            >
-              <Link
-                href="/about"
-                className="p-2"
-                onClick={() => setActivePage(ActivePages.about)}
-              >
-                {t('about')}
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu> */}
       </div>
       <div className="navbar-center"></div>
       <div className="navbar-end">
-        {/* <LanguageSwitcher /> */}
         {status === 'loading' ? (
           <div className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary ml-4">
             <span className="loading loading-spinner loading-sm"></span>

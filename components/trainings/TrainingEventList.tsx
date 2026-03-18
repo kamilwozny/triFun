@@ -4,7 +4,6 @@ import { useCallback, useState } from 'react';
 import { TrainingEvent } from '@/types/training';
 import { TrainingEventCard } from './TrainingEventCard';
 import { ReviewModal } from './ReviewModal';
-import { CreateEventCTA } from './CreateEventCTA';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
@@ -22,13 +21,13 @@ export function TrainingEventList({
   reviewedEventIds,
 }: TrainingEventListProps) {
   const [reviewEventId, setReviewEventId] = useState<string>('');
-  const [modalTrigger, setModalTrigger] = useState<number>(0);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
 
   const { t } = useTranslation();
 
   const handleReview = useCallback((eventId: string) => {
     setReviewEventId(eventId);
-    setModalTrigger((prev) => prev + 1);
+    setIsReviewModalOpen(true);
   }, []);
   if (events.length === 0) {
     return (
@@ -76,7 +75,8 @@ export function TrainingEventList({
         reviewEvent={reviewEvent}
         reviewEventId={reviewEventId}
         userId={userId}
-        modalTrigger={modalTrigger}
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
       />
     </>
   );

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StarRating } from './StarRating';
 import Image from 'next/image';
 import { createReviews } from '@/actions/reviews';
+import { useTranslation } from 'react-i18next';
 
 interface BulkReviewFormProps {
   eventId: string;
@@ -30,6 +31,7 @@ export function BulkReviewForm({
   const [reviews, setReviews] = useState<Record<string, ReviewData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const { t } = useTranslation();
 
   const handleSubmit = async () => {
     if (!userId) return;
@@ -46,7 +48,7 @@ export function BulkReviewForm({
         window.location.reload();
       } else {
         alert(
-          ('error' in result && result.error) || 'Failed to submit reviews'
+          ('error' in result && result.error) || 'Failed to submit reviews',
         );
       }
     } catch (error) {
@@ -57,7 +59,7 @@ export function BulkReviewForm({
     }
   };
   const filteredParticipants = participants.filter(
-    (participant) => participant.attendeeId !== userId && !participant.isHost
+    (participant) => participant.attendeeId !== userId && !participant.isHost,
   );
   const currentParticipant = filteredParticipants[currentStep];
   const totalSteps = filteredParticipants.length;
@@ -90,7 +92,7 @@ export function BulkReviewForm({
     <div className="space-y-6">
       <div className="flex justify-between items-center text-sm text-base-content/70">
         <span>
-          Participant {currentStep + 1} of {totalSteps}
+          {`${t('participant')} ${currentStep + 1} ${t('of')} ${totalSteps}`}
         </span>
         <progress
           className="progress progress-primary w-56"
@@ -99,35 +101,12 @@ export function BulkReviewForm({
         />
       </div>
 
-      <div className="flex items-center gap-4 mb-6">
-        {/* {currentParticipant.image ? (
-          <Image
-            src={currentParticipant.image}
-            alt={currentParticipant.name || 'User'}
-            width={64}
-            height={64}
-            className="rounded-full"
-          />
-        ) : (
-          <div className="avatar placeholder">
-            <div className="bg-neutral-focus text-neutral-content rounded-full w-16">
-              <span className="text-2xl">
-                {currentParticipant.name?.charAt(0) || 'U'}
-              </span>
-            </div>
-          </div>
-        )}
-        <div>
-          <h4 className="text-lg font-medium">
-            {currentParticipant.name || 'Anonymous User'}
-          </h4>
-        </div> */}
-      </div>
+      <div className="flex items-center gap-4 mb-6"></div>
 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-base-content/70 mb-2">
-            Rating
+            {t('rating')}
           </label>
           <StarRating
             rating={reviews[currentParticipant.attendeeId]?.rating || 0}
@@ -150,7 +129,7 @@ export function BulkReviewForm({
             htmlFor="comment"
             className="block text-sm font-medium text-base-content/70 mb-2"
           >
-            Comment (optional)
+            {t('optionalComment')}
           </label>
           <textarea
             id="comment"
@@ -178,7 +157,7 @@ export function BulkReviewForm({
           disabled={currentStep === 0}
           className="btn btn-ghost"
         >
-          Previous
+          {t('previous')}
         </button>
 
         <div className="flex gap-2">
@@ -188,7 +167,7 @@ export function BulkReviewForm({
             className="btn btn-ghost"
             disabled={currentStep === totalSteps - 1}
           >
-            Skip
+            {t('skip')}
           </button>
 
           {currentStep === totalSteps - 1 ? (
@@ -198,7 +177,7 @@ export function BulkReviewForm({
               disabled={isSubmitting}
               className={`btn btn-primary ${isSubmitting ? 'loading' : ''}`}
             >
-              Submit Reviews
+              {t('submitReviews')}
             </button>
           ) : (
             <button
@@ -207,7 +186,7 @@ export function BulkReviewForm({
               disabled={!currentReview.rating}
               className="btn btn-primary"
             >
-              Next
+              {t('next')}
             </button>
           )}
         </div>

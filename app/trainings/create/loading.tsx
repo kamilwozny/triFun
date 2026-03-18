@@ -4,7 +4,6 @@ export default function CreateTrainingLoading() {
       <div className="skeleton h-6 w-48 mb-4 bg-neutral-200" />
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 space-y-4 mx-auto max-w-md">
-          {/* Form fields skeleton */}
           <div className="space-y-2">
             <div className="skeleton h-5 w-24 bg-neutral-200" />
             <div className="skeleton h-10 w-full bg-neutral-200" />
@@ -40,7 +39,6 @@ export default function CreateTrainingLoading() {
           </div>
         </div>
 
-        {/* Map skeleton */}
         <div className="flex-1 min-h-[700px]">
           <div className="skeleton w-full h-[700px] bg-neutral-200" />
         </div>

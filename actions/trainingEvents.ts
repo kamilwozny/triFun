@@ -6,7 +6,7 @@ import type { Location } from '../components/map/types';
 import { auth } from '@/app/auth';
 import { TrainingEvent, Level } from '@/types/training';
 import { revalidateTrainings } from './revalidations';
-import { and, SQL, lte, gte, like, inArray, eq } from 'drizzle-orm';
+import { and, SQL, like, or } from 'drizzle-orm';
 
 interface CreateTrainingEventData {
   name: string;
@@ -50,7 +50,7 @@ export async function createNewTrainingEvent(
       })
       .returning({ id: trainingEvents.id });
 
-    if (resultId) {
+    if (resultId && resultId.length > 0) {
       const insertHostResult = await db.insert(eventAttendees).values({
         eventId: resultId[0].id,
         attendeeId: session.user.id,
@@ -73,46 +73,37 @@ export async function createNewTrainingEvent(
 
 type SearchParamsProps = {
   search?: string;
-  userEvents?: boolean;
-  joinedEvents?: boolean;
-  pastEvents?: boolean;
-  levels?: string[];
   location?: string;
-  radius?: string;
   categorySport?: string;
 };
 
 export async function getTrainingEvents({
   search,
-  userEvents,
-  joinedEvents,
-  pastEvents,
-  levels,
   location,
-  radius,
   categorySport,
 }: SearchParamsProps): Promise<TrainingEvent[]> {
   const conditions: SQL[] = [];
   try {
     if (search) {
-      conditions.push(like(trainingEvents.name, `%${search}%`));
+      conditions.push(
+        or(
+          like(trainingEvents.name, `%${search}%`),
+          like(trainingEvents.description, `%${search}%`),
+        )!,
+      );
+    }
+
+    if (location) {
+      conditions.push(
+        or(
+          like(trainingEvents.city, `%${location}%`),
+          like(trainingEvents.country, `%${location}%`),
+        )!,
+      );
     }
 
     if (categorySport) {
-      conditions.push(eq(trainingEvents.distances, categorySport));
-    }
-
-    if (levels?.length) {
-      conditions.push(inArray(trainingEvents.level, levels));
-    }
-
-    if (pastEvents !== undefined) {
-      const now = new Date();
-      if (pastEvents) {
-        conditions.push(lte(trainingEvents.date, now));
-      } else {
-        conditions.push(gte(trainingEvents.date, now));
-      }
+      conditions.push(like(trainingEvents.distances, `%"activity":"${categorySport}"%`));
     }
 
     const events = await db

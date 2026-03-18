@@ -12,8 +12,8 @@ import { format } from 'date-fns';
 import 'react-day-picker/style.css';
 import { DatePickerModal } from '@/components/datePickerModal/DatePickerModal';
 import { EventTypeSelect } from '@/components/eventTypeSelect/EventTypeSelect';
-import sendSimpleMessage from '@/helpers/sendMail';
 import Map from '@/components/map/Map';
+import { useTranslation } from 'react-i18next';
 
 interface DistanceData {
   activity: string;
@@ -34,6 +34,7 @@ interface FormData {
 
 export default function CreateTrainingEvent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { register, handleSubmit } = useForm<FormData>();
   const [userPosition, setUserPosition] = useState<{
     lat: number;
@@ -163,17 +164,17 @@ export default function CreateTrainingEvent() {
     try {
       setError(null);
       if (!location.city || !location.country || !location.position) {
-        setError('Please select a location on the map');
+        setError(t('selectLocation'));
         return;
       }
 
       if (!selectedDate) {
-        setError('Please select a date');
+        setError(t('selectDate'));
         return;
       }
 
       if (!selectedTime) {
-        setError('Please select a start time');
+        setError(t('selectTime'));
         return;
       }
 
@@ -198,14 +199,10 @@ export default function CreateTrainingEvent() {
         },
         location,
       );
-      sendSimpleMessage();
-
       redirectPath = '/trainings';
     } catch (error) {
       console.error('Error creating event:', error);
-      setError(
-        error instanceof Error ? error.message : 'Failed to create event',
-      );
+      setError(error instanceof Error ? error.message : t('failedCreateEvent'));
     } finally {
       redirectPath && router.push(redirectPath);
     }
@@ -214,7 +211,7 @@ export default function CreateTrainingEvent() {
   return (
     <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-lg font-bold text-gray-800 mb-4">
-        Create a New Event
+        {t('createNewEvent')}
       </h2>
       {error && (
         <div className="alert alert-error mb-4">
@@ -229,7 +226,7 @@ export default function CreateTrainingEvent() {
         <div className="flex-1 space-y-4 mx-auto max-w-md">
           <div className="mb-2">
             <label className="block text-gray-800 text-base font-medium">
-              Event Name
+              {t('eventName')}
             </label>
             <input
               className="input input-sm input-bordered w-full max-w-md"
@@ -238,7 +235,7 @@ export default function CreateTrainingEvent() {
           </div>
           <div className="mb-2">
             <label className="block text-gray-800 text-base font-medium">
-              Description
+              {t('description')}
             </label>
             <textarea
               className="textarea textarea-sm textarea-bordered w-full max-w-md"
@@ -246,12 +243,14 @@ export default function CreateTrainingEvent() {
             />
           </div>
           <div className="form-control">
-            <label className="label text-sm font-medium">Activities</label>
+            <label className="label text-sm font-medium">
+              {t('activities')}
+            </label>
             <div className="dropdown">
               <label tabIndex={0} className="btn btn-sm btn-outline w-full">
                 {selectedActivities.length > 0
                   ? selectedActivities.join(', ')
-                  : 'Select activities'}
+                  : t('selectActivities')}
               </label>
               <ul
                 tabIndex={0}
@@ -276,13 +275,15 @@ export default function CreateTrainingEvent() {
 
           {selectedActivities.length > 0 && (
             <div className="space-y-2">
-              <label className="label text-sm font-medium">Distance</label>
+              <label className="label text-sm font-medium">
+                {t('distance')}
+              </label>
               {selectedActivities.map((activity) => (
                 <div key={activity} className="flex items-center space-x-2">
                   <span className="w-16 text-sm font-medium">{activity}</span>
                   <input
                     type="number"
-                    placeholder="Enter distance"
+                    placeholder={t('enterDistance')}
                     className="input input-sm input-bordered w-full"
                     onChange={(e) =>
                       handleDistanceChange(
@@ -305,17 +306,18 @@ export default function CreateTrainingEvent() {
                       )
                     }
                   >
-                    <option value="meters">Meters</option>
-                    <option value="kilometers">Kilometers</option>
+                    <option value="meters">{t('meters')}</option>
+                    <option value="kilometers">{t('kilometers')}</option>
                   </select>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Privacy Toggle */}
           <div className="form-control">
-            <label className="label text-sm font-medium">Event Privacy</label>
+            <label className="label text-sm font-medium">
+              {t('eventPrivacy')}
+            </label>
             <div className="flex items-center gap-4">
               <EventTypeSelect
                 onChange={(isPrivate) => setIsPrivate(isPrivate)}
@@ -334,20 +336,20 @@ export default function CreateTrainingEvent() {
 
           <div className="mb-2">
             <label className="block text-gray-800 text-base font-medium">
-              Level
+              {t('level')}
             </label>
             <select
               className="select select-sm select-bordered w-full max-w-md"
               {...register('level', { required: true })}
             >
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Expert">Expert</option>
+              <option value="Beginner">{t('beginner')}</option>
+              <option value="Intermediate">{t('intermediate')}</option>
+              <option value="Expert">{t('expert')}</option>
             </select>
           </div>
           <div className="mb-4 space-y-2">
             <label className="block text-gray-800 text-base font-medium">
-              Event Date & Time
+              {t('eventDateTime')}
             </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -379,7 +381,7 @@ export default function CreateTrainingEvent() {
               type="submit"
               className="btn btn-primary btn-sm w-full max-w-md"
             >
-              Create Event
+              {t('btnCreateEvent')}
             </button>
           </div>
         </div>
