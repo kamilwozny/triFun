@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import '@/components/trainings/Trainings.css';
 import { useTrainingEvents } from '@/providers/TrainingEventsProvider';
@@ -10,7 +10,8 @@ import { TrainingEventList } from './TrainingEventList';
 import { TrainingMapView } from './TrainingMapView';
 import { EventTypeCheckboxes, EventTypeFilters } from './EventTypeCheckboxes';
 import { SportTypeFilters, SportType } from './SportTypeFilters';
-import { SearchTrainings } from './SearchTrainings';
+import { useLocationSuggestions } from '@/hooks/useLocationSuggestions';
+import { useTrainingsSearch } from '@/providers/TrainingsSearchContext';
 
 import {
   useAdvancedEventFiltering,
@@ -75,6 +76,13 @@ export default function NewTrainings({
     setFilters((prev) => ({ ...prev, sports }));
   }, []);
 
+  const locationSuggestionsFromEvents = useLocationSuggestions(events);
+  const { setLocationSuggestions } = useTrainingsSearch();
+
+  useEffect(() => {
+    setLocationSuggestions(locationSuggestionsFromEvents);
+  }, [locationSuggestionsFromEvents, setLocationSuggestions]);
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 lg:p-8">
       <div className="flex flex-col lg:flex-row items-start justify-center max-w-full gap-8 w-full">
@@ -102,12 +110,7 @@ export default function NewTrainings({
           </div>
         </div>
         <div className="w-full lg:w-3/6 xl:w-2/5">
-          <SearchTrainings
-            initialSearch={initialSearch}
-            initialLocation={initialLocation}
-            initialRadius={initialRadius}
-          />
-          <div className="no-scrollbar overflow-y-auto max-h-[70vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6 mt-6">
+          <div className="no-scrollbar overflow-y-auto max-h-[70vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
             <TrainingEventList
               events={filteredEvents}
               activeTab={'upcoming'}

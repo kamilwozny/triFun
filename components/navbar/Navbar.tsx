@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
+import { NavbarSearchBar } from './NavbarSearchBar';
 
 import {
   DropdownMenu,
@@ -20,26 +21,28 @@ export const Navbar = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="navbar shadow-xl px-4 md:px-8 lg:px-24 mb-10">
-      <div className="navbar-start">
-        <Link
-          href="/dashboard"
-          className="text-foreground text-2xl md:text-3xl"
-          aria-label="Go to dashboard"
-        >
-          TriFun
-        </Link>
+    <div className="navbar shadow-xl px-4 md:px-8 lg:px-24 mb-10 flex items-center gap-4">
+      <Link
+        href="/dashboard"
+        className="text-foreground text-2xl md:text-3xl shrink-0"
+        aria-label="Go to dashboard"
+      >
+        TriFun
+      </Link>
+
+      <div className="flex-1 flex justify-center px-2">
+        <NavbarSearchBar />
       </div>
-      <div className="navbar-center"></div>
-      <div className="navbar-end">
+
+      <div className="flex items-center gap-2 shrink-0">
         {status === 'loading' ? (
-          <div className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary ml-4">
+          <div className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary">
             <span className="loading loading-spinner loading-sm"></span>
           </div>
         ) : status === 'authenticated' ? (
           <>
             <button
-              className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary ml-4"
+              className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Notifications"
             >
               <svg
@@ -113,10 +116,8 @@ export const Navbar = () => {
             </DropdownMenu>
           </>
         ) : (
-          <Button className="bg-foreground ml-4 p-4 hover:bg-white hover:text-foreground">
-            <Link href="/signin" className="">
-              {t('signin')}
-            </Link>
+          <Button className="bg-foreground p-4 hover:bg-white hover:text-foreground">
+            <Link href="/signin">{t('signin')}</Link>
           </Button>
         )}
       </div>

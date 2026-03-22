@@ -4,6 +4,7 @@ import { SessionProvider } from 'next-auth/react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../localization/client';
 import { useEffect, useState } from 'react';
+import { TrainingsSearchProvider } from '@/providers/TrainingsSearchContext';
 
 export default function Providers({
   children,
@@ -26,7 +27,9 @@ export default function Providers({
 
   return (
     <SessionProvider>
-      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+      <I18nextProvider i18n={i18n}>
+        <TrainingsSearchProvider>{children}</TrainingsSearchProvider>
+      </I18nextProvider>
     </SessionProvider>
   );
 }

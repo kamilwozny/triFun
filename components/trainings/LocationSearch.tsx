@@ -13,12 +13,16 @@ interface LocationSearchProps {
   searchInput: string;
   setSearchInput: (input: string) => void;
   locationSuggestions: LocationSuggestion[];
+  onSearch?: () => void;
+  className?: string;
 }
 
 export function LocationSearch({
   searchInput,
   setSearchInput,
   locationSuggestions,
+  onSearch,
+  className,
 }: LocationSearchProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -37,27 +41,32 @@ export function LocationSearch({
 
   // Handle keyboard navigation in suggestions
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showSuggestions || filteredSuggestions.length === 0) return;
-
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < filteredSuggestions.length - 1 ? prev + 1 : 0,
-        );
+        if (showSuggestions && filteredSuggestions.length > 0) {
+          e.preventDefault();
+          setSelectedIndex((prev) =>
+            prev < filteredSuggestions.length - 1 ? prev + 1 : 0,
+          );
+        }
         break;
       case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev > 0 ? prev - 1 : filteredSuggestions.length - 1,
-        );
+        if (showSuggestions && filteredSuggestions.length > 0) {
+          e.preventDefault();
+          setSelectedIndex((prev) =>
+            prev > 0 ? prev - 1 : filteredSuggestions.length - 1,
+          );
+        }
         break;
       case 'Enter':
         e.preventDefault();
-        if (selectedIndex >= 0) {
+        if (showSuggestions && selectedIndex >= 0 && filteredSuggestions[selectedIndex]) {
           setSearchInput(filteredSuggestions[selectedIndex].text);
           setShowSuggestions(false);
           setSelectedIndex(-1);
+        } else {
+          setShowSuggestions(false);
+          onSearch?.();
         }
         break;
       case 'Escape':
@@ -73,8 +82,8 @@ export function LocationSearch({
   }, [filteredSuggestions]);
 
   return (
-    <div className="relative" ref={searchRef}>
-      <label className="input flex items-center gap-2">
+    <div className={`relative${className ? ` ${className}` : ''}`} ref={searchRef}>
+      <label className="input h-9 flex items-center gap-2">
         <svg
           className="h-[1em] opacity-50"
           xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +110,7 @@ export function LocationSearch({
           onKeyDown={handleKeyDown}
           type="search"
           placeholder={t('searchByLocation')}
-          className="w-full"
+          className="w-full text-black"
           aria-label="Search locations"
           aria-controls="location-suggestions"
           aria-activedescendant={
