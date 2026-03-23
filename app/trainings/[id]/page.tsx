@@ -47,11 +47,11 @@ export default async function TrainingPage({
   if (!training) return <p>{t('trainingNotFound')}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-8">
+      <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-800">
+            <h1 className="text-2xl lg:text-3xl font-bold text-neutral-800">
               {training.name}
             </h1>
             <div className="flex items-center gap-2 mt-2 text-neutral-600">
@@ -75,14 +75,14 @@ export default async function TrainingPage({
         </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-6">
+      <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
         <div className="flex items-center gap-2 mb-4">
           <MdSportsScore className="h-6 w-6" />
           <h2 className="text-2xl font-semibold text-neutral-800">
             {t('activities')}
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {parseDistances(training.distances).map((dist, index) => (
             <div
               key={index}
@@ -102,8 +102,8 @@ export default async function TrainingPage({
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
           <div className="flex items-center gap-2">
             <FaUserFriends className="h-6 w-6" />
             <h2 className="text-2xl font-semibold text-neutral-800">

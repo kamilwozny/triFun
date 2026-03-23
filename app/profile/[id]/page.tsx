@@ -38,9 +38,9 @@ export default async function UserProfilePage({
   const avatarSrc = user.customAvatar ?? user.image;
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-6">
       <div className="rounded-2xl border border-base-300 bg-base-100 shadow-sm p-6">
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex gap-4 flex-1 min-w-0">
             <div className="shrink-0">
               {avatarSrc ? (
@@ -82,9 +82,9 @@ export default async function UserProfilePage({
             </div>
           </div>
 
-          <div className="hidden md:block w-px bg-base-300" />
+          <div className="hidden lg:block w-px bg-base-300" />
 
-          <div className="md:w-52 shrink-0">
+          <div className="lg:w-52 shrink-0">
             <ProfileStats stats={stats} />
           </div>
         </div>

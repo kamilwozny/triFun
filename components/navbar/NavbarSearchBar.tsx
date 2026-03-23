@@ -88,7 +88,7 @@ export function NavbarSearchBar() {
   );
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="hidden lg:flex items-center gap-2">
       <div className="relative w-64 shrink-0" ref={searchRef}>
         <input
           className="input input-bordered h-9 w-full text-sm text-black pr-2"

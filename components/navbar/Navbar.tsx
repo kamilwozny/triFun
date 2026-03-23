@@ -21,10 +21,10 @@ export const Navbar = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="navbar shadow-xl px-4 md:px-8 lg:px-24 mb-10 flex items-center gap-4">
+    <div className="navbar shadow-xl px-4 lg:px-24 mb-4 lg:mb-10 flex items-center gap-4">
       <Link
         href="/dashboard"
-        className="text-foreground text-2xl md:text-3xl shrink-0"
+        className="text-foreground text-xl lg:text-3xl shrink-0"
         aria-label="Go to dashboard"
       >
         TriFun
@@ -47,7 +47,7 @@ export const Navbar = () => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 md:h-6 md:w-6"
+                className="h-5 w-5 lg:h-6 lg:w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

@@ -92,5 +92,8 @@
   "previous": "Poprzedni",
   "skip": "Pomiń",
   "submitReviews": "Prześlij opinie",
-  "yourSelectedLocation": "Twoja wybrana lokalizacja"
+  "yourSelectedLocation": "Twoja wybrana lokalizacja",
+  "showMap": "Pokaż mapę",
+  "hideMap": "Ukryj mapę",
+  "search": "Szukaj"
 }

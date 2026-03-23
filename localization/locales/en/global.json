@@ -94,5 +94,8 @@
   "previous": "Previous",
   "skip": "Skip",
   "submitReviews": "Submit reviews",
-  "yourSelectedLocation": "Your selected location"
+  "yourSelectedLocation": "Your selected location",
+  "showMap": "Show Map",
+  "hideMap": "Hide Map",
+  "search": "Search"
 }

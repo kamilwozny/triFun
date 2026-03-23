@@ -1,3 +1,5 @@
+'use client';
+
 import { ProfileStatsResult } from '@/actions/profileStats';
 import { FaBicycle, FaRunning, FaSwimmer } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';

@@ -209,7 +209,7 @@ export default function CreateTrainingEvent() {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="container mx-auto p-4 lg:p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-lg font-bold text-gray-800 mb-4">
         {t('createNewEvent')}
       </h2>
@@ -386,7 +386,7 @@ export default function CreateTrainingEvent() {
           </div>
         </div>
 
-        <div className="flex-1 min-h-[700px]">
+        <div className="flex-1 min-h-[400px] lg:min-h-[700px]">
           {userPosition ? (
             <Map
               position={userPosition}
