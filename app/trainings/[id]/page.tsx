@@ -35,10 +35,11 @@ interface Attendee {
 export default async function TrainingPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const training = await getTrainingEvent(params.id);
-  const attendees = await getTrainingList(params.id);
+  const { id } = await params;
+  const training = await getTrainingEvent(id);
+  const attendees = await getTrainingList(id);
   const session = await auth();
   const user = session?.user;
   const { t } = await getServerTranslation();
@@ -114,7 +115,7 @@ export default async function TrainingPage({
               <button>{t('inviteFriends')}</button>
             ) : (
               training.createdBy !== user?.id && (
-                <SignupButton eventId={params.id} />
+                <SignupButton eventId={id} />
               )
             )
           ) : null}

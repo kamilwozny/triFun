@@ -37,7 +37,7 @@ export const SignInForm: React.FC = () => {
       setError(null);
       const result = await signIn('credentials', {
         redirect: false,
-        emailn: data.email,
+        email: data.email,
         password: data.password,
         callbackUrl: '/',
       });

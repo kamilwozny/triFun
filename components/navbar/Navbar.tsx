@@ -85,7 +85,7 @@ export const Navbar = () => {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem className="hover:bg-background hover:cursor-pointe focus:bg-backgroundr">
+                <DropdownMenuItem className="hover:bg-background hover:cursor-pointer focus:bg-background">
                   <Link
                     className="w-full"
                     href={`/profile/${session.user?.id}`}

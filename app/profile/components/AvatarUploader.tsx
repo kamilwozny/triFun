@@ -20,8 +20,7 @@ export const AvatarUploader = ({ img, defaultImg }: AvatarUploaderProps) => {
       </div>
       <UploadButton
         endpoint="imageUploader"
-        onClientUploadComplete={(res) => {
-          console.log('Files: ', res);
+        onClientUploadComplete={() => {
           alert('Upload Completed');
         }}
         onUploadError={(error: Error) => {

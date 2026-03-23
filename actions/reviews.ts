@@ -13,7 +13,6 @@ export async function createReviews(
   }[]
 ) {
   try {
-    console.log('Creating reviews:', reviewData);
     const result = await db.insert(reviews).values(reviewData);
 
     if (result) {

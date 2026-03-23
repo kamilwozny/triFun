@@ -111,7 +111,6 @@ export function BulkReviewForm({
           <StarRating
             rating={reviews[currentParticipant.attendeeId]?.rating || 0}
             onChange={(rating) => {
-              console.log(currentParticipant);
               return setReviews({
                 ...reviews,
                 [currentParticipant.attendeeId]: {
