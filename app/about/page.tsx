@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import {
   FaRunning,
   FaSwimmer,
@@ -10,81 +9,52 @@ import {
   FaUsers,
   FaCalendarAlt,
   FaMapMarkedAlt,
-  FaArrowRight,
-  FaUserCircle,
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.5 } },
+};
+
+const features = [
+  {
+    icon: <FaUsers className="h-6 w-6" />,
+    title: 'Find Training Partners',
+    description:
+      'Connect with like-minded athletes in your area who share your passion for training.',
+  },
+  {
+    icon: <FaMapMarkedAlt className="h-6 w-6" />,
+    title: 'Discover Local Events',
+    description:
+      'Browse and join training events happening nearby, filtered by activity and skill level.',
+  },
+  {
+    icon: <FaCalendarAlt className="h-6 w-6" />,
+    title: 'Create Your Own Events',
+    description:
+      'Organize training sessions and invite others to join you on your fitness journey.',
+  },
+  {
+    icon: <FaRunning className="h-6 w-6" />,
+    title: 'Multiple Activities',
+    description:
+      'Whether you enjoy running, swimming, or cycling, find partners for any activity you love.',
+  },
+];
+
 export default function AboutPage() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.5 } },
-  };
-
-  const features = [
-    {
-      icon: <FaUsers className="h-6 w-6" />,
-      title: 'Find Training Partners',
-      description:
-        'Connect with like-minded athletes in your area who share your passion for training.',
-    },
-    {
-      icon: <FaMapMarkedAlt className="h-6 w-6" />,
-      title: 'Discover Local Events',
-      description:
-        'Browse and join training events happening nearby, filtered by activity and skill level.',
-    },
-    {
-      icon: <FaCalendarAlt className="h-6 w-6" />,
-      title: 'Create Your Own Events',
-      description:
-        'Organize training sessions and invite others to join you on your fitness journey.',
-    },
-    {
-      icon: <FaRunning className="h-6 w-6" />,
-      title: 'Multiple Activities',
-      description:
-        'Whether you enjoy running, swimming, or cycling, find partners for any activity you love.',
-    },
-  ];
-
-  const testimonials = [
-    {
-      quote:
-        'This app helped me find consistent training partners, which made it so much easier to stick to my running schedule.',
-      name: 'Sarah J.',
-      role: 'Marathon Runner',
-    },
-    {
-      quote:
-        'I was new to triathlon training and found an amazing group that helped me prepare for my first event.',
-      name: 'Michael T.',
-      role: 'Triathlete',
-    },
-    {
-      quote:
-        'The motivation I get from training with others has completely transformed my fitness routine.',
-      name: 'Emma L.',
-      role: 'Fitness Enthusiast',
-    },
-  ];
-
   return (
     <div className="flex flex-col min-h-screen">
       <section className="relative h-[80vh] overflow-hidden">

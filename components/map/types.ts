@@ -36,6 +36,7 @@ export interface MapProps {
   onBoundsChange?: (bounds: MapBounds) => void;
   pickPoint?: boolean;
   handleLocation?: (location: Location) => void;
+  onLocating?: (isLocating: boolean) => void;
   markers?: MapMarker[];
   routeMode?: boolean;
   onRouteChange?: (data: RouteResult) => void;

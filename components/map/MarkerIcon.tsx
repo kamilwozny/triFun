@@ -37,3 +37,24 @@ export const icons = {
   bike: createCircleIcon(colors.bike, 'bike'),
   swim: createCircleIcon(colors.swim, 'swim'),
 } as const;
+
+export const startIcon = L.divIcon({
+  html: `<div style="width:14px;height:14px;border-radius:50%;background:#22c55e;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>`,
+  className: '',
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+});
+
+export const endIcon = L.divIcon({
+  html: `<div style="width:14px;height:14px;border-radius:50%;background:#ef4444;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>`,
+  className: '',
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+});
+
+export const swimIcon = L.divIcon({
+  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="16" fill="#00BBF9" stroke="white" stroke-width="2"/><g transform="translate(8,10)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M0 4c.4.3.8.7 1.7.7 1.7 0 1.7-1.3 3.3-1.3 1.7 0 1.6 1.3 3.3 1.3 1.7 0 1.7-1.3 3.3-1.3 .9 0 1.3.3 1.7.7"/><path d="M0 8c.4.3.8.7 1.7.7 1.7 0 1.7-1.3 3.3-1.3 1.7 0 1.6 1.3 3.3 1.3 1.7 0 1.7-1.3 3.3-1.3 .9 0 1.3.3 1.7.7"/><path d="M0 12c.4.3.8.7 1.7.7 1.7 0 1.7-1.3 3.3-1.3 1.7 0 1.6 1.3 3.3 1.3 1.7 0 1.7-1.3 3.3-1.3 .9 0 1.3.3 1.7.7"/></g></svg>`,
+  className: '',
+  iconSize: [36, 36],
+  iconAnchor: [18, 36],
+});

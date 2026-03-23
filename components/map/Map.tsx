@@ -5,124 +5,23 @@ import {
   Marker,
   TileLayer,
   Popup,
-  useMapEvents,
-  useMap,
   Polyline,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import { useState, useEffect } from 'react';
-import type { MapProps, MapMarker, Location, RouteResult } from './types';
+import { useState } from 'react';
+import type { MapProps, MapMarker } from './types';
 import { LocationMarker } from './utils';
-import { icons } from './MarkerIcon';
+import { icons, startIcon, endIcon, swimIcon } from './MarkerIcon';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useTranslation } from 'react-i18next';
-import { getOSRMRoute, getElevationGain } from '@/lib/routing';
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
-import 'leaflet-geosearch/dist/geosearch.css';
-
-function MapCursorController({
-  pickPoint,
-  handleLocation,
-}: {
-  pickPoint: boolean;
-  handleLocation?: (location: Location) => void;
-}) {
-  useMapEvents({
-    click: async (e) => {
-      if (pickPoint && handleLocation) {
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`,
-          );
-          const data = await response.json();
-
-          handleLocation({
-            city:
-              data.address.city ||
-              data.address.town ||
-              data.address.village ||
-              data.address.suburb,
-            country: data.address.country,
-            position: {
-              lat: e.latlng.lat,
-              lng: e.latlng.lng,
-            },
-          });
-        } catch (error) {
-          console.error('Error fetching location details:', error);
-        }
-      }
-    },
-  });
-
-  return null;
-}
-
-function CountryBoundsInitializer({
-  position,
-}: {
-  position: L.LatLngExpression;
-}) {
-  const map = useMap();
-
-  useEffect(() => {
-    async function setCountryBounds() {
-      if (!map) return;
-
-      map.invalidateSize();
-      try {
-        const [lat, lng] = Array.isArray(position)
-          ? position
-          : [position.lat, position.lng];
-
-        const response = await fetch(`/api/latlng?lat=${lat}&lng=${lng}`);
-        const boundsData = await response.json();
-
-        if (boundsData[0]) {
-          const bounds = L.latLngBounds(
-            [boundsData[0].boundingbox[0], boundsData[0].boundingbox[2]],
-            [boundsData[0].boundingbox[1], boundsData[0].boundingbox[3]],
-          );
-          map.fitBounds(bounds);
-        }
-      } catch (error) {
-        console.error('Error setting country bounds:', error);
-      }
-    }
-
-    setCountryBounds();
-  }, [map, position]);
-
-  return null;
-}
-
-function MapSearchControl() {
-  const map = useMap();
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    const provider = new OpenStreetMapProvider();
-    const searchControl = GeoSearchControl({
-      provider,
-      style: 'bar',
-      showMarker: false,
-      showPopup: false,
-      autoClose: true,
-      retainZoomLevel: false,
-      animateZoom: true,
-      keepResult: false,
-      searchLabel: t('searchLocationPlaceholder'),
-    });
-    map.addControl(searchControl);
-    return () => {
-      map.removeControl(searchControl);
-    };
-  }, [map]);
-  return null;
-}
+import { MapSearchControl } from './MapSearchControl';
+import { CountryBoundsInitializer } from './CountryBoundsInitializer';
+import { LocationPickerController } from './LocationPickerController';
+import { AnimatedPolyline } from './AnimatedPolyline';
+import { RouteController } from './RouteController';
 
 function createClusterCustomIcon(cluster: any) {
   const count = cluster.getChildCount();
@@ -136,172 +35,12 @@ function createClusterCustomIcon(cluster: any) {
   });
 }
 
-const startIcon = L.divIcon({
-  html: `<div style="width:14px;height:14px;border-radius:50%;background:#22c55e;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>`,
-  className: '',
-  iconSize: [14, 14],
-  iconAnchor: [7, 7],
-});
-
-const endIcon = L.divIcon({
-  html: `<div style="width:14px;height:14px;border-radius:50%;background:#ef4444;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>`,
-  className: '',
-  iconSize: [14, 14],
-  iconAnchor: [7, 7],
-});
-
-const swimIcon = L.divIcon({
-  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36"><circle cx="18" cy="18" r="16" fill="#00BBF9" stroke="white" stroke-width="2"/><g transform="translate(8,10)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M0 4c.4.3.8.7 1.7.7 1.7 0 1.7-1.3 3.3-1.3 1.7 0 1.6 1.3 3.3 1.3 1.7 0 1.7-1.3 3.3-1.3 .9 0 1.3.3 1.7.7"/><path d="M0 8c.4.3.8.7 1.7.7 1.7 0 1.7-1.3 3.3-1.3 1.7 0 1.6 1.3 3.3 1.3 1.7 0 1.7-1.3 3.3-1.3 .9 0 1.3.3 1.7.7"/><path d="M0 12c.4.3.8.7 1.7.7 1.7 0 1.7-1.3 3.3-1.3 1.7 0 1.6 1.3 3.3 1.3 1.7 0 1.7-1.3 3.3-1.3 .9 0 1.3.3 1.7.7"/></g></svg>`,
-  className: '',
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-});
-
-function AnimatedPolyline({
-  points,
-  color,
-}: {
-  points: [number, number][];
-  color: string;
-}) {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const map = useMap();
-
-  useEffect(() => {
-    if (points.length === 0) {
-      setVisibleCount(0);
-      return;
-    }
-    setVisibleCount(0);
-
-    const totalFrames = Math.min(points.length, 300);
-    const chunkSize = Math.ceil(points.length / totalFrames);
-    const intervalMs = 1200 / totalFrames;
-
-    let current = 0;
-    const interval = setInterval(() => {
-      current += chunkSize;
-      if (current >= points.length) {
-        setVisibleCount(points.length);
-        clearInterval(interval);
-      } else {
-        setVisibleCount(current);
-      }
-    }, intervalMs);
-
-    return () => clearInterval(interval);
-  }, [points]);
-
-  useEffect(() => {
-    if (visibleCount === points.length && points.length > 1) {
-      const bounds = L.latLngBounds(points);
-      map.fitBounds(bounds, { padding: [20, 20] });
-    }
-  }, [visibleCount, points, map]);
-
-  if (visibleCount === 0) return null;
-
-  return (
-    <Polyline
-      positions={points.slice(0, visibleCount)}
-      pathOptions={{
-        color,
-        weight: 4,
-        opacity: 0.85,
-        lineCap: 'round',
-        lineJoin: 'round',
-      }}
-    />
-  );
-}
-
-function RouteController({
-  onRouteChange,
-  onPhaseChange,
-  activityColor,
-}: {
-  onRouteChange: (data: RouteResult) => void;
-  onPhaseChange: (
-    phase: 'pick-start' | 'pick-end' | 'routing' | 'done',
-  ) => void;
-  activityColor: string;
-}) {
-  const [startPoint, setStartPoint] = useState<L.LatLng | null>(null);
-  const [endPoint, setEndPoint] = useState<L.LatLng | null>(null);
-  const [routePoints, setRoutePoints] = useState<[number, number][]>([]);
-  const map = useMap();
-
-  useMapEvents({
-    click: async (e) => {
-      if (!startPoint) {
-        setStartPoint(e.latlng);
-        onPhaseChange('pick-end');
-        return;
-      }
-      if (!endPoint) {
-        setEndPoint(e.latlng);
-        onPhaseChange('routing');
-
-        const result = await getOSRMRoute(
-          { lat: startPoint.lat, lng: startPoint.lng },
-          { lat: e.latlng.lat, lng: e.latlng.lng },
-        );
-
-        if (result) {
-          setRoutePoints(result.points);
-          const elevationGainM = await getElevationGain(result.points);
-          onRouteChange({
-            ...result,
-            elevationGainM,
-            start: { lat: startPoint.lat, lng: startPoint.lng },
-            end: { lat: e.latlng.lat, lng: e.latlng.lng },
-          });
-          const bounds = L.latLngBounds(result.points);
-          map.fitBounds(bounds, { padding: [20, 20] });
-        }
-        onPhaseChange('done');
-        return;
-      }
-      setStartPoint(e.latlng);
-      setEndPoint(null);
-      setRoutePoints([]);
-      onPhaseChange('pick-end');
-    },
-  });
-
-  return (
-    <>
-      {startPoint && (
-        <Marker position={startPoint} icon={startIcon}>
-          <Popup>Start</Popup>
-        </Marker>
-      )}
-      {endPoint && (
-        <Marker position={endPoint} icon={endIcon}>
-          <Popup>Finish</Popup>
-        </Marker>
-      )}
-      {routePoints.length > 0 && (
-        <Polyline
-          positions={routePoints}
-          pathOptions={{
-            color: activityColor,
-            weight: 4,
-            opacity: 0.85,
-            lineCap: 'round',
-            lineJoin: 'round',
-          }}
-        />
-      )}
-    </>
-  );
-}
-
 function Map({
   position,
   zoom,
   pickPoint = false,
   handleLocation,
+  onLocating,
   markers = [],
   routeMode = false,
   onRouteChange,
@@ -442,9 +181,10 @@ function Map({
                 pickPointMode={pickPoint}
                 setPosition={setMarkerPosition}
               />
-              <MapCursorController
+              <LocationPickerController
                 pickPoint={pickPoint}
                 handleLocation={handleLocation}
+                onLocating={onLocating}
               />
             </>
           )}

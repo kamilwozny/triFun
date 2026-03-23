@@ -15,10 +15,6 @@ import {
   FaCalendar,
   FaClock,
   FaExclamationTriangle,
-  FaRoute,
-  FaUpload,
-  FaTimes,
-  FaMountain,
   FaRunning,
   FaBicycle,
   FaSwimmer,
@@ -30,6 +26,7 @@ import { EventTypeSelect } from '@/components/eventTypeSelect/EventTypeSelect';
 import Map from '@/components/map/Map';
 import { useTranslation } from 'react-i18next';
 import { parseGPX, gpxToGeoJson } from '@/lib/gpx';
+import { ActivityRouteSection } from '@/components/trainings/ActivityRouteSection';
 
 interface DistanceData {
   activity: string;
@@ -69,6 +66,7 @@ export default function CreateTrainingEvent() {
     lng: number;
   } | null>(null);
   const [location, setLocation] = useState<Location>({});
+  const [swimLocation, setSwimLocation] = useState<Location>({});
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
@@ -83,6 +81,7 @@ export default function CreateTrainingEvent() {
   >({});
   const [drawingActivity, setDrawingActivity] = useState<string | null>(null);
   const [pickingSwim, setPickingSwim] = useState(false);
+  const [swimLocating, setSwimLocating] = useState(false);
   const [animatedPoints, setAnimatedPoints] = useState<
     [number, number][] | undefined
   >();
@@ -216,7 +215,7 @@ export default function CreateTrainingEvent() {
       setAnimatedPoints(gpxData.points);
       setDrawingActivity(null);
 
-      if (!location.position) {
+      if (!location.position && activity !== 'Swim') {
         setLocation((prev) => ({ ...prev, position: gpxData.start }));
       }
     };
@@ -227,7 +226,7 @@ export default function CreateTrainingEvent() {
     setActivityRoutes((prev) => ({ ...prev, [activity]: data }));
     autoFillDistance(activity, data.distanceKm);
     setDrawingActivity(null);
-    if (!location.position) {
+    if (!location.position && activity !== 'Swim') {
       setLocation((prev) => ({ ...prev, position: data.start }));
     }
   };
@@ -399,153 +398,37 @@ export default function CreateTrainingEvent() {
           </div>
 
           {selectedActivities.map((activity) => {
-            const isSwim = activity === 'Swim';
-            const route = activityRoutes[activity] ?? null;
-            const color = ACTIVITY_COLORS[activity] ?? '#9B5DE5';
-            const ActivityIcon =
-              ACTIVITY_CONFIG.find((a) => a.key === activity)?.Icon ??
-              FaRunning;
-            const isDrawing = drawingActivity === activity;
-
+            const config = ACTIVITY_CONFIG.find((a) => a.key === activity);
             return (
-              <div
+              <ActivityRouteSection
                 key={activity}
-                className="border border-base-300 rounded-xl p-3 space-y-2"
-              >
-                <div className="flex items-center gap-2" style={{ color }}>
-                  <ActivityIcon className="h-5 w-5" />
-                  <span className="font-semibold text-gray-800">
-                    {t(activity.toLowerCase())}
-                  </span>
-                </div>
-
-                {isSwim ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        placeholder={t('enterDistance')}
-                        className="input input-sm input-bordered flex-1"
-                        value={
-                          distances.find((d) => d.activity === activity)
-                            ?.distance || ''
-                        }
-                        onChange={(e) =>
-                          handleDistanceChange(
-                            activity,
-                            e.target.value ? Number(e.target.value) : 0,
-                            distances.find((d) => d.activity === activity)
-                              ?.unit || 'meters',
-                          )
-                        }
-                      />
-                      <select
-                        className="select select-sm select-bordered"
-                        value={
-                          distances.find((d) => d.activity === activity)
-                            ?.unit || 'meters'
-                        }
-                        onChange={(e) =>
-                          handleDistanceChange(
-                            activity,
-                            distances.find((d) => d.activity === activity)
-                              ?.distance || 0,
-                            e.target.value as 'meters' | 'kilometers',
-                          )
-                        }
-                      >
-                        <option value="meters">{t('meters')}</option>
-                        <option value="kilometers">{t('kilometers')}</option>
-                      </select>
-                    </div>
-
-                    {location.position ? (
-                      <div className="flex items-center gap-2 text-sm bg-base-200 rounded-lg px-3 py-2">
-                        <span style={{ color }} className="font-semibold">
-                          {location.city}, {location.country}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setLocation({});
-                            setPickingSwim(false);
-                          }}
-                          className="ml-auto text-gray-400 hover:text-gray-600"
-                        >
-                          <FaTimes />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setPickingSwim((p) => !p)}
-                        className={`btn btn-xs gap-1 ${pickingSwim ? 'btn-primary' : 'btn-outline'}`}
-                      >
-                        <FaSwimmer className="text-xs" />
-                        {pickingSwim ? t('picking') : t('pickLocation')}
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {route ? (
-                      <div className="flex items-center gap-3 text-sm bg-base-200 rounded-lg px-3 py-2">
-                        <FaRoute style={{ color }} />
-                        <span className="font-semibold">
-                          {route.distanceKm} km
-                        </span>
-                        {route.elevationGainM > 0 && (
-                          <>
-                            <FaMountain className="text-success" />
-                            <span className="font-semibold">
-                              +{route.elevationGainM} m
-                            </span>
-                          </>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => clearRoute(activity)}
-                          className="ml-auto text-gray-400 hover:text-gray-600"
-                        >
-                          <FaTimes />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <label className="flex items-center gap-1 btn btn-xs btn-outline cursor-pointer">
-                          <FaUpload className="text-xs" />
-                          {t('uploadGpx')}
-                          <input
-                            type="file"
-                            accept=".gpx"
-                            className="hidden"
-                            ref={(el) => {
-                              gpxInputRefs.current[activity] = el;
-                            }}
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleGpxFile(activity, file);
-                              e.target.value = '';
-                            }}
-                          />
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDrawingActivity(isDrawing ? null : activity);
-                            setAnimatedPoints(undefined);
-                            setAnimatingActivity(null);
-                          }}
-                          className={`btn btn-xs gap-1 ${isDrawing ? 'btn-primary' : 'btn-outline'}`}
-                        >
-                          <FaRoute className="text-xs" />
-                          {isDrawing ? t('drawing') : t('drawOnMap')}
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+                activity={activity}
+                color={ACTIVITY_COLORS[activity] ?? '#9B5DE5'}
+                Icon={config?.Icon ?? FaRunning}
+                route={activityRoutes[activity] ?? null}
+                isDrawing={drawingActivity === activity}
+                isSwim={activity === 'Swim'}
+                pickingSwim={pickingSwim}
+                swimLocating={swimLocating}
+                location={activity === 'Swim' ? swimLocation : location}
+                distances={distances}
+                onDistanceChange={handleDistanceChange}
+                onPickSwimToggle={() => setPickingSwim((p) => !p)}
+                onClearLocation={() => {
+                  setSwimLocation({});
+                  setPickingSwim(false);
+                }}
+                onClearRoute={clearRoute}
+                onDrawToggle={(act) => {
+                  setDrawingActivity(drawingActivity === act ? null : act);
+                  setAnimatedPoints(undefined);
+                  setAnimatingActivity(null);
+                }}
+                onGpxFile={handleGpxFile}
+                gpxInputRef={(el) => {
+                  gpxInputRefs.current[activity] = el;
+                }}
+              />
             );
           })}
 
@@ -634,8 +517,10 @@ export default function CreateTrainingEvent() {
               zoom={13}
               showSearch={true}
               pickPoint={pickingSwim}
+              onLocating={setSwimLocating}
               handleLocation={(loc) => {
-                setLocation(loc);
+                setSwimLocation(loc);
+                setLocation((prev) => ({ ...prev, position: loc.position, city: loc.city, country: loc.country }));
                 setPickingSwim(false);
               }}
               routeMode={!!drawingActivity}
@@ -648,8 +533,8 @@ export default function CreateTrainingEvent() {
               activityColor={activeColor}
               staticRoutes={staticRoutes}
               swimPoint={
-                selectedActivities.includes('Swim') && location.position
-                  ? location.position
+                selectedActivities.includes('Swim') && swimLocation.position
+                  ? swimLocation.position
                   : undefined
               }
             />
