@@ -97,5 +97,22 @@
   "yourSelectedLocation": "Your selected location",
   "showMap": "Show Map",
   "hideMap": "Hide Map",
-  "search": "Search"
+  "search": "Search",
+  "uploadGpx": "Upload GPX",
+  "orDrawRoute": "or draw route on map",
+  "drawOnMap": "Draw on map",
+  "drawing": "Drawing…",
+  "drawingRouteFor": "Drawing route for",
+  "clearRoute": "Clear route",
+  "invalidGpxFile": "Invalid GPX file. Please upload a valid .gpx file.",
+  "clickToSetStart": "Click on the map to set the start point",
+  "clickToSetEnd": "Click on the map to set the finish point",
+  "calculatingRoute": "Calculating route…",
+  "routeReady": "Route ready",
+  "clickToReset": "click to reset",
+  "route": "Route",
+  "swimLocationHint": "Click on the map to set the starting location",
+  "pickLocation": "Pick location on map",
+  "picking": "Click on map…",
+  "searchLocationPlaceholder": "Search location…"
 }

@@ -28,10 +28,8 @@ export function LocationSearch({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const { t } = useTranslation();
 
-  // Close suggestions when clicking outside
   const searchRef = useClickOutside<HTMLDivElement>(() => setShowSuggestions(false));
 
-  // Filter suggestions based on input
   const filteredSuggestions = useMemo(() => {
     if (!searchInput) return [];
     return locationSuggestions.filter((suggestion) =>
@@ -39,7 +37,6 @@ export function LocationSearch({
     );
   }, [locationSuggestions, searchInput]);
 
-  // Handle keyboard navigation in suggestions
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.key) {
       case 'ArrowDown':
@@ -76,7 +73,6 @@ export function LocationSearch({
     }
   };
 
-  // Reset selected index when suggestions change
   useEffect(() => {
     setSelectedIndex(-1);
   }, [filteredSuggestions]);

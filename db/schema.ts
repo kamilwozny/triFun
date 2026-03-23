@@ -236,6 +236,8 @@ export const trainingEvents = sqliteTable('training_events', {
   createdBy: text('created_by').notNull(),
   createdAt: createdAt(),
   isPrivate: boolean('is_private').default(false).notNull(),
+  routeGeoJson: text('route_geo_json'),
+  endPosition: text('end_position'),
 });
 
 export const trainingEventsRelations = relations(

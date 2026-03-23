@@ -12,7 +12,7 @@ export interface SportCounts {
 }
 
 export interface WeeklyData {
-  label: string; // e.g. "Week 1"
+  label: string;
   Run: number;
   Bike: number;
   Swim: number;
@@ -44,13 +44,14 @@ function getWeekIndex(dateStr: string, cutoffDate: Date): number {
   return Math.floor(diffDays / 7);
 }
 
-export async function getProfileStats(userId: string): Promise<ProfileStatsResult> {
+export async function getProfileStats(
+  userId: string,
+): Promise<ProfileStatsResult> {
   const now = new Date();
   const cutoff = new Date(now);
   cutoff.setDate(cutoff.getDate() - 28);
   const cutoffStr = cutoff.toISOString().split('T')[0];
 
-  // Fetch events hosted by user in last 4 weeks
   const hostedEvents = await db
     .select({
       id: trainingEvents.id,
@@ -61,11 +62,10 @@ export async function getProfileStats(userId: string): Promise<ProfileStatsResul
     .where(
       and(
         eq(trainingEvents.createdBy, userId),
-        gte(trainingEvents.date, cutoffStr)
-      )
+        gte(trainingEvents.date, cutoffStr),
+      ),
     );
 
-  // Fetch event IDs attended (confirmed) by user in last 4 weeks
   const attendedRows = await db
     .select({
       id: trainingEvents.id,
@@ -79,11 +79,10 @@ export async function getProfileStats(userId: string): Promise<ProfileStatsResul
       and(
         eq(eventAttendees.attendeeId, userId),
         eq(eventAttendees.status, 'confirmed'),
-        gte(trainingEvents.date, cutoffStr)
-      )
+        gte(trainingEvents.date, cutoffStr),
+      ),
     );
 
-  // Merge, dedup by id (hosted events are also in attendees as host)
   const seen = new Set<string>();
   const allEvents: { id: string; distances: string; date: string }[] = [];
   for (const e of [...hostedEvents, ...attendedRows]) {
@@ -95,7 +94,6 @@ export async function getProfileStats(userId: string): Promise<ProfileStatsResul
 
   const bySport: SportCounts = { Run: 0, Bike: 0, Swim: 0, Other: 0 };
 
-  // Initialize 4 weekly buckets
   const weeks: WeeklyData[] = Array.from({ length: 4 }, (_, i) => ({
     label: `W${i + 1}`,
     Run: 0,
@@ -122,7 +120,6 @@ export async function getProfileStats(userId: string): Promise<ProfileStatsResul
       weeks[weekIdx][key]++;
     }
 
-    // If no distances parsed, count as Other
     if (parsedDistances.length === 0) {
       bySport.Other++;
       weeks[weekIdx].Other++;

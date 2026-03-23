@@ -55,7 +55,6 @@ export function useAdvancedEventFiltering(
         (attendee) => attendee.attendeeId === userId,
       );
 
-      // Event type filtering
       let matchesEventType = false;
 
       if (filters.eventType.showHostEvents && isUserHost) {
@@ -77,19 +76,15 @@ export function useAdvancedEventFiltering(
         matchesEventType = true;
       }
 
-      // Sport type filtering
       const matchesSport =
         filters.sports.length === 0 ||
         filters.sports.some((sport) => event.activities.includes(sport));
 
-      // Location text filtering (city/country — server already applied this,
-      // but re-apply client-side so sidebar filter stays in sync)
       const matchesCity =
         !filters.location.city ||
         event.city.toLowerCase().includes(filters.location.city.toLowerCase()) ||
         event.country.toLowerCase().includes(filters.location.city.toLowerCase());
 
-      // Radius filtering — only active when userPosition is available and radius > 0
       const matchesDistance =
         !userPosition ||
         filters.location.distanceKm === 0 ||

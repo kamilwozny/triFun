@@ -24,7 +24,6 @@ export const fetchUserData = async (): Promise<FetchUserDataResult> => {
 
   if (!userData) return null;
 
-  // Fetch user stats
   const hostedEvents = await db
     .select({ count: sql<number>`count(*)` })
     .from(trainingEvents)

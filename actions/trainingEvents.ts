@@ -21,6 +21,7 @@ interface CreateTrainingEventData {
     unit: string;
   }>;
   isPrivate: boolean;
+  routeGeoJson?: string;
 }
 
 export async function createNewTrainingEvent(
@@ -47,6 +48,7 @@ export async function createNewTrainingEvent(
         level: data.level,
         createdBy: session.user.id,
         isPrivate: data.isPrivate,
+        routeGeoJson: data.routeGeoJson ?? null,
       })
       .returning({ id: trainingEvents.id });
 

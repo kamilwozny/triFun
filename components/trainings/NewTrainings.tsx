@@ -57,7 +57,6 @@ export default function NewTrainings({
     },
   }));
 
-  // Mobile-specific state
   const [showMap, setShowMap] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [mobileSearch, setMobileSearch] = useState(initialSearch);

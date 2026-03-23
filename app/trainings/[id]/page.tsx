@@ -2,9 +2,11 @@ import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
 import { auth } from '@/app/auth';
 import { SignupButton } from '@/components/signupButton/SignupButton';
-import 'leaflet/dist/leaflet.css';
-import { FaMapMarkerAlt, FaCalendarAlt, FaUserFriends } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCalendarAlt, FaUserFriends, FaRoute } from 'react-icons/fa';
 import { MdSportsScore } from 'react-icons/md';
+import dynamic from 'next/dynamic';
+
+const RouteMap = dynamic(() => import('@/components/map/RouteMap'), { ssr: false });
 
 import { Badge } from '@/components/ui/badge';
 import { getServerTranslation } from '@/localization/server';
@@ -101,6 +103,24 @@ export default async function TrainingPage({
           ))}
         </div>
       </div>
+
+      {training.routeGeoJson && (
+        <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <FaRoute className="h-5 w-5" />
+            <h2 className="text-2xl font-semibold text-neutral-800">
+              {t('route')}
+            </h2>
+          </div>
+          <RouteMap
+            routeGeoJson={training.routeGeoJson}
+            activityColor={(() => {
+              const first = parseDistances(training.distances)[0]?.activity;
+              return first === 'Run' ? '#FF2E63' : first === 'Swim' ? '#00BBF9' : '#9B5DE5';
+            })()}
+          />
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
         <div className="flex flex-wrap justify-between items-center gap-2 mb-6">

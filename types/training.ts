@@ -15,6 +15,8 @@ export interface TrainingEvent {
   isPrivate: boolean;
   startTime: string;
   activities: string[];
+  routeGeoJson?: string | null;
+  endPosition?: string | null;
   attendees?: {
     eventId: string;
     attendeeId: string;

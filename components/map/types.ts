@@ -14,6 +14,20 @@ export interface MapBounds {
   southWest: LatLng;
 }
 
+export interface RouteResult {
+  points: [number, number][];
+  distanceKm: number;
+  elevationGainM: number;
+  routeGeoJson: string;
+  start: { lat: number; lng: number };
+  end: { lat: number; lng: number };
+}
+
+export interface StaticRoute {
+  points: [number, number][];
+  color: string;
+}
+
 export interface MapProps {
   position?: { lat: number; lng: number };
   zoom?: number;
@@ -23,6 +37,14 @@ export interface MapProps {
   pickPoint?: boolean;
   handleLocation?: (location: Location) => void;
   markers?: MapMarker[];
+  routeMode?: boolean;
+  onRouteChange?: (data: RouteResult) => void;
+  displayRoute?: [number, number][];
+  animatedPoints?: [number, number][];
+  activityColor?: string;
+  showSearch?: boolean;
+  staticRoutes?: StaticRoute[];
+  swimPoint?: { lat: number; lng: number };
 }
 
 export interface LocationMarkerProps {

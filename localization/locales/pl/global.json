@@ -95,5 +95,22 @@
   "yourSelectedLocation": "Twoja wybrana lokalizacja",
   "showMap": "Pokaż mapę",
   "hideMap": "Ukryj mapę",
-  "search": "Szukaj"
+  "search": "Szukaj",
+  "uploadGpx": "Wgraj GPX",
+  "orDrawRoute": "lub narysuj trasę na mapie",
+  "drawOnMap": "Rysuj na mapie",
+  "drawing": "Rysuję…",
+  "drawingRouteFor": "Rysuję trasę dla",
+  "clearRoute": "Usuń trasę",
+  "invalidGpxFile": "Nieprawidłowy plik GPX. Wgraj poprawny plik .gpx.",
+  "clickToSetStart": "Kliknij na mapie, aby ustawić punkt startowy",
+  "clickToSetEnd": "Kliknij na mapie, aby ustawić punkt końcowy",
+  "calculatingRoute": "Obliczam trasę…",
+  "routeReady": "Trasa gotowa",
+  "clickToReset": "kliknij aby zresetować",
+  "route": "Trasa",
+  "swimLocationHint": "Kliknij na mapę, aby ustawić punkt startowy",
+  "pickLocation": "Wybierz lokalizację na mapie",
+  "picking": "Kliknij na mapę…",
+  "searchLocationPlaceholder": "Wyszukaj lokalizacje…"
 }
