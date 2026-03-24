@@ -26,13 +26,11 @@ export function SignupButton({ eventId }: SignupButtonProps) {
 
         if (result.success) {
           toast.success(
-            'message' in result
-              ? result.message
-              : 'Successfully signed up for the event!'
+            ('message' in result && result.message) || 'Successfully signed up for the event!'
           );
           router.refresh();
         } else {
-          toast.error('error' in result ? result.error : 'Failed to sign up');
+          toast.error(('error' in result && result.error) || 'Failed to sign up');
         }
 
         setIsLoading(false);
