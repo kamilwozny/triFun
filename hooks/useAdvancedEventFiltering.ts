@@ -20,7 +20,7 @@ interface UserPosition {
   lng: number;
 }
 
-function haversineDistance(
+export function haversineDistance(
   lat1: number,
   lng1: number,
   lat2: number,

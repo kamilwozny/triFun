@@ -37,7 +37,7 @@ function createClusterCustomIcon(cluster: any) {
 
 function Map({
   position,
-  zoom,
+  zoom = 7,
   pickPoint = false,
   handleLocation,
   onLocating,
@@ -165,9 +165,7 @@ function Map({
             !displayRoute &&
             !animatedPoints &&
             position && (
-              <CountryBoundsInitializer
-                position={[position.lat, position.lng]}
-              />
+              <CountryBoundsInitializer lat={position.lat} lng={position.lng} />
             )}
 
           {pickPoint && markerPosition && (

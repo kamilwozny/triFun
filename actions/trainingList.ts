@@ -7,7 +7,6 @@ export const getTrainingList = async (eventId: string) => {
     .select({
       id: users.id,
       name: users.name,
-      email: users.email,
       status: eventAttendees.status,
       isHost: eventAttendees.isHost,
       joinedDate: eventAttendees.createdAt,

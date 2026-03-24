@@ -5,9 +5,11 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 export function CountryBoundsInitializer({
-  position,
+  lat,
+  lng,
 }: {
-  position: L.LatLngExpression;
+  lat: number;
+  lng: number;
 }) {
   const map = useMap();
 
@@ -16,10 +18,6 @@ export function CountryBoundsInitializer({
       if (!map) return;
       map.invalidateSize();
       try {
-        const [lat, lng] = Array.isArray(position)
-          ? position
-          : [(position as { lat: number; lng: number }).lat, (position as { lat: number; lng: number }).lng];
-
         const response = await fetch(`/api/latlng?lat=${lat}&lng=${lng}`);
         const boundsData = await response.json();
 
@@ -36,7 +34,7 @@ export function CountryBoundsInitializer({
     }
 
     setCountryBounds();
-  }, [map, position]);
+  }, [map, lat, lng]);
 
   return null;
 }

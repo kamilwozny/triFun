@@ -20,7 +20,7 @@ export async function signUpForEvent(eventId: string) {
     }
 
     const existingAttendee = await db
-      .select()
+      .select({ eventId: eventAttendees.eventId })
       .from(eventAttendees)
       .where(
         and(
@@ -28,6 +28,7 @@ export async function signUpForEvent(eventId: string) {
           eq(eventAttendees.attendeeId, session.user.id)
         )
       )
+      .limit(1)
       .execute();
 
     if (existingAttendee.length > 0) {

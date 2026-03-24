@@ -1,7 +1,10 @@
+'use server';
+
 import { db } from '@/db/db';
 import { revalidateTrainings } from './revalidations';
 import { reviews } from '@/db/schema';
 import { eq, inArray } from 'drizzle-orm';
+import { auth } from '@/app/auth';
 
 export async function createReviews(
   reviewData: {
@@ -12,8 +15,17 @@ export async function createReviews(
     comment?: string;
   }[]
 ) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error('Unauthorized');
+
+  const safeData = reviewData
+    .filter((r) => r.targetUserId !== session.user!.id)
+    .map((r) => ({ ...r, reviewerId: session.user!.id }));
+
+  if (safeData.length === 0) return { success: false };
+
   try {
-    const result = await db.insert(reviews).values(reviewData);
+    const result = await db.insert(reviews).values(safeData);
 
     if (result) {
       revalidateTrainings();

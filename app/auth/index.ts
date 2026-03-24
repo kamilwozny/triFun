@@ -20,7 +20,7 @@ const authOptions: NextAuthConfig = {
       clientId: process.env.STRAVA_ID,
       clientSecret: process.env.STRAVA_SECRET,
     }),
-    Credentials({
+    ...(process.env.NODE_ENV === 'development' ? [Credentials({
       name: 'Credentials',
       credentials: {
         username: { label: 'Username', type: 'text', placeholder: 'jsmith' },
@@ -52,7 +52,7 @@ const authOptions: NextAuthConfig = {
           ? { id: user.id, name: user.name, email: user.email }
           : null;
       },
-    }),
+    })] : []),
   ],
   callbacks: {
     async session({ session, user }) {

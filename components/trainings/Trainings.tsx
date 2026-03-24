@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { FilterButton } from '../filterButton/FilterButton';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FaSort } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
@@ -26,15 +26,19 @@ export const Trainings: React.FC<TrainingsPageClientProps> = ({
     direction: string;
   }>({ key: 'id', direction: 'asc' });
 
-  const sortedTrainings = [...trainings].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === 'asc' ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
+  const sortedTrainings = useMemo(
+    () =>
+      [...trainings].sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      }),
+    [trainings, sortConfig],
+  );
   const requestSort = (key: keyof ITraining) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {

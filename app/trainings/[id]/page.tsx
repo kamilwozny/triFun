@@ -4,9 +4,7 @@ import { auth } from '@/app/auth';
 import { SignupButton } from '@/components/signupButton/SignupButton';
 import { FaMapMarkerAlt, FaCalendarAlt, FaUserFriends, FaRoute } from 'react-icons/fa';
 import { MdSportsScore } from 'react-icons/md';
-import dynamic from 'next/dynamic';
-
-const RouteMap = dynamic(() => import('@/components/map/RouteMap'), { ssr: false });
+import RouteMap from '@/components/map/RouteMapClient';
 
 import { Badge } from '@/components/ui/badge';
 import { getServerTranslation } from '@/localization/server';
@@ -28,7 +26,6 @@ const difficultyColors = {
 interface Attendee {
   id: string | null;
   name: string | null;
-  email: string | null;
   isHost: boolean;
   status: 'pending' | 'confirmed' | 'declined';
   joinedDate: Date;
