@@ -6,7 +6,6 @@ import Strava from 'next-auth/providers/strava';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { accounts, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { utapi } from '@/server/uploadthing';
 
 export const BASE_PATH = '/api/auth';
 
@@ -20,39 +19,47 @@ const authOptions: NextAuthConfig = {
       clientId: process.env.STRAVA_ID,
       clientSecret: process.env.STRAVA_SECRET,
     }),
-    ...(process.env.NODE_ENV === 'development' ? [Credentials({
-      name: 'Credentials',
-      credentials: {
-        username: { label: 'Username', type: 'text', placeholder: 'jsmith' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials): Promise<User | null> {
-        const users = [
-          {
-            id: 'test-user-1',
-            userName: 'test1',
-            name: 'Test 1',
-            password: 'pass',
-            email: 'test1@donotreply.com',
-          },
-          {
-            id: 'test-user-2',
-            userName: 'test2',
-            name: 'Test 2',
-            password: 'pass',
-            email: 'test2@donotreply.com',
-          },
-        ];
-        const user = users.find(
-          (user) =>
-            user.userName === credentials.username &&
-            user.password === credentials.password,
-        );
-        return user
-          ? { id: user.id, name: user.name, email: user.email }
-          : null;
-      },
-    })] : []),
+    ...(process.env.NODE_ENV === 'development'
+      ? [
+          Credentials({
+            name: 'Credentials',
+            credentials: {
+              username: {
+                label: 'Username',
+                type: 'text',
+                placeholder: 'jsmith',
+              },
+              password: { label: 'Password', type: 'password' },
+            },
+            async authorize(credentials): Promise<User | null> {
+              const users = [
+                {
+                  id: 'test-user-1',
+                  userName: 'test1',
+                  name: 'Test 1',
+                  password: 'pass',
+                  email: 'test1@donotreply.com',
+                },
+                {
+                  id: 'test-user-2',
+                  userName: 'test2',
+                  name: 'Test 2',
+                  password: 'pass',
+                  email: 'test2@donotreply.com',
+                },
+              ];
+              const user = users.find(
+                (user) =>
+                  user.userName === credentials.username &&
+                  user.password === credentials.password,
+              );
+              return user
+                ? { id: user.id, name: user.name, email: user.email }
+                : null;
+            },
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async session({ session, user }) {
@@ -61,23 +68,10 @@ const authOptions: NextAuthConfig = {
     },
   },
   events: {
-    createUser: async ({ user }) => {
-      if (!user?.id || !user.image) return;
-      const upload = await utapi.uploadFilesFromUrl(user.image);
-      const file = upload.data?.ufsUrl;
-      await db
-        .update(users)
-        .set({
-          customAvatar: file,
-        })
-        .where(eq(users.id, user.id));
-    },
     signIn: async ({ user, account, profile }) => {
       if (account?.provider === 'strava' && profile && user.id) {
         const p = profile as Record<string, unknown>;
-        const location = [p.city, p.country]
-          .filter(Boolean)
-          .join(', ');
+        const location = [p.city, p.country].filter(Boolean).join(', ');
         if (location) {
           const [existing] = await db
             .select({ location: users.location })
