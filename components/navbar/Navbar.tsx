@@ -117,7 +117,7 @@ export const Navbar = () => {
           </>
         ) : (
           <Button className="bg-foreground p-4 hover:bg-white hover:text-foreground">
-            <Link href="/signin">{t('signin')}</Link>
+            <Link href="/signin">{t('signIn')}</Link>
           </Button>
         )}
       </div>

@@ -1,11 +1,5 @@
-import { auth } from './auth';
+import { redirect } from 'next/navigation';
 
-export default async function Home() {
-  const session = await auth();
-  return (
-    <div className="p-10">
-      <button className="btn btn-primary">Button</button>
-      <pre>{JSON.stringify(session)}</pre>
-    </div>
-  );
+export default function Home() {
+  redirect('/trainings');
 }

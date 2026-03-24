@@ -112,5 +112,18 @@
   "swimLocationHint": "Kliknij na mapę, aby ustawić punkt startowy",
   "pickLocation": "Wybierz lokalizację na mapie",
   "picking": "Kliknij na mapę…",
-  "searchLocationPlaceholder": "Wyszukaj lokalizacje…"
+  "searchLocationPlaceholder": "Wyszukaj lokalizacje…",
+  "logIn": "Zaloguj się",
+  "signInWithGoogle": "Zaloguj przez Google",
+  "username": "Nazwa użytkownika",
+  "password": "Hasło",
+  "submit": "Wyślij",
+  "dontHaveAccount": "Nie masz konta?",
+  "invalidCredentials": "Nieprawidłowe dane. Spróbuj ponownie.",
+  "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+  "failedSignInGoogle": "Logowanie przez Google nie powiodło się. Spróbuj ponownie.",
+  "failedSignInStrava": "Logowanie przez Strava nie powiodło się. Spróbuj ponownie.",
+  "notFound": "Strona nie znaleziona",
+  "notFoundMessage": "Wygląda na to, że wyjechałeś poza mapę. Ta strona nie istnieje.",
+  "goHome": "Wróć do strony głównej"
 }

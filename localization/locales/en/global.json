@@ -114,5 +114,18 @@
   "swimLocationHint": "Click on the map to set the starting location",
   "pickLocation": "Pick location on map",
   "picking": "Click on map…",
-  "searchLocationPlaceholder": "Search location…"
+  "searchLocationPlaceholder": "Search location…",
+  "logIn": "Log In",
+  "signInWithGoogle": "Sign In With Google",
+  "username": "Username",
+  "password": "Password",
+  "submit": "Submit",
+  "dontHaveAccount": "Don't have an account?",
+  "invalidCredentials": "Invalid credentials. Please try again.",
+  "unexpectedError": "An unexpected error occurred. Please try again.",
+  "failedSignInGoogle": "Failed to sign in with Google. Please try again.",
+  "failedSignInStrava": "Failed to sign in with Strava. Please try again.",
+  "notFound": "Page Not Found",
+  "notFoundMessage": "Looks like you've cycled off the map. This page doesn't exist.",
+  "goHome": "Go Home"
 }

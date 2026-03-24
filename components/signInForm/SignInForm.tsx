@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
 
 export interface IFormLoginInput {
   email: string;
@@ -26,6 +27,7 @@ export interface IFormLoginInput {
 export const SignInForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const form = useForm<IFormLoginInput>({
     resolver: zodResolver(loginAuthSchema),
@@ -42,13 +44,13 @@ export const SignInForm: React.FC = () => {
         callbackUrl: '/',
       });
       if (result?.error) {
-        setError('Invalid credentials. Please try again.');
+        setError(t('invalidCredentials'));
         console.error(result.error);
       } else {
         window.location.href = result?.url || '/';
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      setError(t('unexpectedError'));
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -61,7 +63,7 @@ export const SignInForm: React.FC = () => {
       setError(null);
       await signIn('google', { callbackUrl: '/' });
     } catch (err) {
-      setError('Failed to sign in with Google. Please try again.');
+      setError(t('failedSignInGoogle'));
       console.error(err);
     }
   };
@@ -72,7 +74,7 @@ export const SignInForm: React.FC = () => {
       setError(null);
       await signIn('strava', { callbackUrl: '/' });
     } catch (err) {
-      setError('Failed to sign in with Strava. Please try again.');
+      setError(t('failedSignInStrava'));
       console.error(err);
     }
   };
@@ -80,19 +82,19 @@ export const SignInForm: React.FC = () => {
   return (
     <div className="h-[90vh] flex items-center justify-center bg-background">
       <div className="border p-16 bg-white">
-        <h1 className="mb-8 text-2xl font-bold text-center">Log In</h1>
+        <h1 className="mb-8 text-2xl font-bold text-center">{t('logIn')}</h1>
         <Button
           className="shadow-sm shadow-foreground bg-white text-lg font-semibold p-4 w-full text-foreground mb-4 hover:bg-background"
           onClick={handleGoogleSignIn}
         >
-          Sign In With Google
+          {t('signInWithGoogle')}
         </Button>
         <Button
           className="shadow-sm shadow-foreground bg-white text-lg font-semibold p-4 w-full text-foreground mb-4 hover:bg-background"
           onClick={handleStravaSignIn}
         >
           <Image
-            src="/assets/strava/btn_strava_connect_with_white.svg"
+            src="/images/assets/strava/btn_strava_connect_with_white.svg"
             width={150}
             height={20}
             alt="strava login"
@@ -105,7 +107,7 @@ export const SignInForm: React.FC = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg">Username</FormLabel>
+                  <FormLabel className="text-lg">{t('username')}</FormLabel>
                   <FormControl>
                     <Input
                       className="p-4 text-black w-80 focus-visible:ring-foreground"
@@ -122,7 +124,7 @@ export const SignInForm: React.FC = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg">Password</FormLabel>
+                  <FormLabel className="text-lg">{t('password')}</FormLabel>
                   <FormControl>
                     <Input
                       className="p-4 text-black w-80 focus-visible:ring-foreground"
@@ -138,15 +140,16 @@ export const SignInForm: React.FC = () => {
               className="bg-foreground text-lg font-semibold p-4 w-full hover:bg-card-foreground"
               type="submit"
             >
-              Submit
+              {t('submit')}
             </Button>
           </form>
+          {error && <p className="mt-4 text-red-500 text-sm text-center">{error}</p>}
           <div className="mt-6 text-center">
             <Link
               className="text-black hover:text-foreground transition-colors"
               href="/signup"
             >
-              Don&apos;t have an account?
+              {t('dontHaveAccount')}
             </Link>
           </div>
         </Form>
