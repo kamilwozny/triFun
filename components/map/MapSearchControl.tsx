@@ -27,7 +27,7 @@ export function MapSearchControl() {
     return () => {
       map.removeControl(searchControl);
     };
-  }, [map]);
+  }, [map, t]);
 
   return null;
 }

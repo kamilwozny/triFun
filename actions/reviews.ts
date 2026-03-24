@@ -18,9 +18,11 @@ export async function createReviews(
   const session = await auth();
   if (!session?.user?.id) throw new Error('Unauthorized');
 
+  const reviewerId = session.user.id as string;
+
   const safeData = reviewData
-    .filter((r) => r.targetUserId !== session.user!.id)
-    .map((r) => ({ ...r, reviewerId: session.user!.id }));
+    .filter((r) => r.targetUserId !== reviewerId)
+    .map((r) => ({ ...r, reviewerId }));
 
   if (safeData.length === 0) return { success: false };
 
