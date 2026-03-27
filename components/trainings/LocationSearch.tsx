@@ -110,7 +110,7 @@ export function LocationSearch({
           aria-label="Search locations"
           aria-controls="location-suggestions"
           aria-activedescendant={
-            selectedIndex >= 0
+            selectedIndex >= 0 && filteredSuggestions[selectedIndex]
               ? `suggestion-${filteredSuggestions[selectedIndex].text}`
               : undefined
           }

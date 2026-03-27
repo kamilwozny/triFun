@@ -48,6 +48,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   reviewsReceived: many(reviews, {
     relationName: 'targetUser',
   }),
+  notifications: many(notifications),
+  sentNotifications: many(notifications, {
+    relationName: 'actorNotifications',
+  }),
 }));
 
 export const accounts = sqliteTable(
@@ -321,5 +325,49 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.targetUserId],
     references: [users.id],
     relationName: 'targetUser',
+  }),
+}));
+
+export type NotificationType =
+  | 'join_request'
+  | 'joined'
+  | 'join_confirmed'
+  | 'join_declined'
+  | 'review_received';
+
+export const notifications = sqliteTable('notifications', {
+  id: id(),
+  userId: text('user_id').notNull(),
+  actorId: text('actor_id'),
+  type: text('type', {
+    enum: [
+      'join_request',
+      'joined',
+      'join_confirmed',
+      'join_declined',
+      'review_received',
+    ],
+  })
+    .notNull()
+    .$type<NotificationType>(),
+  entityId: text('entity_id').notNull(),
+  entityType: text('entity_type', { enum: ['event', 'review'] })
+    .notNull()
+    .$type<'event' | 'review'>(),
+  message: text('message').notNull(),
+  href: text('href').notNull(),
+  isRead: boolean('is_read').default(false).notNull(),
+  createdAt: createdAt(),
+});
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+  actor: one(users, {
+    fields: [notifications.actorId],
+    references: [users.id],
+    relationName: 'actorNotifications',
   }),
 }));

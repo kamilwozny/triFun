@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { signUpEventAction } from '@/actions/attendeesEvents';
 import { useTranslation } from 'react-i18next';
 

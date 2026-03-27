@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import Image from 'next/image';
+import { NotificationBell } from './NotificationBell';
 
 export const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -41,26 +42,7 @@ export const Navbar = () => {
           </div>
         ) : status === 'authenticated' ? (
           <>
-            <button
-              className="btn btn-ghost btn-circle focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Notifications"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 lg:h-6 lg:w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />
-              </svg>
-            </button>
+            <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger
                 className="btn-circle focus:outline-none hover:ring-2 hover:ring-foreground"

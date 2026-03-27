@@ -81,23 +81,24 @@ export function VirtualizedTrainingList({
 
   useEffect(() => {
     const rowIndex = initialScrollRow.current;
-    if (!rowIndex) return;
+    if (!rowIndex || events.length === 0) return;
+    const safeIndex = Math.min(rowIndex, events.length - 1);
     requestAnimationFrame(() => {
       listRef.current?.scrollToRow({
-        index: rowIndex,
+        index: safeIndex,
         align: 'start',
         behavior: 'instant',
       });
       isRestoringRef.current = false;
     });
-  }, []);
+  }, [events.length]);
 
   const handleRowsRendered = useCallback(
     (visibleRows: { startIndex: number; stopIndex: number }) => {
       if (isRestoringRef.current) return;
       sessionStorage.setItem(
         SCROLL_STORAGE_KEY,
-        String(visibleRows.startIndex + 2),
+        String(visibleRows.startIndex),
       );
     },
     [],

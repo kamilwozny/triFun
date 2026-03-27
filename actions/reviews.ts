@@ -2,9 +2,11 @@
 
 import { db } from '@/db/db';
 import { revalidateTrainings } from './revalidations';
-import { reviews } from '@/db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { reviews, users, trainingEvents } from '@/db/schema';
+import { alias } from 'drizzle-orm/sqlite-core';
+import { and, eq, inArray } from 'drizzle-orm';
 import { auth } from '@/app/auth';
+import { createNotification } from './notifications';
 
 export async function createReviews(
   reviewData: {
@@ -30,6 +32,40 @@ export async function createReviews(
     const result = await db.insert(reviews).values(safeData);
 
     if (result) {
+      // Fetch reviewer name and event name for notification messages
+      const [reviewer, event] = await Promise.all([
+        db
+          .select({ name: users.name })
+          .from(users)
+          .where(eq(users.id, reviewerId))
+          .limit(1)
+          .execute(),
+        safeData[0]?.eventId
+          ? db
+              .select({ name: trainingEvents.name })
+              .from(trainingEvents)
+              .where(eq(trainingEvents.id, safeData[0].eventId))
+              .limit(1)
+              .execute()
+          : Promise.resolve([]),
+      ]);
+      const reviewerName = reviewer[0]?.name ?? 'Someone';
+      const eventName = (event as { name: string }[])[0]?.name ?? 'an event';
+
+      await Promise.all(
+        safeData.map((r) =>
+          createNotification({
+            userId: r.targetUserId,
+            actorId: reviewerId,
+            type: 'review_received',
+            entityId: r.eventId,
+            entityType: 'review',
+            message: `${reviewerName} gave you a review after "${eventName}"`,
+            href: `/profile/${r.targetUserId}`,
+          }),
+        ),
+      );
+
       revalidateTrainings();
       return { success: true };
     }
@@ -55,11 +91,105 @@ export async function getReviewsForEvent(eventId: string) {
   }
 }
 
-export async function getReviewedEventIds(eventIds: string[]): Promise<string[]> {
+export async function getReviewedEventIds(
+  eventIds: string[],
+  reviewerId?: string,
+): Promise<string[]> {
   if (eventIds.length === 0) return [];
+  const baseCondition = inArray(reviews.eventId, eventIds);
   const rows = await db
     .selectDistinct({ eventId: reviews.eventId })
     .from(reviews)
-    .where(inArray(reviews.eventId, eventIds));
+    .where(
+      reviewerId
+        ? and(baseCondition, eq(reviews.reviewerId, reviewerId))
+        : baseCondition,
+    );
   return rows.map((r) => r.eventId);
+}
+
+export async function hasCurrentUserReviewedEvent(eventId: string): Promise<boolean> {
+  const session = await auth();
+  if (!session?.user?.id) return false;
+  const rows = await db
+    .select({ eventId: reviews.eventId })
+    .from(reviews)
+    .where(and(eq(reviews.eventId, eventId), eq(reviews.reviewerId, session.user.id)))
+    .limit(1);
+  return rows.length > 0;
+}
+
+export async function getUserReviews(userId: string) {
+  const targetUsers = alias(users, 'target_users');
+
+  const [received, given] = await Promise.all([
+    db
+      .select({
+        id: reviews.id,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        createdAt: reviews.createdAt,
+        reviewerId: reviews.reviewerId,
+        reviewerName: users.name,
+        reviewerImage: users.image,
+        eventId: reviews.eventId,
+        eventName: trainingEvents.name,
+      })
+      .from(reviews)
+      .leftJoin(users, eq(reviews.reviewerId, users.id))
+      .leftJoin(trainingEvents, eq(reviews.eventId, trainingEvents.id))
+      .where(eq(reviews.targetUserId, userId)),
+
+    db
+      .select({
+        id: reviews.id,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        createdAt: reviews.createdAt,
+        targetUserId: reviews.targetUserId,
+        targetUserName: targetUsers.name,
+        targetUserImage: targetUsers.image,
+        eventId: reviews.eventId,
+        eventName: trainingEvents.name,
+      })
+      .from(reviews)
+      .leftJoin(targetUsers, eq(reviews.targetUserId, targetUsers.id))
+      .leftJoin(trainingEvents, eq(reviews.eventId, trainingEvents.id))
+      .where(eq(reviews.reviewerId, userId)),
+  ]);
+
+  const totalReviews = received.length;
+  const averageRating =
+    totalReviews > 0
+      ? received.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      : 0;
+
+  const allReviews = [
+    ...received.map((r) => ({
+      id: r.id,
+      rating: r.rating,
+      comment: r.comment ?? '',
+      createdAt: new Date(r.createdAt).toISOString(),
+      isReviewer: false,
+      reviewer: { id: r.reviewerId, name: r.reviewerName ?? '', image: r.reviewerImage ?? '' },
+      targetUser: { id: userId, name: '', image: '' },
+      event: { id: r.eventId, name: r.eventName ?? '' },
+    })),
+    ...given.map((r) => ({
+      id: r.id,
+      rating: r.rating,
+      comment: r.comment ?? '',
+      createdAt: new Date(r.createdAt).toISOString(),
+      isReviewer: true,
+      reviewer: { id: userId, name: '', image: '' },
+      targetUser: {
+        id: r.targetUserId,
+        name: r.targetUserName ?? '',
+        image: r.targetUserImage ?? '',
+      },
+      event: { id: r.eventId, name: r.eventName ?? '' },
+    })),
+  ].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+  return { reviews: allReviews, stats: { averageRating, totalReviews } };
 }

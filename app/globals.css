@@ -109,7 +109,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background;
+  }
+  input,
+  textarea,
+  select {
+    @apply text-black;
   }
 }
 

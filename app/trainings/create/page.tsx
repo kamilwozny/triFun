@@ -25,6 +25,7 @@ import { DatePickerModal } from '@/components/datePickerModal/DatePickerModal';
 import { EventTypeSelect } from '@/components/eventTypeSelect/EventTypeSelect';
 import Map from '@/components/map/Map';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { parseGPX, gpxToGeoJson } from '@/lib/gpx';
 import { ActivityRouteSection } from '@/components/trainings/ActivityRouteSection';
 
@@ -324,9 +325,11 @@ export default function CreateTrainingEvent() {
         },
         location,
       );
+      toast.success(t('eventCreatedSuccess'));
       redirectPath = '/trainings';
     } catch (err) {
       console.error('Error creating event:', err);
+      toast.error(err instanceof Error ? err.message : t('failedCreateEvent'));
       setError(err instanceof Error ? err.message : t('failedCreateEvent'));
     } finally {
       redirectPath && router.push(redirectPath);

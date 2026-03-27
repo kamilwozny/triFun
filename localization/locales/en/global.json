@@ -54,7 +54,6 @@
   "joinedDateEvent": "Joined Date",
   "close": "Close",
   "signingUp": "Signing up...",
-  "send": "Send",
   "enterYourEmail": "Enter your email",
   "id": "ID",
   "name": "Name",
@@ -129,5 +128,19 @@
   "failedSignInStrava": "Failed to sign in with Strava. Please try again.",
   "notFound": "Page Not Found",
   "notFoundMessage": "Looks like you've cycled off the map. This page doesn't exist.",
-  "goHome": "Go Home"
+  "goHome": "Go Home",
+  "notifications": "Notifications",
+  "noNotifications": "No notifications yet",
+  "seeAllNotifications": "See all notifications",
+  "unread": "Unread",
+  "earlier": "Earlier",
+  "actions": "Actions",
+  "approve": "Approve",
+  "decline": "Decline",
+  "attendeeApproved": "Attendee approved",
+  "attendeeDeclined": "Attendee declined",
+  "somethingWentWrong": "Something went wrong",
+  "eventCreatedSuccess": "Event created successfully!",
+  "declined": "Declined",
+  "send": "Send"
 }

@@ -1,4 +1,4 @@
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 import { Navbar } from '@/components/navbar';
 import './globals.css';
 import Head from 'next/head';

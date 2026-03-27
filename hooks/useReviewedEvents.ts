@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { TrainingEvent } from '@/types/training';
 import { getReviewedEventIds } from '@/actions/reviews';
 
-export function useReviewedEvents(pastEvents: TrainingEvent[], activeTab: string) {
+export function useReviewedEvents(pastEvents: TrainingEvent[], activeTab: string, userId?: string) {
   const [reviewedEventIds, setReviewedEventIds] = useState<string[]>([]);
 
   const noAttendeeIds = useMemo(
@@ -16,12 +16,12 @@ export function useReviewedEvents(pastEvents: TrainingEvent[], activeTab: string
   );
 
   useEffect(() => {
-    if (activeTab === 'past') {
-      getReviewedEventIds(eligibleIds).then((reviewedIds) => {
+    if (activeTab === 'past' && userId) {
+      getReviewedEventIds(eligibleIds, userId).then((reviewedIds) => {
         setReviewedEventIds([...noAttendeeIds, ...reviewedIds]);
       });
     }
-  }, [activeTab, eligibleIds, noAttendeeIds]);
+  }, [activeTab, eligibleIds, noAttendeeIds, userId]);
 
   return reviewedEventIds;
 }

@@ -5,8 +5,10 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 import { getProfileStats } from '@/actions/profileStats';
+import { getUserReviews } from '@/actions/reviews';
 import { ProfileStats } from '@/app/profile/components/ProfileStats';
 import { ActivityChart } from '@/app/profile/components/ActivityChart';
+import { UserReviewsClient } from '@/components/reviews/UserReviews';
 import { getServerTranslation } from '@/localization/server';
 
 export default async function UserProfilePage({
@@ -34,7 +36,10 @@ export default async function UserProfilePage({
     notFound();
   }
 
-  const stats = await getProfileStats(userId);
+  const [stats, { reviews: userReviews, stats: reviewStats }] = await Promise.all([
+    getProfileStats(userId),
+    getUserReviews(userId),
+  ]);
   const avatarSrc = user.customAvatar ?? user.image;
 
   return (
@@ -95,6 +100,10 @@ export default async function UserProfilePage({
           {t('lastFourWeeks')}
         </h2>
         <ActivityChart data={stats.weeklyData} />
+      </div>
+
+      <div className="rounded-2xl border border-base-300 bg-base-100 shadow-sm p-6">
+        <UserReviewsClient reviews={userReviews} stats={reviewStats} />
       </div>
     </div>
   );

@@ -1,18 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { StarRating } from './StarRating';
-import Image from 'next/image';
 import { createReviews } from '@/actions/reviews';
 import { useTranslation } from 'react-i18next';
 
 interface BulkReviewFormProps {
   eventId: string;
   participants: {
-    eventId: string;
     attendeeId: string;
+    name?: string | null;
     status: string;
-    createdAt: Date;
     isHost?: boolean;
   }[];
   userId?: string;
@@ -32,6 +32,7 @@ export function BulkReviewForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const { t } = useTranslation();
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (!userId) return;
@@ -45,21 +46,21 @@ export function BulkReviewForm({
       }));
       const result = await createReviews(reviewData);
       if (result.success) {
-        window.location.reload();
+        toast.success('Reviews submitted successfully!');
+        router.refresh();
       } else {
-        alert(
-          ('error' in result && result.error) || 'Failed to submit reviews',
-        );
+        toast.error('Failed to submit reviews');
       }
     } catch (error) {
       console.error('Failed to submit reviews:', error);
-      alert('Failed to submit reviews. Please try again.');
+      toast.error('Failed to submit reviews. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
   const filteredParticipants = participants.filter(
-    (participant) => participant.attendeeId !== userId && !participant.isHost,
+    (participant) =>
+      participant.attendeeId !== userId && participant.status === 'confirmed',
   );
   const currentParticipant = filteredParticipants[currentStep];
   const totalSteps = filteredParticipants.length;
@@ -101,7 +102,25 @@ export function BulkReviewForm({
         />
       </div>
 
-      <div className="flex items-center gap-4 mb-6"></div>
+      <div className="flex items-center gap-4 mb-6">
+        <div className="avatar placeholder">
+          <div className="bg-neutral text-neutral-content rounded-full w-12">
+            <span className="text-xl">
+              {currentParticipant.name?.charAt(0).toUpperCase() ?? '?'}
+            </span>
+          </div>
+        </div>
+        <div>
+          {currentParticipant.name && (
+            <p className="font-semibold text-base-content">{currentParticipant.name}</p>
+          )}
+          <span
+            className={`badge badge-sm ${currentParticipant.isHost ? 'badge-warning' : 'badge-info'}`}
+          >
+            {currentParticipant.isHost ? t('host') : t('participant')}
+          </span>
+        </div>
+      </div>
 
       <div className="space-y-4">
         <div>

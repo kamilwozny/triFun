@@ -33,12 +33,16 @@ export function TrainingEventList({
   }, []);
 
   const showReviewButton = useCallback(
-    (event: TrainingEvent) =>
-      activeTab === 'past' &&
-      userId === event.createdBy &&
-      !reviewedEventIds.includes(event.id) &&
-      (event.attendees?.length || 0) > 2,
-    [activeTab, userId, reviewedEventIds],
+    (event: TrainingEvent) => {
+      if (!userId) return false;
+      const isPast = new Date(event.date) < new Date();
+      const isConfirmedAttendee =
+        event.attendees?.some(
+          (a) => a.attendeeId === userId && a.status === 'confirmed',
+        ) ?? false;
+      return isPast && isConfirmedAttendee && !reviewedEventIds.includes(event.id);
+    },
+    [userId, reviewedEventIds],
   );
 
   if (events.length === 0) {

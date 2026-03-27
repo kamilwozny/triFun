@@ -1,7 +1,11 @@
+import Link from 'next/link';
 import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
 import { auth } from '@/app/auth';
 import { SignupButton } from '@/components/signupButton/SignupButton';
+import { ApproveAttendeeButtons } from '@/components/trainings/ApproveAttendeeButtons';
+import { TrainingReviewSection } from '@/components/trainings/TrainingReviewSection';
+import { hasCurrentUserReviewedEvent } from '@/actions/reviews';
 import { FaMapMarkerAlt, FaCalendarAlt, FaUserFriends, FaRoute } from 'react-icons/fa';
 import { BackToListButton } from '@/components/trainings/BackToListButton';
 import { MdSportsScore } from 'react-icons/md';
@@ -42,6 +46,14 @@ export default async function TrainingPage({
   const attendees = await getTrainingList(id);
   const session = await auth();
   const user = session?.user;
+  const isHost = training?.createdBy === user?.id;
+  const isPast = new Date(training.date) < new Date();
+  const isUserParticipantOrHost =
+    attendees?.some((a) => a.id === user?.id && a.status === 'confirmed') ?? false;
+  const hasReviewed =
+    user?.id && isPast && isUserParticipantOrHost
+      ? await hasCurrentUserReviewedEvent(id)
+      : false;
   const { t } = await getServerTranslation();
 
   if (!training) return <p>{t('trainingNotFound')}</p>;
@@ -133,13 +145,22 @@ export default async function TrainingPage({
               {t('atendees')} ({attendees?.length || 0})
             </h2>
           </div>
-          {Date.parse(training.date) > Date.now() ? (
-            attendees?.find((attendee) => attendee.id === user?.id) ? (
-              <button>{t('inviteFriends')}</button>
-            ) : (
-              training.createdBy !== user?.id && <SignupButton eventId={id} />
-            )
-          ) : null}
+          <div className="flex items-center gap-2">
+            {isPast && isUserParticipantOrHost && !hasReviewed && user?.id && (
+              <TrainingReviewSection
+                eventId={id}
+                userId={user.id}
+                attendees={attendees ?? []}
+              />
+            )}
+            {!isPast && (
+              attendees?.find((attendee) => attendee.id === user?.id) ? (
+                <button>{t('inviteFriends')}</button>
+              ) : (
+                training.createdBy !== user?.id && <SignupButton eventId={id} />
+              )
+            )}
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -150,9 +171,12 @@ export default async function TrainingPage({
                   {t('participant')}
                 </th>
                 <th className="bg-neutral-100">{t('status')}</th>
-                <th className="bg-neutral-100 rounded-r-lg">
-                  {t('joinedDateEvent')}
-                </th>
+                <th className="bg-neutral-100">{t('joinedDateEvent')}</th>
+                {isHost && (
+                  <th className="bg-neutral-100 rounded-r-lg">
+                    {t('actions')}
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -169,7 +193,13 @@ export default async function TrainingPage({
                       </div>
                       <div>
                         <div className="font-semibold text-neutral-800 flex gap-1">
-                          {attendee.name}{' '}
+                          {attendee.id ? (
+                            <Link href={`/profile/${attendee.id}`} className="hover:underline">
+                              {attendee.name}
+                            </Link>
+                          ) : (
+                            attendee.name
+                          )}
                           <p className="font-bold">
                             {attendee.isHost && `(${t('host')})`}
                           </p>
@@ -178,23 +208,25 @@ export default async function TrainingPage({
                     </div>
                   </td>
                   <td className="py-4">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="font-semibold text-neutral-800">
-                          {t(attendee.status)}
-                        </div>
-                      </div>
+                    <div className="font-semibold text-neutral-800">
+                      {t(attendee.status)}
                     </div>
                   </td>
                   <td className="py-4">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="font-semibold text-neutral-800">
-                          {attendee.joinedDate.toLocaleDateString()}
-                        </div>
-                      </div>
+                    <div className="font-semibold text-neutral-800">
+                      {attendee.joinedDate.toLocaleDateString()}
                     </div>
                   </td>
+                  {isHost && (
+                    <td className="py-4">
+                      {attendee.status === 'pending' && attendee.id && (
+                        <ApproveAttendeeButtons
+                          eventId={id}
+                          attendeeId={attendee.id}
+                        />
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
               {(!attendees || attendees.length === 0) && (

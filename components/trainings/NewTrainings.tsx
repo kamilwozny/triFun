@@ -121,7 +121,7 @@ export default function NewTrainings({
     return events.filter((event) => new Date(event.date) < today);
   }, [events]);
 
-  const reviewedEventIds = useReviewedEvents(pastEvents, 'past');
+  const reviewedEventIds = useReviewedEvents(pastEvents, 'past', session?.user?.id);
 
   const handleEventTypeFiltersChange = useCallback(
     (eventTypeFilters: EventTypeFilters) => {

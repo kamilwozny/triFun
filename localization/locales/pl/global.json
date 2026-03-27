@@ -127,5 +127,19 @@
   "failedSignInStrava": "Logowanie przez Strava nie powiodło się. Spróbuj ponownie.",
   "notFound": "Strona nie znaleziona",
   "notFoundMessage": "Wygląda na to, że wyjechałeś poza mapę. Ta strona nie istnieje.",
-  "goHome": "Wróć do strony głównej"
+  "goHome": "Wróć do strony głównej",
+  "notifications": "Powiadomienia",
+  "noNotifications": "Brak powiadomień",
+  "seeAllNotifications": "Zobacz wszystkie powiadomienia",
+  "unread": "Nieprzeczytane",
+  "earlier": "Wcześniej",
+  "actions": "Akcje",
+  "approve": "Zatwierdź",
+  "decline": "Odrzuć",
+  "attendeeApproved": "Uczestnik zatwierdzony",
+  "attendeeDeclined": "Uczestnik odrzucony",
+  "somethingWentWrong": "Coś poszło nie tak",
+  "eventCreatedSuccess": "Wydarzenie zostało utworzone!",
+  "declined": "Odrzucony",
+  "send": "Wyślij"
 }
