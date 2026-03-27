@@ -2,14 +2,8 @@ import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
 import { auth } from '@/app/auth';
 import { SignupButton } from '@/components/signupButton/SignupButton';
-import {
-  FaMapMarkerAlt,
-  FaCalendarAlt,
-  FaUserFriends,
-  FaRoute,
-  FaArrowLeft,
-} from 'react-icons/fa';
-import Link from 'next/link';
+import { FaMapMarkerAlt, FaCalendarAlt, FaUserFriends, FaRoute } from 'react-icons/fa';
+import { BackToListButton } from '@/components/trainings/BackToListButton';
 import { MdSportsScore } from 'react-icons/md';
 import RouteMap from '@/components/map/RouteMapClient';
 
@@ -54,13 +48,7 @@ export default async function TrainingPage({
 
   return (
     <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-8">
-      <Link
-        href="/trainings"
-        className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
-      >
-        <FaArrowLeft className="h-3 w-3" />
-        {t('backToList')}
-      </Link>
+      <BackToListButton label={t('backToList')} />
       <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
         <div className="flex justify-between items-start">
           <div>

@@ -2,8 +2,8 @@
 
 import { useCallback, useState } from 'react';
 import { TrainingEvent } from '@/types/training';
-import { TrainingEventCard } from './TrainingEventCard';
 import { ReviewModal } from './ReviewModal';
+import { VirtualizedTrainingList } from './VirtualizedTrainingList';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,7 @@ interface TrainingEventListProps {
   activeTab: 'upcoming' | 'myEvents' | 'past';
   userId?: string;
   reviewedEventIds: string[];
+  filterVersion: number;
 }
 
 export function TrainingEventList({
@@ -19,6 +20,7 @@ export function TrainingEventList({
   activeTab,
   userId,
   reviewedEventIds,
+  filterVersion,
 }: TrainingEventListProps) {
   const [reviewEventId, setReviewEventId] = useState<string>('');
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
@@ -29,6 +31,16 @@ export function TrainingEventList({
     setReviewEventId(eventId);
     setIsReviewModalOpen(true);
   }, []);
+
+  const showReviewButton = useCallback(
+    (event: TrainingEvent) =>
+      activeTab === 'past' &&
+      userId === event.createdBy &&
+      !reviewedEventIds.includes(event.id) &&
+      (event.attendees?.length || 0) > 2,
+    [activeTab, userId, reviewedEventIds],
+  );
+
   if (events.length === 0) {
     return (
       <div className="text-center text-neutral text-xl font-extrabold mt-4 h-40 gap-8 flex justify-center flex-col items-center">
@@ -54,22 +66,13 @@ export function TrainingEventList({
   const reviewEvent = events.find((event) => event.id === reviewEventId);
 
   return (
-    <>
-      <div className="space-y-6">
-        {events.map((event) => (
-          <TrainingEventCard
-            key={event.id}
-            event={event}
-            showReviewButton={
-              activeTab === 'past' &&
-              userId === event.createdBy &&
-              !reviewedEventIds.includes(event.id) &&
-              (event.attendees?.length || 0) > 2
-            }
-            onReview={handleReview}
-          />
-        ))}
-      </div>
+    <div className="h-full">
+      <VirtualizedTrainingList
+        events={events}
+        showReviewButton={showReviewButton}
+        onReview={handleReview}
+        filterVersion={filterVersion}
+      />
 
       <ReviewModal
         reviewEvent={reviewEvent}
@@ -78,6 +81,6 @@ export function TrainingEventList({
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
       />
-    </>
+    </div>
   );
 }

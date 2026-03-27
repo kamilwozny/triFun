@@ -6,6 +6,8 @@ import { formatDate } from '@/lib/utils';
 import { TrainingEvent } from '@/types/training';
 import { useTranslation } from 'react-i18next';
 
+const RETURN_URL_STORAGE_KEY = 'trainings-return-url';
+
 const difficultyColors = {
   Beginner: 'bg-green-100 text-green-800',
   Intermediate: 'bg-yellow-100 text-yellow-800',
@@ -27,6 +29,10 @@ export function TrainingEventCard({
   const { t } = useTranslation();
 
   const handleCardClick = useCallback(() => {
+    sessionStorage.setItem(
+      RETURN_URL_STORAGE_KEY,
+      window.location.pathname + window.location.search,
+    );
     router.push(`/trainings/${event.id}`);
   }, [event.id, router]);
 

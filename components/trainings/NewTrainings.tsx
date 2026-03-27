@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import '@/components/trainings/Trainings.css';
@@ -33,6 +33,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+const FILTER_STORAGE_KEY = 'trainings-filter-state';
+
+interface PersistedFilterState {
+  eventType: AllFilters['eventType'];
+  sports: AllFilters['sports'];
+}
+
+function readSavedFilters(): PersistedFilterState | null {
+  try {
+    const raw = sessionStorage.getItem(FILTER_STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as PersistedFilterState;
+  } catch {}
+  return null;
+}
+
 interface NewTrainingsProps {
   initialSearch?: string;
   initialLocation?: string;
@@ -49,23 +64,48 @@ export default function NewTrainings({
   const { t } = useTranslation();
   const router = useRouter();
 
-  const [filters, setFilters] = useState<AllFilters>(() => ({
-    ...getDefaultFilters(),
-    location: {
-      city: initialLocation,
-      distanceKm: Number(initialRadius),
-    },
-  }));
+  const [filters, setFilters] = useState<AllFilters>(() => {
+    const saved = readSavedFilters();
+    return {
+      ...getDefaultFilters(),
+      eventType: saved?.eventType ?? getDefaultFilters().eventType,
+      sports: saved?.sports ?? [],
+      location: { city: initialLocation, distanceKm: Number(initialRadius) },
+    };
+  });
 
   const [showMap, setShowMap] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Mobile search inputs are URL-driven — only initialise from URL params, not sessionStorage
   const [mobileSearch, setMobileSearch] = useState(initialSearch);
   const [mobileLocation, setMobileLocation] = useState(initialLocation);
   const [mobileRadius, setMobileRadius] = useState(
     initialRadius && initialRadius !== '0' ? initialRadius : '10',
   );
 
+  // Persist only the client-side filter state (eventType + sports)
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        FILTER_STORAGE_KEY,
+        JSON.stringify({ eventType: filters.eventType, sports: filters.sports }),
+      );
+    } catch {}
+  }, [filters.eventType, filters.sports]);
+
   const debouncedFilters = useDebounce(filters, 400);
+
+  // filterVersion increments only on user-driven filter changes (not initial mount)
+  const [filterVersion, setFilterVersion] = useState(0);
+  const isFirstFilterChange = useRef(true);
+  useEffect(() => {
+    if (isFirstFilterChange.current) {
+      isFirstFilterChange.current = false;
+      return;
+    }
+    setFilterVersion((v) => v + 1);
+  }, [debouncedFilters]);
 
   const userPosition = useGeolocation();
 
@@ -212,12 +252,13 @@ export default function NewTrainings({
             />
           </div>
         ) : (
-          <div className="no-scrollbar overflow-y-auto max-h-[70vh] rounded-2xl bg-base-100 p-4 space-y-6">
+          <div className="h-[70vh] rounded-2xl bg-base-100 p-4">
             <TrainingEventList
               events={filteredEvents}
               activeTab={'upcoming'}
               userId={session?.user?.id}
               reviewedEventIds={reviewedEventIds}
+              filterVersion={filterVersion}
             />
           </div>
         )}
@@ -246,12 +287,13 @@ export default function NewTrainings({
         </div>
 
         <div className="w-3/6 xl:w-2/5">
-          <div className="no-scrollbar overflow-y-auto max-h-[70vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
+          <div className="h-[70vh] pr-4 rounded-xl bg-base-100 p-6">
             <TrainingEventList
               events={filteredEvents}
               activeTab={'upcoming'}
               userId={session?.user?.id}
               reviewedEventIds={reviewedEventIds}
+              filterVersion={filterVersion}
             />
           </div>
         </div>
