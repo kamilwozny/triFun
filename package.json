@@ -9,7 +9,7 @@
     "lint": "next lint",
     "db:push": "drizzle-kit push --config ./drizzle.config.ts",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx seed.ts",
+    "db:seed": "tsx --env-file=.env seed.ts",
     "test": "jest"
   },
   "dependencies": {

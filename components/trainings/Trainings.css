@@ -1,5 +1,6 @@
 .leaflet-container {
-  height: 700px;
+  height: 100%;
+  min-height: 800px;
 }
 
 .no-scrollbar::-webkit-scrollbar {

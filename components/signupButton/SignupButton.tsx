@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'react-hot-toast';
 import { signUpEventAction } from '@/actions/attendeesEvents';
+import { useTranslation } from 'react-i18next';
 
 interface SignupButtonProps {
   eventId: string;
@@ -13,6 +14,7 @@ export function SignupButton({ eventId }: SignupButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleSignUp = async () => {
     try {
@@ -26,11 +28,14 @@ export function SignupButton({ eventId }: SignupButtonProps) {
 
         if (result.success) {
           toast.success(
-            ('message' in result && result.message) || 'Successfully signed up for the event!'
+            ('message' in result && result.message) ||
+              'Successfully signed up for the event!',
           );
           router.refresh();
         } else {
-          toast.error(('error' in result && result.error) || 'Failed to sign up');
+          toast.error(
+            ('error' in result && result.error) || 'Failed to sign up',
+          );
         }
 
         setIsLoading(false);
@@ -48,7 +53,7 @@ export function SignupButton({ eventId }: SignupButtonProps) {
       className="btn btn-primary"
       disabled={isLoading || isPending}
     >
-      {isLoading || isPending ? 'Signing up...' : 'Sign up'}
+      {isLoading || isPending ? t('signingUp') : t('signUp')}
     </button>
   );
 }

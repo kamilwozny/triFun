@@ -86,9 +86,9 @@ export function TrainingEventCard({
         </div>
 
         <div className="flex flex-wrap gap-2 my-4">
-          {event.activities.map((activity) => (
+          {event.activities.map((activity, i) => (
             <div
-              key={activity}
+              key={`${activity}-${i}`}
               className="bg-background shadow-md p-2 rounded-lg flex items-center gap-3 w-40"
             >
               <div>

@@ -50,6 +50,7 @@ function Map({
   showSearch = false,
   staticRoutes = [],
   swimPoint,
+  className = 'h-[700px]',
 }: MapProps) {
   const [markerPosition, setMarkerPosition] = useState(
     position ? { lat: position.lat, lng: position.lng } : null,
@@ -131,7 +132,7 @@ function Map({
           center={markerPosition || position}
           zoom={zoom}
           scrollWheelZoom={true}
-          className="h-[700px] w-full"
+          className={`${className} w-full`}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -46,6 +46,7 @@ export interface MapProps {
   showSearch?: boolean;
   staticRoutes?: StaticRoute[];
   swimPoint?: { lat: number; lng: number };
+  className?: string;
 }
 
 export interface LocationMarkerProps {

@@ -1,242 +1,894 @@
-// import { db } from './db/db';
-// import {
-//   users,
-//   events,
-//   trainingData,
-//   trainingEvents,
-//   posts,
-//   comments,
-//   eventAttendees,
-//   checklists,
-//   checklistItems,
-// } from './db/schema';
+import { db } from './db/db';
+import { users, trainingEvents, eventAttendees, reviews } from './db/schema';
 
-// async function seedDatabase() {
-//   const newUsers = await db
-//     .insert(users)
-//     .values([
-//       {
-//         email: 'john.doe@example.com',
-//         password: 'password123',
-//         username: 'johndoe',
-//         name: 'John',
-//         surname: 'Doe',
-//         country: 'USA',
-//         city: 'New York',
-//         bio: 'Bio of John Doe',
-//         age: 30,
-//         expierenceLevel: 'Intermediate',
-//       },
-//       {
-//         email: 'jane.doe@example.com',
-//         password: 'password123',
-//         username: 'janedoe',
-//         name: 'Jane',
-//         surname: 'Doe',
-//         country: 'USA',
-//         city: 'Los Angeles',
-//         bio: 'Bio of Jane Doe',
-//         age: 28,
-//         expierenceLevel: 'Expert',
-//       },
-//     ])
-//     .returning();
+const USER_IDS = {
+  u1: 'test-user-1',
+  u2: 'test-user-2',
+  u3: 'demo-user-3',
+  u4: 'demo-user-4',
+  u5: 'demo-user-5',
+};
 
-//   const newEvents = await db
-//     .insert(events)
-//     .values([
-//       {
-//         name: 'Marathon',
-//         startOn: '2023-12-01',
-//         createdById: newUsers[0].id,
-//         description: 'A marathon event',
-//         country: 'USA',
-//         city: 'New York',
-//         address: '123 Main St',
-//         organization: 'Marathon Org',
-//         distance_swim: 0,
-//         distance_bike: 0,
-//         distance_run: 42,
-//         isPrivate: false,
-//         price: 100,
-//         status: 'live',
-//       },
-//       {
-//         name: 'Triathlon',
-//         startOn: '2023-11-01',
-//         createdById: newUsers[1].id,
-//         description: 'A triathlon event',
-//         country: 'USA',
-//         city: 'Los Angeles',
-//         address: '456 Elm St',
-//         organization: 'Triathlon Org',
-//         distance_swim: 1.5,
-//         distance_bike: 40,
-//         distance_run: 10,
-//         isPrivate: false,
-//         price: 150,
-//         status: 'live',
-//       },
-//     ])
-//     .returning();
+const seedUsers = [
+  {
+    id: USER_IDS.u1,
+    name: 'Test User One',
+    email: 'test1@donotreply.com',
+    bio: 'Triathlon enthusiast and weekend warrior. Training for my first Ironman.',
+    location: 'Warsaw, Poland',
+  },
+  {
+    id: USER_IDS.u2,
+    name: 'Test User Two',
+    email: 'test2@donotreply.com',
+    bio: 'Cyclist and runner. Love exploring new routes and pushing my limits.',
+    location: 'Kraków, Poland',
+  },
+  {
+    id: USER_IDS.u3,
+    name: 'Anna Kowalski',
+    email: 'anna@demo.com',
+    bio: 'Open water swimmer and trail runner. Nature lover.',
+    location: 'Berlin, Germany',
+  },
+  {
+    id: USER_IDS.u4,
+    name: 'Marco Rossi',
+    email: 'marco@demo.com',
+    bio: 'Road cyclist with 10 years of experience. Alpinist at heart.',
+    location: 'Rome, Italy',
+  },
+  {
+    id: USER_IDS.u5,
+    name: 'Sarah Johnson',
+    email: 'sarah@demo.com',
+    bio: 'Marathon runner and fitness coach. Helping others reach their potential.',
+    location: 'Amsterdam, Netherlands',
+  },
+];
 
-//   const newTrainingData = await db
-//     .insert(trainingData)
-//     .values([
-//       {
-//         athleteId: newUsers[0].id,
-//         postId: 'some-post-id-1',
-//         activityType: 'Running',
-//         distance: 10000,
-//         duration: 3600,
-//         caloriesBurned: 600,
-//         elevationGain: 100,
-//         avgPace: 360,
-//         avgHeartRate: 150,
-//         sourcePlatform: 'Strava',
-//         timestamp: '2023-10-01T10:00:00Z',
-//         location: 'Central Park',
-//       },
-//       {
-//         athleteId: newUsers[1].id,
-//         postId: 'some-post-id-2',
-//         activityType: 'Cycling',
-//         distance: 50000,
-//         duration: 7200,
-//         caloriesBurned: 1200,
-//         elevationGain: 500,
-//         avgPace: 240,
-//         avgHeartRate: 140,
-//         sourcePlatform: 'Garmin',
-//         timestamp: '2023-10-02T10:00:00Z',
-//         location: 'Santa Monica',
-//       },
-//     ])
-//     .returning();
+// Past events: before 2026-03-27
+// Future events: after 2026-03-27
+const seedEvents = [
+  // ── PAST EVENTS (7) ──
+  {
+    name: 'Winter City Run',
+    description: 'A scenic 10km run through the historic old town of Warsaw. Flat course, perfect for beginners and intermediates looking for a winter challenge.',
+    city: 'Warsaw',
+    country: 'Poland',
+    userPosition: '52.2297,21.0122',
+    distances: JSON.stringify([{ activity: 'Run', distance: 10, unit: 'km' }]),
+    date: '2026-01-15',
+    startTime: '09:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Kraków Cycling Tour',
+    description: 'A 60km cycling loop around Kraków and the surrounding countryside. Moderate hills, stunning views of the Tatra mountains in the distance.',
+    city: 'Kraków',
+    country: 'Poland',
+    userPosition: '50.0647,19.9450',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 60, unit: 'km' }]),
+    date: '2026-02-01',
+    startTime: '08:30',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Berlin Indoor Triathlon',
+    description: 'Indoor triathlon at the Berlin Sports Center: 500m swim, 15km stationary bike, 5km treadmill run. Great for off-season training.',
+    city: 'Berlin',
+    country: 'Germany',
+    userPosition: '52.5200,13.4050',
+    distances: JSON.stringify([
+      { activity: 'Swim', distance: 500, unit: 'm' },
+      { activity: 'Bike', distance: 15, unit: 'km' },
+      { activity: 'Run', distance: 5, unit: 'km' },
+    ]),
+    date: '2026-02-14',
+    startTime: '10:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Prague Half Marathon',
+    description: 'Run through the heart of Prague along the Vltava river. Classic 21km half marathon course with gentle elevation.',
+    city: 'Prague',
+    country: 'Czech Republic',
+    userPosition: '50.0755,14.4378',
+    distances: JSON.stringify([{ activity: 'Run', distance: 21, unit: 'km' }]),
+    date: '2026-02-28',
+    startTime: '07:45',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Vienna Lake Swim',
+    description: 'Open water swim in the beautiful Old Danube lake. 2km loop in calm, clean water. Wetsuits recommended in February.',
+    city: 'Vienna',
+    country: 'Austria',
+    userPosition: '48.2082,16.3738',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 2, unit: 'km' }]),
+    date: '2026-03-08',
+    startTime: '11:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Warsaw Vistula Bike Ride',
+    description: 'A relaxed 40km cycling session along the Vistula riverbank. Mostly flat paths, great for all levels.',
+    city: 'Warsaw',
+    country: 'Poland',
+    userPosition: '52.2297,21.0122',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 40, unit: 'km' }]),
+    date: '2026-03-15',
+    startTime: '10:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Expert Trail Run Kraków',
+    description: 'Technical trail run in the Tatra foothills. 25km with 800m elevation gain. Experienced runners only.',
+    city: 'Kraków',
+    country: 'Poland',
+    userPosition: '50.0647,19.9450',
+    distances: JSON.stringify([{ activity: 'Run', distance: 25, unit: 'km' }]),
+    date: '2026-03-22',
+    startTime: '07:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
 
-//   // const newTrainingEvents = await db
-//   //   .insert(trainingEvents)
-//   //   .values([
-//   //     {
-//   //       description: 'Training for marathon',
-//   //       name: 'Marathon Training',
-//   //       location: 'Central Park',
-//   //       goalType: 'Distance',
-//   //       goalValue: 10000,
-//   //       date: '2023-10-01',
-//   //       createdBy: newUsers[0].id,
-//   //       createdAt: '2023-09-01T10:00:00Z',
-//   //     },
-//   //     {
-//   //       description: 'Training for triathlon',
-//   //       name: 'Triathlon Training',
-//   //       location: 'Santa Monica',
-//   //       goalType: 'Time',
-//   //       goalValue: 7200,
-//   //       date: '2023-10-02',
-//   //       createdBy: newUsers[1].id,
-//   //       createdAt: '2023-09-02T10:00:00Z',
-//   //     },
-//   //   ])
-//   //   .returning();
+  // ── FUTURE EVENTS (15) ──
+  {
+    name: 'Amsterdam Spring Run',
+    description: 'Classic spring run through Amsterdam\'s famous canal district. 12km route past tulip gardens and historic bridges.',
+    city: 'Amsterdam',
+    country: 'Netherlands',
+    userPosition: '52.3676,4.9041',
+    distances: JSON.stringify([{ activity: 'Run', distance: 12, unit: 'km' }]),
+    date: '2026-04-12',
+    startTime: '09:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Paris Cycling Classic',
+    description: 'A 80km route through Paris and the surrounding countryside. Includes a loop through the Bois de Vincennes and Bois de Boulogne.',
+    city: 'Paris',
+    country: 'France',
+    userPosition: '48.8566,2.3522',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 80, unit: 'km' }]),
+    date: '2026-04-20',
+    startTime: '08:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Barcelona Beach Triathlon',
+    description: 'Sprint triathlon on the sunny Barcelona coast: 750m sea swim, 20km coastal bike, 5km beach run. Perfect spring weather guaranteed.',
+    city: 'Barcelona',
+    country: 'Spain',
+    userPosition: '41.3851,2.1734',
+    distances: JSON.stringify([
+      { activity: 'Swim', distance: 750, unit: 'm' },
+      { activity: 'Bike', distance: 20, unit: 'km' },
+      { activity: 'Run', distance: 5, unit: 'km' },
+    ]),
+    date: '2026-05-03',
+    startTime: '07:30',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Rome Marathon Training Run',
+    description: 'Group training run along the historic Appian Way. 30km on ancient cobblestones with stops at Roman landmarks.',
+    city: 'Rome',
+    country: 'Italy',
+    userPosition: '41.9028,12.4964',
+    distances: JSON.stringify([{ activity: 'Run', distance: 30, unit: 'km' }]),
+    date: '2026-05-10',
+    startTime: '06:30',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Warsaw Summer Duathlon',
+    description: 'A summer duathlon in Łazienki Park: 5km run, 30km bike, 5km run. Registration includes post-race picnic in the park.',
+    city: 'Warsaw',
+    country: 'Poland',
+    userPosition: '52.2153,21.0353',
+    distances: JSON.stringify([
+      { activity: 'Run', distance: 5, unit: 'km' },
+      { activity: 'Bike', distance: 30, unit: 'km' },
+      { activity: 'Run', distance: 5, unit: 'km' },
+    ]),
+    date: '2026-05-24',
+    startTime: '08:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Swiss Alps Cycling Camp',
+    description: 'Three-day cycling camp in the Swiss Alps. Day 1: 100km Grimsel Pass. Day 2: 90km Furka Pass. Day 3: 80km Susten Pass.',
+    city: 'Lucerne',
+    country: 'Switzerland',
+    userPosition: '47.0502,8.3093',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 270, unit: 'km' }]),
+    date: '2026-06-05',
+    startTime: '07:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Kraków Open Water Challenge',
+    description: 'Open water swimming event on Bagry lake. Options: 1km, 2km, or 5km. Timing chips included. Great atmosphere and free refreshments.',
+    city: 'Kraków',
+    country: 'Poland',
+    userPosition: '50.0290,20.0365',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 2, unit: 'km' }]),
+    date: '2026-06-14',
+    startTime: '10:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Berlin Half Ironman Prep',
+    description: 'Full Ironman 70.3 simulation: 1.9km lake swim, 90km cycling through Brandenburg, 21km run through Tiergarten.',
+    city: 'Berlin',
+    country: 'Germany',
+    userPosition: '52.5200,13.4050',
+    distances: JSON.stringify([
+      { activity: 'Swim', distance: 1.9, unit: 'km' },
+      { activity: 'Bike', distance: 90, unit: 'km' },
+      { activity: 'Run', distance: 21, unit: 'km' },
+    ]),
+    date: '2026-07-04',
+    startTime: '06:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Lisbon Coastal Run',
+    description: 'Beautiful coastal run from Belém to Cascais along the Tagus estuary and Atlantic coast. 20km of stunning views.',
+    city: 'Lisbon',
+    country: 'Portugal',
+    userPosition: '38.7223,-9.1393',
+    distances: JSON.stringify([{ activity: 'Run', distance: 20, unit: 'km' }]),
+    date: '2026-07-18',
+    startTime: '07:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Warsaw Private Cycling Group',
+    description: 'Private cycling session for our club members only. 50km route through Kampinos National Park with coffee stop halfway.',
+    city: 'Warsaw',
+    country: 'Poland',
+    userPosition: '52.2297,21.0122',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 50, unit: 'km' }]),
+    date: '2026-08-01',
+    startTime: '09:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: true,
+  },
+  {
+    name: 'Vienna Ironman Full',
+    description: 'Full Ironman simulation: 3.8km swim in the Old Danube, 180km bike through the Wachau valley, 42km marathon through Vienna.',
+    city: 'Vienna',
+    country: 'Austria',
+    userPosition: '48.2082,16.3738',
+    distances: JSON.stringify([
+      { activity: 'Swim', distance: 3.8, unit: 'km' },
+      { activity: 'Bike', distance: 180, unit: 'km' },
+      { activity: 'Run', distance: 42, unit: 'km' },
+    ]),
+    date: '2026-08-23',
+    startTime: '06:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Copenhagen 5K Fun Run',
+    description: 'Friendly 5km run around Fælledparken. All paces welcome. Perfect for beginners or a relaxed recovery run.',
+    city: 'Copenhagen',
+    country: 'Denmark',
+    userPosition: '55.6761,12.5683',
+    distances: JSON.stringify([{ activity: 'Run', distance: 5, unit: 'km' }]),
+    date: '2026-09-06',
+    startTime: '10:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Gdańsk Baltic Swim',
+    description: 'Open water swim in the Baltic Sea near the iconic Gdańsk pier. 3km course for experienced swimmers. Wetsuits mandatory.',
+    city: 'Gdańsk',
+    country: 'Poland',
+    userPosition: '54.3520,18.6466',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 3, unit: 'km' }]),
+    date: '2026-09-20',
+    startTime: '09:30',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Munich Autumn Cycling',
+    description: 'A scenic 70km autumn ride around the lakes south of Munich: Starnberger See and Ammersee. Spectacular fall colors.',
+    city: 'Munich',
+    country: 'Germany',
+    userPosition: '48.1351,11.5820',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 70, unit: 'km' }]),
+    date: '2026-10-04',
+    startTime: '08:30',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Warsaw Year-End Marathon',
+    description: 'Cap off the year with a full marathon through Warsaw. Flat course along the Vistula river. Official timing and medals for all finishers.',
+    city: 'Warsaw',
+    country: 'Poland',
+    userPosition: '52.2297,21.0122',
+    distances: JSON.stringify([{ activity: 'Run', distance: 42.195, unit: 'km' }]),
+    date: '2026-11-15',
+    startTime: '08:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
 
-//   const newPosts = await db
-//     .insert(posts)
-//     .values([
-//       {
-//         userId: newUsers[0].id,
-//         description: 'Completed a 10k run',
-//         location: 'Central Park',
-//         distance: 10000,
-//         time: 3600,
-//         avgHeartRate: 150,
-//         avgSpeed: 10,
-//         activityType: 'Running',
-//         platform: 'Strava',
-//         createdAt: '2023-10-01T10:00:00Z',
-//         updatedAt: '2023-10-01T10:00:00Z',
-//       },
-//       {
-//         userId: newUsers[1].id,
-//         description: 'Completed a 50k bike ride',
-//         location: 'Santa Monica',
-//         distance: 50000,
-//         time: 7200,
-//         avgHeartRate: 140,
-//         avgSpeed: 25,
-//         activityType: 'Cycling',
-//         platform: 'Garmin',
-//         createdAt: '2023-10-02T10:00:00Z',
-//         updatedAt: '2023-10-02T10:00:00Z',
-//       },
-//     ])
-//     .returning();
+  // ── EXTRA EVENTS to reach ~50 ──
+  {
+    name: 'Wrocław Morning Run',
+    description: 'Early morning 8km run through the charming streets and bridges of Wrocław. Coffee and croissants after the run at a local café.',
+    city: 'Wrocław',
+    country: 'Poland',
+    userPosition: '51.1079,17.0385',
+    distances: JSON.stringify([{ activity: 'Run', distance: 8, unit: 'km' }]),
+    date: '2026-04-05',
+    startTime: '07:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Poznań Lake Circuit Bike',
+    description: 'A 55km loop around the Maltańskie lake and surrounding countryside. Mostly flat, great for building base fitness.',
+    city: 'Poznań',
+    country: 'Poland',
+    userPosition: '52.4064,16.9252',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 55, unit: 'km' }]),
+    date: '2026-04-26',
+    startTime: '09:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Gdańsk Triathlon Sprint',
+    description: 'Sprint triathlon in the Gulf of Gdańsk: 400m sea swim, 18km coastal bike, 4km run. Fun atmosphere, all levels welcome.',
+    city: 'Gdańsk',
+    country: 'Poland',
+    userPosition: '54.3520,18.6466',
+    distances: JSON.stringify([
+      { activity: 'Swim', distance: 400, unit: 'm' },
+      { activity: 'Bike', distance: 18, unit: 'km' },
+      { activity: 'Run', distance: 4, unit: 'km' },
+    ]),
+    date: '2026-05-17',
+    startTime: '08:30',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Brussels Park Run',
+    description: '10km social run through the Bois de la Cambre and Forêt de Soignes. Beautiful forest trails close to the city center.',
+    city: 'Brussels',
+    country: 'Belgium',
+    userPosition: '50.8503,4.3517',
+    distances: JSON.stringify([{ activity: 'Run', distance: 10, unit: 'km' }]),
+    date: '2026-05-31',
+    startTime: '09:30',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Stockholm Archipelago Swim',
+    description: 'Open water swim through the stunning Stockholm archipelago. 1.5km point-to-point between two islands. Boat support provided.',
+    city: 'Stockholm',
+    country: 'Sweden',
+    userPosition: '59.3293,18.0686',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 1.5, unit: 'km' }]),
+    date: '2026-06-21',
+    startTime: '10:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Helsinki Coastal Cycling',
+    description: 'A 65km cycling route along the Helsinki coastline visiting the fortress island of Suomenlinna. Ferry crossing included.',
+    city: 'Helsinki',
+    country: 'Finland',
+    userPosition: '60.1699,24.9384',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 65, unit: 'km' }]),
+    date: '2026-06-28',
+    startTime: '08:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Oslo Fjord Trail Run',
+    description: 'Trail running around the Oslo Fjord with 600m of elevation gain. Spectacular views of the water and forests. 18km total.',
+    city: 'Oslo',
+    country: 'Norway',
+    userPosition: '59.9139,10.7522',
+    distances: JSON.stringify([{ activity: 'Run', distance: 18, unit: 'km' }]),
+    date: '2026-07-11',
+    startTime: '07:30',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Budapest Danube Swim',
+    description: 'Downstream swim in the Danube between the iconic Chain Bridge and Margaret Bridge. 2km with fast current — wetsuits optional.',
+    city: 'Budapest',
+    country: 'Hungary',
+    userPosition: '47.4979,19.0402',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 2, unit: 'km' }]),
+    date: '2026-07-25',
+    startTime: '11:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Łódź Urban Cycling',
+    description: 'Urban cycling through the newly renovated streets of Łódź, including the famous Piotrkowska street. 35km, mostly flat.',
+    city: 'Łódź',
+    country: 'Poland',
+    userPosition: '51.7592,19.4560',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 35, unit: 'km' }]),
+    date: '2026-08-08',
+    startTime: '09:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Zakopane Mountain Run',
+    description: 'High-altitude trail run in the Tatra National Park. 15km with 1200m elevation gain. Summit of Kasprowy Wierch reached.',
+    city: 'Zakopane',
+    country: 'Poland',
+    userPosition: '49.2992,19.9496',
+    distances: JSON.stringify([{ activity: 'Run', distance: 15, unit: 'km' }]),
+    date: '2026-08-15',
+    startTime: '06:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Rotterdam Harbor Triathlon',
+    description: 'Olympic distance triathlon in the world\'s largest port: 1.5km harbor swim, 40km flat cycling, 10km run. PB course guaranteed.',
+    city: 'Rotterdam',
+    country: 'Netherlands',
+    userPosition: '51.9244,4.4777',
+    distances: JSON.stringify([
+      { activity: 'Swim', distance: 1.5, unit: 'km' },
+      { activity: 'Bike', distance: 40, unit: 'km' },
+      { activity: 'Run', distance: 10, unit: 'km' },
+    ]),
+    date: '2026-08-30',
+    startTime: '07:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Zurich Lake Swim',
+    description: 'Classic open water swim across the Zürichsee. 1.8km between Mythenquai and Tiefenbrunnen. One of the most scenic swims in Europe.',
+    city: 'Zurich',
+    country: 'Switzerland',
+    userPosition: '47.3769,8.5417',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 1.8, unit: 'km' }]),
+    date: '2026-09-05',
+    startTime: '10:30',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Kraków Night Run',
+    description: 'A unique 10km night run through the illuminated streets of the Kraków old town and along the Vistula river. Headlamps provided.',
+    city: 'Kraków',
+    country: 'Poland',
+    userPosition: '50.0647,19.9450',
+    distances: JSON.stringify([{ activity: 'Run', distance: 10, unit: 'km' }]),
+    date: '2026-09-12',
+    startTime: '20:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Athens Marathon Route Training',
+    description: 'Run the original 2026 Athens Marathon route from Sparta to Athens. 42km of history. A bucket-list run for every marathoner.',
+    city: 'Athens',
+    country: 'Greece',
+    userPosition: '37.9838,23.7275',
+    distances: JSON.stringify([{ activity: 'Run', distance: 42.195, unit: 'km' }]),
+    date: '2026-09-27',
+    startTime: '06:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Warsaw Bike to Work Challenge',
+    description: 'A weekly bike-to-work group ride across Warsaw. 20km commuter route with social breakfast at the finish. All bikes welcome.',
+    city: 'Warsaw',
+    country: 'Poland',
+    userPosition: '52.2297,21.0122',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 20, unit: 'km' }]),
+    date: '2026-10-10',
+    startTime: '07:30',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Poznań Triathlon Olympic',
+    description: 'Olympic triathlon at Malta lake: 1.5km swim, 40km bike, 10km run. Chip timing, podium ceremony, live music at finish.',
+    city: 'Poznań',
+    country: 'Poland',
+    userPosition: '52.4064,16.9252',
+    distances: JSON.stringify([
+      { activity: 'Swim', distance: 1.5, unit: 'km' },
+      { activity: 'Bike', distance: 40, unit: 'km' },
+      { activity: 'Run', distance: 10, unit: 'km' },
+    ]),
+    date: '2026-10-18',
+    startTime: '08:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Wrocław Autumn Bike Tour',
+    description: 'A leisurely 45km cycling tour through the autumn forests around Wrocław. Stunning fall foliage, coffee stop at a forest lodge.',
+    city: 'Wrocław',
+    country: 'Poland',
+    userPosition: '51.1079,17.0385',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 45, unit: 'km' }]),
+    date: '2026-10-25',
+    startTime: '09:30',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Milan Fashion Week Run',
+    description: 'Run through the fashion capital — 15km loop past the Duomo, Navigli canals, and Sempione Park. Stylish finishers t-shirt included.',
+    city: 'Milan',
+    country: 'Italy',
+    userPosition: '45.4642,9.1900',
+    distances: JSON.stringify([{ activity: 'Run', distance: 15, unit: 'km' }]),
+    date: '2026-11-01',
+    startTime: '09:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Gdańsk Amber Road Cycling',
+    description: 'A 90km cycling route following the historic Amber Road along the Baltic coast. Stunning dunes and sea views throughout.',
+    city: 'Gdańsk',
+    country: 'Poland',
+    userPosition: '54.3520,18.6466',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 90, unit: 'km' }]),
+    date: '2026-11-08',
+    startTime: '08:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Kraków Winter Swim',
+    description: 'Cold water swimming in the Vistula river. 1km for the brave. Medical support on site, warm drinks afterwards. Not for the faint-hearted!',
+    city: 'Kraków',
+    country: 'Poland',
+    userPosition: '50.0647,19.9450',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 1, unit: 'km' }]),
+    date: '2026-12-06',
+    startTime: '12:00',
+    level: 'Expert' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Berlin New Year Eve Run',
+    description: 'Ring in the new year with a midnight 10km run through the Tiergarten and past the Brandenburg Gate. Fireworks finish guaranteed.',
+    city: 'Berlin',
+    country: 'Germany',
+    userPosition: '52.5200,13.4050',
+    distances: JSON.stringify([{ activity: 'Run', distance: 10, unit: 'km' }]),
+    date: '2026-12-31',
+    startTime: '23:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Lublin Castle Cycling',
+    description: 'A 50km cycling loop around the historic Lublin castle and the surrounding countryside. Cobblestone streets and medieval scenery.',
+    city: 'Lublin',
+    country: 'Poland',
+    userPosition: '51.2465,22.5684',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 50, unit: 'km' }]),
+    date: '2026-12-13',
+    startTime: '10:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Sopot Beach Duathlon',
+    description: 'Duathlon on the famous Sopot beach: 5km run on sand, 25km coastal bike, 3km beach run finish. Unique seaside experience.',
+    city: 'Sopot',
+    country: 'Poland',
+    userPosition: '54.4418,18.5601',
+    distances: JSON.stringify([
+      { activity: 'Run', distance: 5, unit: 'km' },
+      { activity: 'Bike', distance: 25, unit: 'km' },
+      { activity: 'Run', distance: 3, unit: 'km' },
+    ]),
+    date: '2026-12-20',
+    startTime: '10:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+  {
+    name: 'Katowice Industrial Run',
+    description: 'A 12km run through Katowice\'s transformed industrial landscape — past repurposed coal mines, street art and modern architecture.',
+    city: 'Katowice',
+    country: 'Poland',
+    userPosition: '50.2649,19.0238',
+    distances: JSON.stringify([{ activity: 'Run', distance: 12, unit: 'km' }]),
+    date: '2026-11-22',
+    startTime: '09:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u5,
+    isPrivate: false,
+  },
+  {
+    name: 'Szczecin Oder River Swim',
+    description: 'Open water swimming in the Oder river with views of the Chrobry Embankment. 1km loop in calm, fresh water.',
+    city: 'Szczecin',
+    country: 'Poland',
+    userPosition: '53.4289,14.5530',
+    distances: JSON.stringify([{ activity: 'Swim', distance: 1, unit: 'km' }]),
+    date: '2026-11-29',
+    startTime: '11:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u1,
+    isPrivate: false,
+  },
+  {
+    name: 'Toruń Gingerbread City Run',
+    description: '10km run through the medieval old town of Toruń, birthplace of Copernicus. Famous gingerbread cookies at the finish line!',
+    city: 'Toruń',
+    country: 'Poland',
+    userPosition: '53.0138,18.5981',
+    distances: JSON.stringify([{ activity: 'Run', distance: 10, unit: 'km' }]),
+    date: '2026-12-19',
+    startTime: '10:00',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u2,
+    isPrivate: false,
+  },
+  {
+    name: 'Bydgoszcz Canal Cycling',
+    description: 'A leisurely 40km cycling tour along the famous Bydgoszcz Canal and the Brda river. Flat route, perfect for a family outing.',
+    city: 'Bydgoszcz',
+    country: 'Poland',
+    userPosition: '53.1235,18.0084',
+    distances: JSON.stringify([{ activity: 'Bike', distance: 40, unit: 'km' }]),
+    date: '2026-12-27',
+    startTime: '10:30',
+    level: 'Beginner' as const,
+    createdBy: USER_IDS.u3,
+    isPrivate: false,
+  },
+  {
+    name: 'Białystok Forest Trail Run',
+    description: 'Trail run through the Knyszyńska Primeval Forest near Białystok. 20km of soft forest trails and wildlife spotting opportunities.',
+    city: 'Białystok',
+    country: 'Poland',
+    userPosition: '53.1325,23.1688',
+    distances: JSON.stringify([{ activity: 'Run', distance: 20, unit: 'km' }]),
+    date: '2027-01-10',
+    startTime: '08:00',
+    level: 'Intermediate' as const,
+    createdBy: USER_IDS.u4,
+    isPrivate: false,
+  },
+];
 
-//   const newComments = await db
-//     .insert(comments)
-//     .values([
-//       {
-//         postId: newPosts[0].id,
-//         userId: newUsers[1].id,
-//         content: 'Great job on the run!',
-//         createdAt: '2023-10-01T12:00:00Z',
-//       },
-//       {
-//         postId: newPosts[1].id,
-//         userId: newUsers[0].id,
-//         content: 'Awesome bike ride!',
-//         createdAt: '2023-10-02T12:00:00Z',
-//       },
-//     ])
-//     .returning();
+// event index → participant user IDs (excluding host/creator)
+const attendeeMap: Record<number, string[]> = {
+  0: [USER_IDS.u2, USER_IDS.u3, USER_IDS.u5],
+  1: [USER_IDS.u1, USER_IDS.u4],
+  2: [USER_IDS.u1, USER_IDS.u2, USER_IDS.u4],
+  3: [USER_IDS.u2, USER_IDS.u5],
+  4: [USER_IDS.u1, USER_IDS.u3],
+  5: [USER_IDS.u2, USER_IDS.u3, USER_IDS.u4],
+  6: [USER_IDS.u1, USER_IDS.u5],
+  7: [USER_IDS.u1, USER_IDS.u2, USER_IDS.u4],
+  8: [USER_IDS.u2, USER_IDS.u3],
+  9: [USER_IDS.u1, USER_IDS.u4, USER_IDS.u5],
+  10: [USER_IDS.u3, USER_IDS.u5],
+  11: [USER_IDS.u1, USER_IDS.u2, USER_IDS.u4],
+  12: [USER_IDS.u2, USER_IDS.u4],
+  13: [USER_IDS.u1, USER_IDS.u3, USER_IDS.u5],
+  14: [USER_IDS.u3, USER_IDS.u4],
+  15: [USER_IDS.u2, USER_IDS.u5],
+  16: [USER_IDS.u1, USER_IDS.u2],
+  17: [USER_IDS.u3, USER_IDS.u4, USER_IDS.u5],
+  18: [USER_IDS.u1, USER_IDS.u2, USER_IDS.u3],
+  19: [USER_IDS.u4, USER_IDS.u5],
+  20: [USER_IDS.u1, USER_IDS.u2, USER_IDS.u3],
+  21: [USER_IDS.u3, USER_IDS.u4, USER_IDS.u5],
+  22: [USER_IDS.u1, USER_IDS.u4],
+  23: [USER_IDS.u2, USER_IDS.u5],
+  24: [USER_IDS.u1, USER_IDS.u3, USER_IDS.u5],
+  25: [USER_IDS.u2, USER_IDS.u4],
+  26: [USER_IDS.u1, USER_IDS.u3],
+  27: [USER_IDS.u2, USER_IDS.u4, USER_IDS.u5],
+  28: [USER_IDS.u1, USER_IDS.u2],
+  29: [USER_IDS.u3, USER_IDS.u5],
+  30: [USER_IDS.u1, USER_IDS.u4, USER_IDS.u5],
+  31: [USER_IDS.u2, USER_IDS.u3],
+  32: [USER_IDS.u1, USER_IDS.u4],
+  33: [USER_IDS.u2, USER_IDS.u5],
+  34: [USER_IDS.u3, USER_IDS.u4, USER_IDS.u5],
+  35: [USER_IDS.u1, USER_IDS.u2],
+  36: [USER_IDS.u3, USER_IDS.u5],
+  37: [USER_IDS.u1, USER_IDS.u2, USER_IDS.u4],
+  38: [USER_IDS.u3, USER_IDS.u5],
+  39: [USER_IDS.u1, USER_IDS.u4],
+  40: [USER_IDS.u2, USER_IDS.u3, USER_IDS.u5],
+  41: [USER_IDS.u1, USER_IDS.u4],
+  42: [USER_IDS.u2, USER_IDS.u5],
+  43: [USER_IDS.u3, USER_IDS.u4],
+  44: [USER_IDS.u1, USER_IDS.u2, USER_IDS.u3],
+  45: [USER_IDS.u4, USER_IDS.u5],
+  46: [USER_IDS.u1, USER_IDS.u3],
+  47: [USER_IDS.u2, USER_IDS.u4, USER_IDS.u5],
+  48: [USER_IDS.u1, USER_IDS.u3],
+  49: [USER_IDS.u2, USER_IDS.u4],
+};
 
-//   const newEventAttendees = await db
-//     .insert(eventAttendees)
-//     .values([
-//       {
-//         eventId: newEvents[0].id,
-//         attendeeId: newUsers[1].id,
-//       },
-//       {
-//         eventId: newEvents[1].id,
-//         attendeeId: newUsers[0].id,
-//       },
-//     ])
-//     .returning();
+// Reviews only for past events (indices 0-6)
+// Format: [reviewerIdx (from attendees incl. host), targetIdx, rating, comment]
+const reviewTemplates = [
+  { rating: 5, comment: 'Amazing event! Great organization and wonderful atmosphere.' },
+  { rating: 4, comment: 'Really enjoyed the route. Will definitely come back next time.' },
+  { rating: 5, comment: 'Perfect pace and very friendly group. Highly recommended!' },
+  { rating: 3, comment: 'Good event overall, though the start was a bit disorganized.' },
+  { rating: 5, comment: 'Best training session I\'ve had this season. Top notch!' },
+  { rating: 4, comment: 'Great effort from everyone. Looking forward to the next one.' },
+  { rating: 5, comment: 'Incredible scenery and super supportive group. 10/10!' },
+];
 
-//   const newChecklists = await db
-//     .insert(checklists)
-//     .values([
-//       {
-//         eventId: newEvents[0].id,
-//         userId: newUsers[0].id,
-//         eventStartDate: '2023-12-01',
-//       },
-//       {
-//         eventId: newEvents[1].id,
-//         userId: newUsers[1].id,
-//         eventStartDate: '2023-11-01',
-//       },
-//     ])
-//     .returning();
+async function seed() {
+  console.log('🌱 Starting seed...');
 
-//   const newChecklistItems = await db
-//     .insert(checklistItems)
-//     .values([
-//       {
-//         checklistId: newChecklists[0].id,
-//         name: 'Running Shoes',
-//         status: 'Pending',
-//         amount: 1,
-//       },
-//       {
-//         checklistId: newChecklists[1].id,
-//         name: 'Bike Helmet',
-//         status: 'Pending',
-//         amount: 1,
-//       },
-//     ])
-//     .returning();
-// }
+  // 1. Clear data in dependency order
+  console.log('  Clearing existing data...');
+  await db.delete(reviews);
+  await db.delete(eventAttendees);
+  await db.delete(trainingEvents);
+  await db.delete(users);
 
-// seedDatabase().catch(console.error);
+  // 2. Insert users
+  console.log('  Inserting users...');
+  await db.insert(users).values(seedUsers);
+
+  // 3. Insert training events
+  console.log('  Inserting training events...');
+  const insertedEvents = await db.insert(trainingEvents).values(seedEvents).returning({ id: trainingEvents.id });
+
+  // 4. Insert attendees
+  console.log('  Inserting event attendees...');
+  const now = new Date();
+  for (let i = 0; i < insertedEvents.length; i++) {
+    const eventId = insertedEvents[i].id;
+    const creatorId = seedEvents[i].createdBy;
+    const participants = (attendeeMap[i] ?? []).filter((id) => id !== creatorId);
+
+    const attendeeRows = [
+      {
+        eventId,
+        attendeeId: creatorId,
+        status: 'confirmed' as const,
+        isHost: true,
+        createdAt: now,
+      },
+      ...participants.map((userId) => ({
+        eventId,
+        attendeeId: userId,
+        status: 'confirmed' as const,
+        isHost: false,
+        createdAt: now,
+      })),
+    ];
+
+    await db.insert(eventAttendees).values(attendeeRows);
+  }
+
+  // 5. Insert reviews for past events (indices 0-6)
+  console.log('  Inserting reviews...');
+  const reviewRows = [];
+  for (let i = 0; i < 7; i++) {
+    const eventId = insertedEvents[i].id;
+    const creatorId = seedEvents[i].createdBy;
+    const participants = attendeeMap[i] ?? [];
+    const allParticipants = [creatorId, ...participants];
+
+    // Each participant reviews the next one in the list (circular)
+    for (let j = 0; j < allParticipants.length; j++) {
+      const reviewerId = allParticipants[j];
+      const targetUserId = allParticipants[(j + 1) % allParticipants.length];
+      const template = reviewTemplates[(i + j) % reviewTemplates.length];
+      reviewRows.push({
+        eventId,
+        reviewerId,
+        targetUserId,
+        rating: template.rating,
+        comment: template.comment,
+      });
+    }
+  }
+  await db.insert(reviews).values(reviewRows);
+
+  console.log(`✅ Seed complete!`);
+  console.log(`   Users: ${seedUsers.length}`);
+  console.log(`   Training events: ${insertedEvents.length}`);
+  console.log(`   Attendee records: inserted`);
+  console.log(`   Reviews: ${reviewRows.length} (on past events)`);
+  console.log('');
+  console.log('   Demo login credentials (development only):');
+  console.log('     Username: test1  Password: pass');
+  console.log('     Username: test2  Password: pass');
+}
+
+seed().catch(console.error);

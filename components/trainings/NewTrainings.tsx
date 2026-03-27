@@ -112,11 +112,7 @@ export default function NewTrainings({
 
   return (
     <div className="flex flex-col items-center gap-4 p-4 lg:p-8">
-
-      {/* ===== MOBILE HEADER (hidden on desktop) ===== */}
       <div className="lg:hidden w-full space-y-3">
-
-        {/* Search panel — full width, stacked */}
         <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-4 space-y-2">
           <input
             className="input input-bordered h-9 w-full text-sm text-black"
@@ -156,7 +152,6 @@ export default function NewTrainings({
           </div>
         </div>
 
-        {/* Controls: segmented pill (Filters | Show Map) */}
         <div className="flex gap-1 p-1 bg-base-200 rounded-2xl">
           <button
             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors duration-200 ${
@@ -180,7 +175,6 @@ export default function NewTrainings({
           </button>
         </div>
 
-        {/* Collapsible filters panel — CSS transition slide-in */}
         <div
           className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
             showMobileFilters
@@ -208,7 +202,6 @@ export default function NewTrainings({
         </div>
       </div>
 
-      {/* ===== MOBILE CONTENT: list or map ===== */}
       <div className="lg:hidden w-full">
         {showMap ? (
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden h-[70vh]">
@@ -230,9 +223,7 @@ export default function NewTrainings({
         )}
       </div>
 
-      {/* ===== DESKTOP LAYOUT: 3 columns (unchanged) ===== */}
       <div className="hidden lg:flex flex-row items-start justify-center max-w-full gap-8 w-full">
-        {/* Left: Filters sidebar */}
         <div className="w-1/6 xl:w-1/5">
           <div className="overflow-y-auto max-h-[80vh] space-y-6 rounded-xl bg-base-100 p-6">
             <h1 className="text-2xl font-bold text-black">{t('filters')}</h1>
@@ -254,7 +245,6 @@ export default function NewTrainings({
           </div>
         </div>
 
-        {/* Center: Events list */}
         <div className="w-3/6 xl:w-2/5">
           <div className="no-scrollbar overflow-y-auto max-h-[70vh] pr-4 space-y-6 rounded-xl bg-base-100 p-6">
             <TrainingEventList
@@ -266,9 +256,8 @@ export default function NewTrainings({
           </div>
         </div>
 
-        {/* Right: Map */}
         <div className="w-2/6 xl:w-2/5 sticky top-0">
-          <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden h-[70vh]">
             <TrainingMapView
               userPosition={userPosition}
               events={filteredEvents}

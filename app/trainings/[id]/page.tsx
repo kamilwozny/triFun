@@ -2,7 +2,14 @@ import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
 import { auth } from '@/app/auth';
 import { SignupButton } from '@/components/signupButton/SignupButton';
-import { FaMapMarkerAlt, FaCalendarAlt, FaUserFriends, FaRoute } from 'react-icons/fa';
+import {
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaUserFriends,
+  FaRoute,
+  FaArrowLeft,
+} from 'react-icons/fa';
+import Link from 'next/link';
 import { MdSportsScore } from 'react-icons/md';
 import RouteMap from '@/components/map/RouteMapClient';
 
@@ -47,6 +54,13 @@ export default async function TrainingPage({
 
   return (
     <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-8">
+      <Link
+        href="/trainings"
+        className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
+      >
+        <FaArrowLeft className="h-3 w-3" />
+        {t('backToList')}
+      </Link>
       <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
         <div className="flex justify-between items-start">
           <div>
@@ -90,7 +104,7 @@ export default async function TrainingPage({
               {activityIcons[dist.activity as keyof typeof activityIcons]}
               <div>
                 <span className="block text-lg font-semibold text-neutral-800">
-                  {dist.activity}
+                  {t(dist.activity.toLowerCase())}
                 </span>
                 <span className="text-neutral-600 text-lg">
                   {dist.distance} {dist.unit}
@@ -113,7 +127,11 @@ export default async function TrainingPage({
             routeGeoJson={training.routeGeoJson}
             activityColor={(() => {
               const first = parseDistances(training.distances)[0]?.activity;
-              return first === 'Run' ? '#FF2E63' : first === 'Swim' ? '#00BBF9' : '#9B5DE5';
+              return first === 'Run'
+                ? '#FF2E63'
+                : first === 'Swim'
+                  ? '#00BBF9'
+                  : '#9B5DE5';
             })()}
           />
         </div>
@@ -131,9 +149,7 @@ export default async function TrainingPage({
             attendees?.find((attendee) => attendee.id === user?.id) ? (
               <button>{t('inviteFriends')}</button>
             ) : (
-              training.createdBy !== user?.id && (
-                <SignupButton eventId={id} />
-              )
+              training.createdBy !== user?.id && <SignupButton eventId={id} />
             )
           ) : null}
         </div>
@@ -142,7 +158,7 @@ export default async function TrainingPage({
           <table className="table w-full">
             <thead>
               <tr>
-                <th className="bg-neutral-100 rounded-l-lg">
+                <th className="bg-neutral-100 rounded-l-lg pl-16">
                   {t('participant')}
                 </th>
                 <th className="bg-neutral-100">{t('status')}</th>
@@ -155,7 +171,7 @@ export default async function TrainingPage({
               {attendees?.map((attendee: Attendee) => (
                 <tr key={attendee.id} className="hover:bg-neutral-50">
                   <td className="py-4">
-                    <div className="flex items-center gap-3">
+                    <div className="flex gap-3">
                       <div className="avatar placeholder">
                         <div className="text-white rounded-full w-10">
                           <span className="text-lg">
@@ -177,7 +193,7 @@ export default async function TrainingPage({
                     <div className="flex items-center gap-3">
                       <div>
                         <div className="font-semibold text-neutral-800">
-                          {attendee.status}
+                          {t(attendee.status)}
                         </div>
                       </div>
                     </div>

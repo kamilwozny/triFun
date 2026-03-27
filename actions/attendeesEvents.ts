@@ -25,8 +25,8 @@ export async function signUpForEvent(eventId: string) {
       .where(
         and(
           eq(eventAttendees.eventId, eventId),
-          eq(eventAttendees.attendeeId, session.user.id)
-        )
+          eq(eventAttendees.attendeeId, session.user.id),
+        ),
       )
       .limit(1)
       .execute();
