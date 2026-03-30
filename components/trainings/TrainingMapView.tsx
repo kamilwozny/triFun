@@ -3,11 +3,12 @@
 import { useMemo } from 'react';
 import type { LatLng } from 'leaflet';
 import { TrainingEvent } from '@/types/training';
+import type { GeoPosition } from '@/hooks/useGeolocation';
 import MapSkeleton from '../skeletons/MapSkeleton';
 import Map from '@/components/map/Map';
 
 interface TrainingMapViewProps {
-  userPosition: LatLng | null;
+  userPosition: GeoPosition | null;
   events: TrainingEvent[];
   selectedTraining: string | null;
 }
