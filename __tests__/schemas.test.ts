@@ -11,9 +11,14 @@ describe('loginAuthSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects password shorter than 6 characters', () => {
-    const result = loginAuthSchema.safeParse({ email: 'user@example.com', password: '123' });
+  it('rejects password shorter than 3 characters', () => {
+    const result = loginAuthSchema.safeParse({ email: 'user@example.com', password: 'ab' });
     expect(result.success).toBe(false);
+  });
+
+  it('accepts password of exactly 3 characters (minimum)', () => {
+    const result = loginAuthSchema.safeParse({ email: 'user@example.com', password: '123' });
+    expect(result.success).toBe(true);
   });
 
   it('rejects missing email', () => {
