@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
-import type { LatLng } from 'leaflet';
+
+export interface GeoPosition {
+  lat: number;
+  lng: number;
+}
 
 export function useGeolocation() {
-  const [userPosition, setUserPosition] = useState<LatLng | null>(null);
+  const [userPosition, setUserPosition] = useState<GeoPosition | null>(null);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -11,7 +15,7 @@ export function useGeolocation() {
           setUserPosition({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          } as LatLng);
+          });
         },
         (error) => {
           console.error('Error getting geolocation:', error);

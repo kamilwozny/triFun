@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { TrainingEvent } from '@/types/training';
 
 interface TrainingEventsContextType {
@@ -32,10 +32,6 @@ export function TrainingEventsProvider({
   initialEvents,
 }: TrainingEventsProviderProps) {
   const [events, setEvents] = useState<TrainingEvent[]>(initialEvents);
-
-  useEffect(() => {
-    setEvents(initialEvents);
-  }, [initialEvents]);
 
   return (
     <TrainingEventsContext.Provider value={{ events, setEvents }}>

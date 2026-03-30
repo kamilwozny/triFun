@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db/db';
-import { revalidateTrainings } from './revalidations';
+import { revalidateTrainingsList } from './revalidations';
 import { reviews, users, trainingEvents, eventAttendees } from '@/db/schema';
 import { alias } from 'drizzle-orm/sqlite-core';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -98,7 +98,7 @@ export async function createReviews(
         ),
       );
 
-      revalidateTrainings();
+      revalidateTrainingsList();
       return { success: true };
     }
 

@@ -32,24 +32,3 @@ export function useTrainingEventsFilter(events: TrainingEvent[], userId?: string
   };
 }
 
-export function useEventFiltering(
-  events: TrainingEvent[],
-  searchQuery: string,
-  selectedActivity: string | null
-) {
-  return useMemo(() => {
-    return events.filter((event) => {
-      const matchesSearch = searchQuery
-        ? event.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          event.country.toLowerCase().includes(searchQuery.toLowerCase())
-        : true;
-
-      const matchesActivity =
-        !selectedActivity || selectedActivity === 'All'
-          ? true
-          : event.activities.includes(selectedActivity);
-
-      return matchesSearch && matchesActivity;
-    });
-  }, [events, selectedActivity, searchQuery]);
-}

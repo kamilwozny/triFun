@@ -13,14 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
-const DISTANCES_SEARCH = [
-  { text: '10km', value: '10' },
-  { text: '20km', value: '20' },
-  { text: '30km', value: '30' },
-  { text: '50km', value: '50' },
-  { text: '100km', value: '100' },
-];
+import { DISTANCE_OPTIONS } from '@/helpers/constants';
 
 const RECENT_SEARCHES_KEY = 'trifun-recent-searches';
 const MAX_RECENT = 5;
@@ -147,9 +140,9 @@ export function NavbarSearchBar() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {DISTANCES_SEARCH.map((d) => (
+              {DISTANCE_OPTIONS.map((d) => (
                 <SelectItem key={d.value} value={d.value}>
-                  {d.text}
+                  {d.label}
                 </SelectItem>
               ))}
             </SelectContent>

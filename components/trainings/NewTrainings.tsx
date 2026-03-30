@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TRAININGS_FILTER_KEY } from '@/helpers/constants';
+import { TRAININGS_FILTER_KEY, DISTANCE_OPTIONS } from '@/helpers/constants';
 
 interface PersistedFilterState {
   eventType: AllFilters['eventType'];
@@ -174,9 +174,9 @@ export default function NewTrainings({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {[10, 20, 30, 50, 100].map((d) => (
-                    <SelectItem key={d} value={String(d)}>
-                      {d}km
+                  {DISTANCE_OPTIONS.map((d) => (
+                    <SelectItem key={d.value} value={d.value}>
+                      {d.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -26,6 +26,7 @@ import { EventTypeSelect } from '@/components/eventTypeSelect/EventTypeSelect';
 import Map from '@/components/map/Map';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { parseGPX, gpxToGeoJson } from '@/lib/gpx';
 import { ActivityRouteSection } from '@/components/trainings/ActivityRouteSection';
 
@@ -62,10 +63,7 @@ export default function CreateTrainingEvent() {
   const router = useRouter();
   const { t } = useTranslation();
   const { register, handleSubmit } = useForm<FormData>();
-  const [userPosition, setUserPosition] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const userPosition = useGeolocation();
   const [location, setLocation] = useState<Location>({});
   const [swimLocation, setSwimLocation] = useState<Location>({});
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
@@ -148,19 +146,6 @@ export default function CreateTrainingEvent() {
   };
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) =>
-          setUserPosition({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          }),
-        (err) => console.error('Error getting geolocation:', err),
-      );
-    }
-  }, []);
-
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
@@ -172,16 +157,6 @@ export default function CreateTrainingEvent() {
     if (isDatePickerOpen)
       document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isDatePickerOpen]);
-
-  useEffect(() => {
-    if (isDatePickerOpen) {
-      modalRef.current?.showModal();
-      document.body.style.overflow = 'hidden';
-    } else {
-      modalRef.current?.close();
-      document.body.style.overflow = 'unset';
-    }
   }, [isDatePickerOpen]);
 
   const handleDateSelect = (date: Date | undefined) => {

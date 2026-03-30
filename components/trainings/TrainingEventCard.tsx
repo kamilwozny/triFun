@@ -5,13 +5,7 @@ import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import { TrainingEvent } from '@/types/training';
 import { useTranslation } from 'react-i18next';
-import { TRAININGS_RETURN_URL_KEY } from '@/helpers/constants';
-
-const difficultyColors = {
-  Beginner: 'bg-green-100 text-green-800',
-  Intermediate: 'bg-yellow-100 text-yellow-800',
-  Expert: 'bg-red-100 text-red-800',
-};
+import { TRAININGS_RETURN_URL_KEY, DIFFICULTY_COLORS } from '@/helpers/constants';
 
 interface TrainingEventCardProps {
   event: TrainingEvent;
@@ -82,7 +76,7 @@ export function TrainingEventCard({
             </span>
             <span
               className={`mt-2 px-3 py-1 rounded-full text-xs font-medium ${
-                difficultyColors[event.level as keyof typeof difficultyColors]
+                DIFFICULTY_COLORS[event.level as keyof typeof DIFFICULTY_COLORS]
               }`}
             >
               {t(event.level.toLowerCase())}

@@ -5,6 +5,7 @@ import { eventAttendees, trainingEvents } from '@/db/schema';
 import { eq, gte, and } from 'drizzle-orm';
 import { getActivityKey, getWeekIndex, SportCounts } from '@/lib/statsUtils';
 import { unstable_cache } from 'next/cache';
+import { parseDistances } from '@/lib/utils';
 
 export type { SportCounts };
 
@@ -85,12 +86,7 @@ const _getProfileStatsCached = unstable_cache(
     }));
 
     for (const event of allEvents) {
-      let parsedDistances: { activity: string }[] = [];
-      try {
-        parsedDistances = JSON.parse(event.distances);
-      } catch {
-        parsedDistances = [];
-      }
+      const parsedDistances = parseDistances(event.distances);
 
       const weekIdx = Math.min(
         3,
