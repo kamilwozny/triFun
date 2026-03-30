@@ -58,6 +58,7 @@ export const Navbar = () => {
                       alt="Avatar"
                       width={36}
                       height={36}
+                      priority
                     />
                   ) : (
                     <div className="bg-foreground text-white text-md font-semibold rounded-full w-8">

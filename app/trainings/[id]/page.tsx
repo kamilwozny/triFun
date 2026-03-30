@@ -10,7 +10,9 @@ import { hasCurrentUserReviewedEvent } from '@/actions/reviews';
 import { FaMapMarkerAlt, FaCalendarAlt, FaUserFriends, FaRoute } from 'react-icons/fa';
 import { BackToListButton } from '@/components/trainings/BackToListButton';
 import { MdSportsScore } from 'react-icons/md';
+import { Suspense } from 'react';
 import RouteMap from '@/components/map/RouteMapClient';
+import MapSkeleton from '@/components/skeletons/MapSkeleton';
 
 import { Badge } from '@/components/ui/badge';
 import { getServerTranslation } from '@/localization/server';
@@ -128,17 +130,19 @@ export default async function TrainingPage({
               {t('route')}
             </h2>
           </div>
-          <RouteMap
-            routeGeoJson={training.routeGeoJson}
-            activityColor={(() => {
-              const first = parseDistances(training.distances)[0]?.activity;
-              return first === 'Run'
-                ? '#FF2E63'
-                : first === 'Swim'
-                  ? '#00BBF9'
-                  : '#9B5DE5';
-            })()}
-          />
+          <Suspense fallback={<MapSkeleton />}>
+            <RouteMap
+              routeGeoJson={training.routeGeoJson}
+              activityColor={(() => {
+                const first = parseDistances(training.distances)[0]?.activity;
+                return first === 'Run'
+                  ? '#FF2E63'
+                  : first === 'Swim'
+                    ? '#00BBF9'
+                    : '#9B5DE5';
+              })()}
+            />
+          </Suspense>
         </div>
       )}
 

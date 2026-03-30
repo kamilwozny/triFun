@@ -7,8 +7,7 @@ import { MapPin } from 'lucide-react';
 import { getProfileStats } from '@/actions/profileStats';
 import { getUserReviews } from '@/actions/reviews';
 import { ProfileStats } from '@/app/profile/components/ProfileStats';
-import { ActivityChart } from '@/app/profile/components/ActivityChart';
-import { UserReviewsClient } from '@/components/reviews/UserReviews';
+import { ActivityChart, UserReviewsClient } from '@/app/profile/components/DynamicComponents';
 import { getServerTranslation } from '@/localization/server';
 
 export default async function UserProfilePage({

@@ -11,6 +11,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.strava.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dgalywyr863hv.cloudfront.net',
+      },
     ],
   },
   async headers() {
