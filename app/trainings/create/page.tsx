@@ -271,16 +271,11 @@ export default function CreateTrainingEvent() {
       if (!location.city || !location.country) {
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.position.lat}&lon=${location.position.lng}`,
+            `/api/reverse-geocode?lat=${location.position.lat}&lon=${location.position.lng}`,
           );
           const geo = await response.json();
-          location.city =
-            geo.address.city ||
-            geo.address.town ||
-            geo.address.village ||
-            geo.address.suburb ||
-            '';
-          location.country = geo.address.country || '';
+          location.city = geo.city || '';
+          location.country = geo.country || '';
         } catch {}
       }
 

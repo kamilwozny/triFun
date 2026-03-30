@@ -6,6 +6,7 @@ import { ReviewModal } from './ReviewModal';
 import { VirtualizedTrainingList } from './VirtualizedTrainingList';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { getTodayMidnight } from '@/lib/utils';
 
 interface TrainingEventListProps {
   events: TrainingEvent[];
@@ -35,7 +36,7 @@ export function TrainingEventList({
   const showReviewButton = useCallback(
     (event: TrainingEvent) => {
       if (!userId) return false;
-      const isPast = new Date(event.date) < new Date();
+      const isPast = new Date(event.date) < getTodayMidnight();
       const isConfirmedAttendee =
         event.attendees?.some(
           (a) => a.attendeeId === userId && a.status === 'confirmed',

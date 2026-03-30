@@ -119,6 +119,25 @@ export async function approveAttendee(
       return { success: false, error: 'Not authorized' };
     }
 
+    // Prevent removing already-confirmed attendees
+    if (action === 'decline') {
+      const attendee = await db
+        .select({ status: eventAttendees.status })
+        .from(eventAttendees)
+        .where(
+          and(
+            eq(eventAttendees.eventId, eventId),
+            eq(eventAttendees.attendeeId, attendeeId),
+          ),
+        )
+        .limit(1)
+        .execute();
+
+      if (attendee[0]?.status === 'confirmed') {
+        return { success: false, error: 'Cannot decline an already-confirmed attendee' };
+      }
+    }
+
     const newStatus = action === 'confirm' ? 'confirmed' : 'declined';
 
     await db

@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import { TrainingEvent } from '@/types/training';
 import { useTranslation } from 'react-i18next';
-
-const RETURN_URL_STORAGE_KEY = 'trainings-return-url';
+import { TRAININGS_RETURN_URL_KEY } from '@/helpers/constants';
 
 const difficultyColors = {
   Beginner: 'bg-green-100 text-green-800',
@@ -30,7 +29,7 @@ export function TrainingEventCard({
 
   const handleCardClick = useCallback(() => {
     sessionStorage.setItem(
-      RETURN_URL_STORAGE_KEY,
+      TRAININGS_RETURN_URL_KEY,
       window.location.pathname + window.location.search,
     );
     router.push(`/trainings/${event.id}`);

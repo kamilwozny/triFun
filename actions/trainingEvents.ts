@@ -69,7 +69,7 @@ export async function createNewTrainingEvent(
     }
   } catch (error) {
     console.error('Error creating training event:', error);
-    throw error;
+    return { success: false, error: 'Failed to create training event' };
   }
 }
 
@@ -115,7 +115,12 @@ export async function getTrainingEvents({
 
     return events.map((event) => {
       const userPosition = event.userPosition.split(',').map(Number);
-      const distances = JSON.parse(event.distances);
+      let distances: Array<{ activity: string; distance: number; unit: string }>;
+      try {
+        distances = JSON.parse(event.distances);
+      } catch {
+        distances = [];
+      }
       const activities = distances.map((d: { activity: string }) => d.activity);
 
       return {
@@ -129,6 +134,6 @@ export async function getTrainingEvents({
     });
   } catch (error) {
     console.error('Error fetching training events:', error);
-    throw new Error('Failed to fetch training events');
+    return [];
   }
 }

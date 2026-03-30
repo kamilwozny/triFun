@@ -32,26 +32,27 @@ const authOptions: NextAuthConfig = {
               password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials): Promise<User | null> {
-              const users = [
+              const devUsers = [
                 {
-                  id: 'test-user-1',
-                  userName: 'test1',
+                  id: process.env.DEV_TEST_USER_1_ID ?? 'test-user-1',
+                  userName: process.env.DEV_TEST_USER_1_NAME ?? 'test1',
                   name: 'Test 1',
-                  password: 'pass',
-                  email: 'test1@donotreply.com',
+                  password: process.env.DEV_TEST_USER_1_PASSWORD,
+                  email: process.env.DEV_TEST_USER_1_EMAIL ?? 'test1@donotreply.com',
                 },
                 {
-                  id: 'test-user-2',
-                  userName: 'test2',
+                  id: process.env.DEV_TEST_USER_2_ID ?? 'test-user-2',
+                  userName: process.env.DEV_TEST_USER_2_NAME ?? 'test2',
                   name: 'Test 2',
-                  password: 'pass',
-                  email: 'test2@donotreply.com',
+                  password: process.env.DEV_TEST_USER_2_PASSWORD,
+                  email: process.env.DEV_TEST_USER_2_EMAIL ?? 'test2@donotreply.com',
                 },
               ];
-              const user = users.find(
-                (user) =>
-                  user.userName === credentials.username &&
-                  user.password === credentials.password,
+              const user = devUsers.find(
+                (u) =>
+                  u.password &&
+                  u.userName === credentials.username &&
+                  u.password === credentials.password,
               );
               return user
                 ? { id: user.id, name: user.name, email: user.email }

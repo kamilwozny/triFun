@@ -3,8 +3,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa';
-
-const RETURN_URL_STORAGE_KEY = 'trainings-return-url';
+import { TRAININGS_RETURN_URL_KEY } from '@/helpers/constants';
 
 interface BackToListButtonProps {
   label: string;
@@ -14,7 +13,7 @@ export function BackToListButton({ label }: BackToListButtonProps) {
   const router = useRouter();
 
   const handleBack = useCallback(() => {
-    const saved = sessionStorage.getItem(RETURN_URL_STORAGE_KEY);
+    const saved = sessionStorage.getItem(TRAININGS_RETURN_URL_KEY);
     router.push(saved || '/trainings');
   }, [router]);
 

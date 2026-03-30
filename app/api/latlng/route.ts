@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
   const response = await fetch(url, {
-    headers: { 'User-Agent': 'TriFun (kamil.wozny@edu.uekat.pl)' },
+    headers: { 'User-Agent': 'TriFun/1.0' },
   });
   if (!response.ok) {
     return Response.json([], { status: 200 });
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   const boundsResponse = await fetch(
     `https://nominatim.openstreetmap.org/search?country=${countryCode}&format=json`,
     {
-      headers: { 'User-Agent': 'TriFun (kamil.wozny@edu.uekat.pl)' },
+      headers: { 'User-Agent': 'TriFun/1.0' },
     },
   );
   if (!boundsResponse.ok) {

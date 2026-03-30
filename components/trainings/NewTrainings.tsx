@@ -32,8 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
-const FILTER_STORAGE_KEY = 'trainings-filter-state';
+import { TRAININGS_FILTER_KEY } from '@/helpers/constants';
 
 interface PersistedFilterState {
   eventType: AllFilters['eventType'];
@@ -42,7 +41,7 @@ interface PersistedFilterState {
 
 function readSavedFilters(): PersistedFilterState | null {
   try {
-    const raw = sessionStorage.getItem(FILTER_STORAGE_KEY);
+    const raw = sessionStorage.getItem(TRAININGS_FILTER_KEY);
     if (raw) return JSON.parse(raw) as PersistedFilterState;
   } catch {}
   return null;
@@ -88,7 +87,7 @@ export default function NewTrainings({
   useEffect(() => {
     try {
       sessionStorage.setItem(
-        FILTER_STORAGE_KEY,
+        TRAININGS_FILTER_KEY,
         JSON.stringify({ eventType: filters.eventType, sports: filters.sports }),
       );
     } catch {}

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { COOKIE_NAME, SECRET_AUTH } from './contants';
+import { COOKIE_NAME, SECRET_AUTH } from './constants';
 import { cookies } from 'next/headers';
 
 export const getUserIdFromToken = async (): Promise<string | null> => {

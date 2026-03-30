@@ -2,7 +2,7 @@
 
 import { db } from '@/db/db';
 import { revalidateTrainings } from './revalidations';
-import { reviews, users, trainingEvents } from '@/db/schema';
+import { reviews, users, trainingEvents, eventAttendees } from '@/db/schema';
 import { alias } from 'drizzle-orm/sqlite-core';
 import { and, eq, inArray } from 'drizzle-orm';
 import { auth } from '@/app/auth';
@@ -27,6 +27,38 @@ export async function createReviews(
     .map((r) => ({ ...r, reviewerId }));
 
   if (safeData.length === 0) return { success: false };
+
+  const eventId = safeData[0].eventId;
+
+  // Verify the event exists and has already occurred
+  const event = await db
+    .select({ date: trainingEvents.date, createdBy: trainingEvents.createdBy })
+    .from(trainingEvents)
+    .where(eq(trainingEvents.id, eventId))
+    .limit(1);
+
+  if (!event[0]) return { success: false, error: 'Event not found' };
+  if (new Date(event[0].date) >= new Date()) {
+    return { success: false, error: 'Cannot review an event that has not occurred yet' };
+  }
+
+  // Verify the reviewer was a confirmed attendee
+  const attendeeRow = await db
+    .select({ status: eventAttendees.status })
+    .from(eventAttendees)
+    .where(
+      and(
+        eq(eventAttendees.eventId, eventId),
+        eq(eventAttendees.attendeeId, reviewerId),
+        eq(eventAttendees.status, 'confirmed'),
+      ),
+    )
+    .limit(1);
+
+  const isHost = event[0].createdBy === reviewerId;
+  if (!isHost && attendeeRow.length === 0) {
+    return { success: false, error: 'Only confirmed attendees can submit reviews' };
+  }
 
   try {
     const result = await db.insert(reviews).values(safeData);
@@ -72,12 +104,40 @@ export async function createReviews(
 
     return { success: false };
   } catch (error) {
-    console.error('Error creating training event:', error);
-    throw error;
+    console.error('Error creating review:', error);
+    return { success: false, error: 'Failed to submit review' };
   }
 }
 
 export async function getReviewsForEvent(eventId: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error('Unauthorized');
+
+  const userId = session.user.id;
+
+  // Caller must be the event host or a confirmed attendee
+  const [eventRow, attendeeRow] = await Promise.all([
+    db
+      .select({ createdBy: trainingEvents.createdBy })
+      .from(trainingEvents)
+      .where(eq(trainingEvents.id, eventId))
+      .limit(1),
+    db
+      .select({ status: eventAttendees.status })
+      .from(eventAttendees)
+      .where(
+        and(
+          eq(eventAttendees.eventId, eventId),
+          eq(eventAttendees.attendeeId, userId),
+          eq(eventAttendees.status, 'confirmed'),
+        ),
+      )
+      .limit(1),
+  ]);
+
+  const isHost = eventRow[0]?.createdBy === userId;
+  if (!isHost && attendeeRow.length === 0) throw new Error('Forbidden');
+
   try {
     const reviewsList = await db
       .select()

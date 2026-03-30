@@ -8,5 +8,5 @@ export const loginAuthSchema = z.object({
 export const registerAuthSchema = z.object({
   username: z.string().min(4),
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(8),
 });

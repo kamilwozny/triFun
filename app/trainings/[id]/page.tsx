@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getTrainingEvent } from '@/actions/getTrainingEvent';
 import { getTrainingList } from '@/actions/trainingList';
 import { auth } from '@/app/auth';
@@ -13,7 +14,7 @@ import RouteMap from '@/components/map/RouteMapClient';
 
 import { Badge } from '@/components/ui/badge';
 import { getServerTranslation } from '@/localization/server';
-import { formatDateLong, parseDistances } from '@/lib/utils';
+import { formatDateLong, getTodayMidnight, parseDistances } from '@/lib/utils';
 import { activityIcons } from '@/lib/activityIcons';
 
 enum Difficulties {
@@ -43,20 +44,24 @@ export default async function TrainingPage({
 }) {
   const { id } = await params;
   const training = await getTrainingEvent(id);
-  const attendees = await getTrainingList(id);
+
+  if (!training) notFound();
+
   const session = await auth();
   const user = session?.user;
-  const isHost = training?.createdBy === user?.id;
-  const isPast = new Date(training.date) < new Date();
+  const isHost = training.createdBy === user?.id;
+  const attendees = await getTrainingList(id);
   const isUserParticipantOrHost =
     attendees?.some((a) => a.id === user?.id && a.status === 'confirmed') ?? false;
+
+  if (training.isPrivate && !isHost && !isUserParticipantOrHost) notFound();
+
+  const isPast = new Date(training.date) < getTodayMidnight();
   const hasReviewed =
     user?.id && isPast && isUserParticipantOrHost
       ? await hasCurrentUserReviewedEvent(id)
       : false;
   const { t } = await getServerTranslation();
-
-  if (!training) return <p>{t('trainingNotFound')}</p>;
 
   return (
     <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-8">

@@ -9,8 +9,7 @@ import {
 } from 'react-window';
 import { TrainingEvent } from '@/types/training';
 import { TrainingEventCard } from './TrainingEventCard';
-
-const SCROLL_STORAGE_KEY = 'trainings-scroll-row';
+import { TRAININGS_SCROLL_KEY } from '@/helpers/constants';
 
 interface RowData {
   events: TrainingEvent[];
@@ -68,7 +67,7 @@ export function VirtualizedTrainingList({
 
   const initialScrollRow = useRef(
     typeof window !== 'undefined'
-      ? Number(sessionStorage.getItem(SCROLL_STORAGE_KEY)) || 0
+      ? Number(sessionStorage.getItem(TRAININGS_SCROLL_KEY)) || 0
       : 0,
   );
 
@@ -97,7 +96,7 @@ export function VirtualizedTrainingList({
     (visibleRows: { startIndex: number; stopIndex: number }) => {
       if (isRestoringRef.current) return;
       sessionStorage.setItem(
-        SCROLL_STORAGE_KEY,
+        TRAININGS_SCROLL_KEY,
         String(visibleRows.startIndex),
       );
     },
@@ -107,7 +106,7 @@ export function VirtualizedTrainingList({
   useEffect(() => {
     if (filterVersion === 0) return;
     listRef.current?.scrollToRow({ index: 0, behavior: 'instant' });
-    sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+    sessionStorage.removeItem(TRAININGS_SCROLL_KEY);
   }, [filterVersion]);
 
   const rowProps = useMemo<RowData>(
