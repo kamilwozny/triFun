@@ -1,7 +1,7 @@
 export const DIFFICULTY_COLORS: Record<string, string> = {
-  Beginner: 'bg-green-100 text-green-800',
-  Intermediate: 'bg-yellow-100 text-yellow-800',
-  Expert: 'bg-red-100 text-red-800',
+  Beginner: 'bg-green-bg text-green-text border border-green-text/30',
+  Intermediate: 'bg-yellow-bg text-yellow-text border border-yellow-text/40',
+  Expert: 'bg-red-bg text-red-text border border-red-text/30',
 };
 
 export const DISTANCE_OPTIONS = [

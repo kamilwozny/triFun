@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import { TrainingEventList } from './TrainingEventList';
 import { TrainingMapView } from './TrainingMapView';
+import { CreateEventCTA } from './CreateEventCTA';
 import { EventTypeCheckboxes, EventTypeFilters } from './EventTypeCheckboxes';
 import { SportTypeFilters, SportType } from './SportTypeFilters';
 import { LocationSearch } from './LocationSearch';
@@ -238,7 +239,7 @@ export default function NewTrainings({
         </div>
       </div>
 
-      <div className="lg:hidden w-full">
+      <div className="lg:hidden w-full space-y-6">
         {showMap ? (
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden h-[70vh]">
             <TrainingMapView
@@ -258,10 +259,11 @@ export default function NewTrainings({
             />
           </div>
         )}
+        <CreateEventCTA />
       </div>
 
       <div className="hidden lg:flex flex-row items-start justify-center max-w-full gap-8 w-full">
-        <div className="w-1/6 xl:w-1/5">
+        <div className="w-1/6 xl:w-1/5 space-y-6">
           <div className="overflow-y-auto max-h-[80vh] space-y-6 rounded-xl bg-base-100 p-6">
             <h1 className="text-2xl font-bold text-black">{t('filters')}</h1>
             <Separator />
@@ -280,6 +282,7 @@ export default function NewTrainings({
               />
             </div>
           </div>
+          <CreateEventCTA />
         </div>
 
         <div className="w-3/6 xl:w-2/5">

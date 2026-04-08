@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { parseGPX, gpxToGeoJson } from '@/lib/gpx';
 import { ActivityRouteSection } from '@/components/trainings/ActivityRouteSection';
+import { BackToListButton } from '@/components/trainings/BackToListButton';
 
 interface DistanceData {
   activity: string;
@@ -303,9 +304,12 @@ export default function CreateTrainingEvent() {
 
   return (
     <div className="container mx-auto p-4 lg:p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-lg font-bold text-gray-800 mb-4">
-        {t('createNewEvent')}
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-gray-800">
+          {t('createNewEvent')}
+        </h2>
+        <BackToListButton label={t('backToList')} />
+      </div>
       {error && (
         <div className="alert alert-error mb-4">
           <FaExclamationTriangle />
