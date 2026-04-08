@@ -10,46 +10,49 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  getNotificationCount,
-  getRecentNotifications,
+  getNotificationPreview,
   markAllAsRead,
   type NotificationWithActor,
 } from '@/actions/notifications';
 import { useTranslation } from 'react-i18next';
 
-export function NotificationBell() {
+interface NotificationBellProps {
+  initialCount?: number;
+  initialItems?: NotificationWithActor[];
+}
+
+export function NotificationBell({
+  initialCount = 0,
+  initialItems = [],
+}: NotificationBellProps) {
   const { t } = useTranslation();
-  const [count, setCount] = useState(0);
-  const [notifications, setNotifications] = useState<NotificationWithActor[]>(
-    [],
-  );
+  const [count, setCount] = useState(initialCount);
+  const [notifications, setNotifications] =
+    useState<NotificationWithActor[]>(initialItems);
   const [open, setOpen] = useState(false);
   const [, startTransition] = useTransition();
 
-  const refreshCount = () => {
+  const refreshPreview = () => {
     startTransition(async () => {
-      const c = await getNotificationCount();
+      const { count: c, items } = await getNotificationPreview(3);
       setCount(c);
+      setNotifications(items);
     });
   };
 
   useEffect(() => {
-    refreshCount();
-    window.addEventListener('focus', refreshCount);
-    return () => window.removeEventListener('focus', refreshCount);
+    window.addEventListener('focus', refreshPreview);
+    return () => window.removeEventListener('focus', refreshPreview);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOpen = (isOpen: boolean) => {
     setOpen(isOpen);
-    if (isOpen) {
+    if (isOpen && count > 0) {
+      // Optimistically clear the badge; mark as read in the background.
+      setCount(0);
       startTransition(async () => {
-        const [recent] = await Promise.all([
-          getRecentNotifications(3),
-          markAllAsRead(),
-        ]);
-        setNotifications(recent);
-        setCount(0);
+        await markAllAsRead();
       });
     }
   };
@@ -143,6 +146,7 @@ export function NotificationBell() {
         <div className="border-t border-border">
           <Link
             href="/notifications"
+            prefetch
             onClick={() => setOpen(false)}
             className="block text-center text-sm py-3 text-primary hover:underline font-medium"
           >

@@ -76,14 +76,12 @@ export default function NewTrainings({
   const [showMap, setShowMap] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // Mobile search inputs are URL-driven — only initialise from URL params, not sessionStorage
   const [mobileSearch, setMobileSearch] = useState(initialSearch);
   const [mobileLocation, setMobileLocation] = useState(initialLocation);
   const [mobileRadius, setMobileRadius] = useState(
     initialRadius && initialRadius !== '0' ? initialRadius : '10',
   );
 
-  // Persist only the client-side filter state (eventType + sports)
   useEffect(() => {
     try {
       sessionStorage.setItem(
@@ -95,7 +93,6 @@ export default function NewTrainings({
 
   const debouncedFilters = useDebounce(filters, 400);
 
-  // filterVersion increments only on user-driven filter changes (not initial mount)
   const [filterVersion, setFilterVersion] = useState(0);
   const isFirstFilterChange = useRef(true);
   useEffect(() => {

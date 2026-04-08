@@ -16,9 +16,8 @@ import {
   FaClock,
   FaExclamationTriangle,
   FaRunning,
-  FaBicycle,
-  FaSwimmer,
 } from 'react-icons/fa';
+import { ACTIVITY_COLORS, ACTIVITY_CONFIG } from '@/components/trainings/activityConfig';
 import { format } from 'date-fns';
 import 'react-day-picker/style.css';
 import { DatePickerModal } from '@/components/datePickerModal/DatePickerModal';
@@ -46,18 +45,6 @@ interface FormData {
   startTime: string;
   isPrivate: boolean;
 }
-
-const ACTIVITY_COLORS: Record<string, string> = {
-  Run: '#FF2E63',
-  Bike: '#9B5DE5',
-  Swim: '#00BBF9',
-};
-
-const ACTIVITY_CONFIG = [
-  { key: 'Run', Icon: FaRunning, color: '#FF2E63' },
-  { key: 'Bike', Icon: FaBicycle, color: '#9B5DE5' },
-  { key: 'Swim', Icon: FaSwimmer, color: '#00BBF9' },
-];
 
 export default function CreateTrainingEvent() {
   const router = useRouter();
@@ -205,6 +192,14 @@ export default function CreateTrainingEvent() {
     if (!location.position && activity !== 'Swim') {
       setLocation((prev) => ({ ...prev, position: data.start }));
     }
+  };
+
+  const handleElevationUpdate = (activity: string, elevationGainM: number) => {
+    setActivityRoutes((prev) => {
+      const existing = prev[activity];
+      if (!existing) return prev;
+      return { ...prev, [activity]: { ...existing, elevationGainM } };
+    });
   };
 
   const clearRoute = (activity: string) => {
@@ -500,6 +495,11 @@ export default function CreateTrainingEvent() {
               onRouteChange={
                 drawingActivity
                   ? (data) => handleRouteChange(drawingActivity, data)
+                  : undefined
+              }
+              onElevationUpdate={
+                drawingActivity
+                  ? (gain) => handleElevationUpdate(drawingActivity, gain)
                   : undefined
               }
               animatedPoints={activeAnimatedPoints}

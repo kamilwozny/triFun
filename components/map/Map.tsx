@@ -11,6 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 import { useState } from 'react';
+import Link from 'next/link';
 import type { MapProps, MapMarker } from './types';
 import { LocationMarker } from './utils';
 import { icons, startIcon, endIcon, swimIcon } from './MarkerIcon';
@@ -22,6 +23,9 @@ import { CountryBoundsInitializer } from './CountryBoundsInitializer';
 import { LocationPickerController } from './LocationPickerController';
 import { AnimatedPolyline } from './AnimatedPolyline';
 import { RouteController } from './RouteController';
+import { getActivityConfig } from '@/components/trainings/activityConfig';
+import { formatDate } from '@/lib/utils';
+import { DIFFICULTY_COLORS } from '@/helpers/constants';
 
 function createClusterCustomIcon(cluster: any) {
   const count = cluster.getChildCount();
@@ -44,6 +48,7 @@ function Map({
   markers = [],
   routeMode = false,
   onRouteChange,
+  onElevationUpdate,
   displayRoute,
   animatedPoints,
   activityColor = '#9B5DE5',
@@ -61,7 +66,12 @@ function Map({
   const { t } = useTranslation();
 
   const mapKey =
-    routeMode || displayRoute || animatedPoints || pickPoint || swimPoint
+    routeMode ||
+    displayRoute ||
+    animatedPoints ||
+    pickPoint ||
+    swimPoint ||
+    staticRoutes.length > 0
       ? 'route-map'
       : `${markerPosition?.lat}-${markerPosition?.lng}`;
 
@@ -118,7 +128,7 @@ function Map({
         </div>
       )}
 
-      <div className="relative">
+      <div className="relative h-full">
         {routePhase === 'routing' && (
           <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-black/10 rounded pointer-events-none">
             <div className="bg-white rounded-lg px-4 py-2 shadow-lg flex items-center gap-2 text-sm font-medium">
@@ -165,6 +175,7 @@ function Map({
             !routeMode &&
             !displayRoute &&
             !animatedPoints &&
+            staticRoutes.length === 0 &&
             position && (
               <CountryBoundsInitializer lat={position.lat} lng={position.lng} />
             )}
@@ -191,6 +202,7 @@ function Map({
           {routeMode && onRouteChange && (
             <RouteController
               onRouteChange={onRouteChange}
+              onElevationUpdate={onElevationUpdate}
               onPhaseChange={setRoutePhase}
               activityColor={activityColor}
             />
@@ -249,15 +261,60 @@ function Map({
                 return (
                   <Marker key={index} position={marker.position} icon={icon}>
                     <Popup className="custom-popup">
-                      <div className="text-center">
-                        <h3 className="font-bold text-lg mb-1">
+                      <div className="w-[220px] space-y-2">
+                        <h3 className="font-bold text-base leading-tight line-clamp-2 m-0">
                           {marker.popup}
                         </h3>
-                        {marker.details && (
-                          <p className="text-sm text-gray-600">
-                            {marker.details}
-                          </p>
-                        )}
+                        <div className="flex items-center justify-between gap-2 text-xs text-gray-600">
+                          <span>
+                            {formatDate(marker.date)} · {marker.startTime}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              DIFFICULTY_COLORS[
+                                marker.level as keyof typeof DIFFICULTY_COLORS
+                              ] ?? ''
+                            }`}
+                          >
+                            {t(marker.level.toLowerCase())}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {marker.activities.map((activity, idx) => {
+                            const cfg = getActivityConfig(activity);
+                            const Icon = cfg?.Icon;
+                            const dist = marker.parsedDistances.find(
+                              (d) =>
+                                d.activity.toLowerCase() ===
+                                activity.toLowerCase(),
+                            );
+                            return (
+                              <span
+                                key={`${activity}-${idx}`}
+                                className="inline-flex items-center gap-1 text-xs"
+                                style={{ color: cfg?.color }}
+                              >
+                                {Icon && <Icon className="h-3 w-3" />}
+                                {dist && (
+                                  <span className="text-gray-700">
+                                    {dist.distance}
+                                    {t(dist.unit)}
+                                  </span>
+                                )}
+                              </span>
+                            );
+                          })}
+                        </div>
+                        <p className="text-[11px] text-gray-500 m-0 truncate">
+                          {marker.city}, {marker.country}
+                        </p>
+                        <Link
+                          href={`/trainings/${marker.id}`}
+                          prefetch
+                          className="btn btn-primary btn-xs w-full text-white"
+                        >
+                          {t('viewDetails')}
+                        </Link>
                       </div>
                     </Popup>
                   </Marker>

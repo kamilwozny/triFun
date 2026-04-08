@@ -142,5 +142,6 @@
   "somethingWentWrong": "Something went wrong",
   "eventCreatedSuccess": "Event created successfully!",
   "declined": "Declined",
-  "send": "Send"
+  "send": "Send",
+  "viewDetails": "View details"
 }

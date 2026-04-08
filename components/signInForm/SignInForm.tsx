@@ -100,59 +100,6 @@ export const SignInForm: React.FC = () => {
             alt="strava login"
           />
         </Button>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">{t('username')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="p-4 text-black w-80 focus-visible:ring-foreground"
-                      placeholder="johndoe@gmail.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">{t('password')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="p-4 text-black w-80 focus-visible:ring-foreground"
-                      placeholder="secret-password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              className="bg-foreground text-lg font-semibold p-4 w-full hover:bg-card-foreground"
-              type="submit"
-            >
-              {t('submit')}
-            </Button>
-          </form>
-          {error && <p className="mt-4 text-red-500 text-sm text-center">{error}</p>}
-          <div className="mt-6 text-center">
-            <Link
-              className="text-black hover:text-foreground transition-colors"
-              href="/signup"
-            >
-              {t('dontHaveAccount')}
-            </Link>
-          </div>
-        </Form>
       </div>
     </div>
   );

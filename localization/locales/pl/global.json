@@ -141,5 +141,6 @@
   "somethingWentWrong": "Coś poszło nie tak",
   "eventCreatedSuccess": "Wydarzenie zostało utworzone!",
   "declined": "Odrzucony",
-  "send": "Wyślij"
+  "send": "Wyślij",
+  "viewDetails": "Zobacz szczegóły"
 }

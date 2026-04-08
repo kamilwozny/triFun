@@ -45,17 +45,18 @@ export function useAdvancedEventFiltering(
   return useMemo(() => {
     const today = getTodayMidnight();
 
-    // Resolve the reference point for distance filtering:
-    // If a city is searched with a radius, use that city's coordinates (from any matching event).
-    // Otherwise fall back to the user's GPS position.
     let referencePoint: UserPosition | undefined;
     if (filters.location.city && filters.location.distanceKm > 0) {
       const cityEvent = events.find(
         (e) =>
-          e.city.toLowerCase() === filters.location.city.toLowerCase() && e.location,
+          e.city.toLowerCase() === filters.location.city.toLowerCase() &&
+          e.location,
       );
       if (cityEvent?.location) {
-        referencePoint = { lat: cityEvent.location.lat, lng: cityEvent.location.lng };
+        referencePoint = {
+          lat: cityEvent.location.lat,
+          lng: cityEvent.location.lng,
+        };
       }
     } else if (!filters.location.city) {
       referencePoint = userPosition;
@@ -76,7 +77,11 @@ export function useAdvancedEventFiltering(
       if (filters.eventType.showHostEvents && isUserHost) {
         matchesEventType = true;
       }
-      if (filters.eventType.showPlannedEvents && isUserAttendee && isUpcomingEvent) {
+      if (
+        filters.eventType.showPlannedEvents &&
+        isUserAttendee &&
+        isUpcomingEvent
+      ) {
         matchesEventType = true;
       }
       if (filters.eventType.showPastEvents && isPastEvent) {
@@ -96,21 +101,27 @@ export function useAdvancedEventFiltering(
         filters.sports.length === 0 ||
         filters.sports.some((sport) => event.activities.includes(sport));
 
-      // When doing a radius search from a city, distance handles the geo-filtering.
-      // Fall back to name-matching only when there's no distance radius set.
       let matchesCity: boolean;
       if (!filters.location.city) {
         matchesCity = true;
       } else if (filters.location.distanceKm > 0 && referencePoint) {
-        matchesCity = true; // distance filter covers this
+        matchesCity = true;
       } else {
         matchesCity =
-          event.city.toLowerCase().includes(filters.location.city.toLowerCase()) ||
-          event.country.toLowerCase().includes(filters.location.city.toLowerCase());
+          event.city
+            .toLowerCase()
+            .includes(filters.location.city.toLowerCase()) ||
+          event.country
+            .toLowerCase()
+            .includes(filters.location.city.toLowerCase());
       }
 
       let matchesDistance: boolean;
-      if (!referencePoint || filters.location.distanceKm === 0 || !event.location) {
+      if (
+        !referencePoint ||
+        filters.location.distanceKm === 0 ||
+        !event.location
+      ) {
         matchesDistance = true;
       } else {
         matchesDistance =

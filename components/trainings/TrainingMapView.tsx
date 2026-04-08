@@ -36,11 +36,18 @@ export function TrainingMapView({
         | 'swim';
 
       return {
+        id: event.id,
         position,
         popup: event.name,
-        details: `${event.city}, ${event.country}`,
         type: primaryActivity,
         selected: selectedTraining === event.id,
+        city: event.city,
+        country: event.country,
+        date: event.date,
+        startTime: event.startTime,
+        level: event.level,
+        activities: event.activities,
+        parsedDistances: event.parsedDistances,
       };
     });
   }, [events, selectedTraining]);
@@ -56,6 +63,7 @@ export function TrainingMapView({
       handleLocation={() => {}}
       events={events}
       markers={mapMarkers}
+      className="h-full"
     />
   );
 }

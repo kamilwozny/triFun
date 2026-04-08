@@ -32,7 +32,7 @@ export const SportTypeFilters = React.memo(function SportTypeFilters({
   };
 
   return (
-    <div className="space-y-2 flex flex-col gap-2">
+    <div className="space flex gap-4">
       {sportTypes.map((sport) => (
         <Button
           key={sport.value}

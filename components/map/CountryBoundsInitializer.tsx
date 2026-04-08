@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -12,8 +12,12 @@ export function CountryBoundsInitializer({
   lng: number;
 }) {
   const map = useMap();
+  const hasFittedRef = useRef(false);
 
   useEffect(() => {
+    if (hasFittedRef.current) return;
+    hasFittedRef.current = true;
+
     async function setCountryBounds() {
       if (!map) return;
       map.invalidateSize();

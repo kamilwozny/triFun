@@ -17,6 +17,63 @@ export type NotificationWithActor = {
   actor: { id: string; name: string | null; image: string | null } | null;
 };
 
+export async function getNotificationPreview(
+  limit = 3,
+): Promise<{ count: number; items: NotificationWithActor[] }> {
+  const session = await auth();
+  if (!session?.user?.id) return { count: 0, items: [] };
+
+  const userId = session.user.id;
+
+  const [unread, rows] = await Promise.all([
+    db
+      .select({ id: notifications.id })
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.userId, userId),
+          eq(notifications.isRead, false),
+        ),
+      ),
+    db
+      .select({
+        id: notifications.id,
+        type: notifications.type,
+        entityId: notifications.entityId,
+        entityType: notifications.entityType,
+        message: notifications.message,
+        href: notifications.href,
+        isRead: notifications.isRead,
+        createdAt: notifications.createdAt,
+        actorId: notifications.actorId,
+        actorName: users.name,
+        actorImage: users.image,
+      })
+      .from(notifications)
+      .leftJoin(users, eq(notifications.actorId, users.id))
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt))
+      .limit(limit),
+  ]);
+
+  return {
+    count: unread.length,
+    items: rows.map((r) => ({
+      id: r.id,
+      type: r.type,
+      entityId: r.entityId,
+      entityType: r.entityType,
+      message: r.message,
+      href: r.href,
+      isRead: r.isRead,
+      createdAt: r.createdAt,
+      actor: r.actorId
+        ? { id: r.actorId, name: r.actorName ?? null, image: r.actorImage ?? null }
+        : null,
+    })),
+  };
+}
+
 export async function getNotificationCount(): Promise<number> {
   const session = await auth();
   if (!session?.user?.id) return 0;

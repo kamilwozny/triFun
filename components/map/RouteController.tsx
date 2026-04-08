@@ -9,10 +9,12 @@ import { startIcon, endIcon } from './MarkerIcon';
 
 export function RouteController({
   onRouteChange,
+  onElevationUpdate,
   onPhaseChange,
   activityColor,
 }: {
   onRouteChange: (data: RouteResult) => void;
+  onElevationUpdate?: (elevationGainM: number) => void;
   onPhaseChange: (phase: 'pick-start' | 'pick-end' | 'routing' | 'done') => void;
   activityColor: string;
 }) {
@@ -39,15 +41,21 @@ export function RouteController({
 
         if (result) {
           setRoutePoints(result.points);
-          const elevationGainM = await getElevationGain(result.points);
           onRouteChange({
             ...result,
-            elevationGainM,
+            elevationGainM: 0,
             start: { lat: startPoint.lat, lng: startPoint.lng },
             end: { lat: e.latlng.lat, lng: e.latlng.lng },
           });
           const bounds = L.latLngBounds(result.points);
           map.fitBounds(bounds, { padding: [20, 20] });
+          onPhaseChange('done');
+
+          // Fire elevation lookup in background — non-blocking.
+          getElevationGain(result.points).then((elevationGainM) => {
+            if (elevationGainM > 0) onElevationUpdate?.(elevationGainM);
+          });
+          return;
         }
         onPhaseChange('done');
         return;

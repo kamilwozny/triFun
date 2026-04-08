@@ -28,7 +28,9 @@ export function LocationSearch({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const { t } = useTranslation();
 
-  const searchRef = useClickOutside<HTMLDivElement>(() => setShowSuggestions(false));
+  const searchRef = useClickOutside<HTMLDivElement>(() =>
+    setShowSuggestions(false),
+  );
 
   const filteredSuggestions = useMemo(() => {
     if (!searchInput) return [];
@@ -57,7 +59,11 @@ export function LocationSearch({
         break;
       case 'Enter':
         e.preventDefault();
-        if (showSuggestions && selectedIndex >= 0 && filteredSuggestions[selectedIndex]) {
+        if (
+          showSuggestions &&
+          selectedIndex >= 0 &&
+          filteredSuggestions[selectedIndex]
+        ) {
           setSearchInput(filteredSuggestions[selectedIndex].text);
           setShowSuggestions(false);
           setSelectedIndex(-1);
@@ -78,7 +84,10 @@ export function LocationSearch({
   }, [filteredSuggestions]);
 
   return (
-    <div className={`relative${className ? ` ${className}` : ''}`} ref={searchRef}>
+    <div
+      className={`relative${className ? ` ${className}` : ''}`}
+      ref={searchRef}
+    >
       <label className="input h-9 flex items-center gap-2">
         <svg
           className="h-[1em] opacity-50"
@@ -106,7 +115,7 @@ export function LocationSearch({
           onKeyDown={handleKeyDown}
           type="search"
           placeholder={t('searchByLocation')}
-          className="w-full text-black"
+          className="w-full text-black focus:outline-none"
           aria-label="Search locations"
           aria-controls="location-suggestions"
           aria-activedescendant={

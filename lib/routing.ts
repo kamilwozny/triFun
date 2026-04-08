@@ -19,8 +19,14 @@ export async function getOSRMRoute(
   profile: 'foot' | 'bike' = 'foot',
 ): Promise<OSRMRouteResult | null> {
   try {
-    const url = `https://router.project-osrm.org/route/v1/${profile}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
-    const res = await fetch(url);
+    const params = new URLSearchParams({
+      startLat: String(start.lat),
+      startLng: String(start.lng),
+      endLat: String(end.lat),
+      endLng: String(end.lng),
+      profile,
+    });
+    const res = await fetch(`/api/route?${params.toString()}`);
     if (!res.ok) return null;
     const data = await res.json();
     if (!data.routes?.length) return null;
@@ -43,10 +49,28 @@ export async function getOSRMRoute(
   }
 }
 
+const elevationCache = new Map<string, number>();
+
+function elevationCacheKey(points: [number, number][]): string {
+  if (points.length === 0) return '';
+  const s = points[0];
+  const e = points[points.length - 1];
+  const r = (n: number) => n.toFixed(4);
+  return `${r(s[0])},${r(s[1])}->${r(e[0])},${r(e[1])}:${points.length}`;
+}
+
 export async function getElevationGain(
   points: [number, number][],
 ): Promise<number> {
-  const sampled = samplePoints(points, 50);
+  const cacheKey = elevationCacheKey(points);
+  if (cacheKey && elevationCache.has(cacheKey)) {
+    return elevationCache.get(cacheKey)!;
+  }
+
+  const sampled = samplePoints(points, 25);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 6000);
+
   try {
     const res = await fetch('https://api.open-elevation.com/api/v1/lookup', {
       method: 'POST',
@@ -57,6 +81,7 @@ export async function getElevationGain(
           longitude: lng,
         })),
       }),
+      signal: controller.signal,
     });
     if (!res.ok) return 0;
     const data = await res.json();
@@ -69,8 +94,12 @@ export async function getElevationGain(
         gain += elevations[i] - elevations[i - 1];
       }
     }
-    return Math.round(gain);
+    const result = Math.round(gain);
+    if (cacheKey) elevationCache.set(cacheKey, result);
+    return result;
   } catch {
     return 0;
+  } finally {
+    clearTimeout(timeout);
   }
 }

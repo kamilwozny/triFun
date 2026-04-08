@@ -1,12 +1,19 @@
 import { LatLng } from 'leaflet';
-import { TrainingEvent } from '@/types/training';
+import { TrainingEvent, Level } from '@/types/training';
 
 export interface MapMarker {
+  id: string;
   position: LatLng;
   popup: string;
   selected?: boolean;
-  details?: string;
   type?: 'run' | 'bike' | 'swim';
+  city: string;
+  country: string;
+  date: string;
+  startTime: string;
+  level: Level;
+  activities: string[];
+  parsedDistances: { activity: string; distance: number; unit: string }[];
 }
 
 export interface MapBounds {
@@ -40,6 +47,7 @@ export interface MapProps {
   markers?: MapMarker[];
   routeMode?: boolean;
   onRouteChange?: (data: RouteResult) => void;
+  onElevationUpdate?: (elevationGainM: number) => void;
   displayRoute?: [number, number][];
   animatedPoints?: [number, number][];
   activityColor?: string;
